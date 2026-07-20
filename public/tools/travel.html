@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<title>근무지 내·외 출장비 정산 도구</title>
+<style>
+:root{--navy:#173f6b;--blue:#276da9;--pale:#edf5fb;--line:#d9e3ec;--text:#1d2b39;--muted:#6d7a87;--ok:#167347;--warn:#a86100;--danger:#b42318;--shadow:0 10px 28px rgba(27,64,97,.10)}
+*{box-sizing:border-box}body{margin:0;font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;background:#f3f7fa;color:var(--text)}button,input,select{font:inherit}
+header{background:linear-gradient(135deg,#14385e,#286da8);color:#fff;padding:26px 30px;box-shadow:0 6px 20px rgba(10,42,74,.18)}
+.header{max-width:1500px;margin:auto;display:flex;justify-content:space-between;gap:20px;align-items:center}h1{margin:0 0 6px;font-size:28px}.sub{font-size:14px;opacity:.84}.mock{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);padding:9px 13px;border-radius:999px;font-size:12px}
+main{max-width:1500px;margin:auto;padding:26px 22px 44px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}.step{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 15px;display:flex;gap:9px;align-items:center;color:var(--muted)}.step b{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--pale);color:var(--blue);font-size:12px}.step.active{border-color:#9abfe0;color:var(--navy)}.step.active b{background:var(--blue);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}.card-head{padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;align-items:center}.title{font-size:18px;font-weight:800;color:var(--navy)}.desc{font-size:13px;color:var(--muted);margin-top:4px}.body{padding:19px}
+.status{padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800}.wait{background:#fff3e0;color:var(--warn)}.ok{background:#e8f6ed;color:var(--ok)}
+.upload{border:2px dashed #aac5de;background:linear-gradient(#f9fcfe,#f0f7fc);border-radius:15px;min-height:165px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;cursor:pointer}.upload:hover{border-color:var(--blue);background:#edf6fd}.upload input{display:none}.icon{width:50px;height:50px;border-radius:15px;background:#dcecf9;color:var(--blue);display:grid;place-items:center;margin:0 auto 11px;font-size:24px;font-weight:900}.upload-title{font-weight:800;margin-bottom:5px}.upload-note{font-size:13px;color:var(--muted);line-height:1.55}.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:13px}.btn{border:0;border-radius:9px;padding:9px 13px;font-weight:750;cursor:pointer}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--blue);color:#fff}.soft{background:var(--pale);color:var(--navy)}.line{background:#fff;border:1px solid var(--line);color:var(--navy)}.danger{background:#fff1f0;color:var(--danger)}.file-state{margin-top:13px;padding:10px 12px;border-radius:10px;background:#f6f8fa;border:1px solid #e5eaef;color:var(--muted);font-size:13px}.file-state.ready{background:#edf8f2;border-color:#ccebd9;color:var(--ok)}.file-state.error{background:#fff1f0;border-color:#f0c8c5;color:var(--danger)}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.chip{background:#f1f5f8;border:1px solid #dfe7ed;color:#526474;font-size:11px;padding:5px 8px;border-radius:999px}
+.section{margin-top:20px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 11px}.section-title{font-size:18px;font-weight:800;color:var(--navy)}.section-note{font-size:13px;color:var(--muted)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.hint{background:#fff9e9;border:1px solid #efd68f;color:#73530e;border-radius:11px;padding:11px 13px;font-size:13px;line-height:1.55;margin-bottom:13px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px;background:#fff}table{border-collapse:separate;border-spacing:0;width:100%;min-width:1020px}th{position:sticky;top:0;z-index:1;background:#edf4fa;color:#294b6d;font-size:12px;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:center}td{font-size:13px;padding:8px;border-bottom:1px solid #edf0f3;text-align:center;white-space:nowrap}tbody tr:hover{background:#fafcff}td input,td select{width:100%;min-width:80px;padding:7px;border:1px solid #d7e0e8;border-radius:8px;background:#fff;text-align:center}td input.money{text-align:right}.empty{padding:31px;text-align:center;color:var(--muted);font-size:13px}.validation-box{margin:12px 0;padding:11px 13px;border-radius:10px;background:#edf8f2;border:1px solid #ccebd9;color:var(--ok);font-size:13px}.validation-box.bad{background:#fff1f0;border-color:#f0c8c5;color:var(--danger)}.invalid-row{background:#fff7f6!important}.allocation{display:flex;flex-direction:column;gap:2px;min-width:105px}.allocation strong{font-size:13px}.allocation small{font-size:11px}.allocation.ok small{color:var(--ok)}.allocation.bad{color:var(--danger)}
+.summary{background:linear-gradient(135deg,#153b64,#2369a4);color:#fff;border-radius:17px;padding:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:13px;box-shadow:var(--shadow)}.metric{padding:5px 12px;border-right:1px solid rgba(255,255,255,.18)}.metric:last-child{border-right:0}.metric small{display:block;opacity:.78;margin-bottom:5px}.metric strong{display:block;font-size:24px}.result th{background:#173f6a;color:#fff}.result td:nth-child(n+4){text-align:right;font-variant-numeric:tabular-nums}.total td{font-weight:900;background:#f0f6fb;color:var(--navy)}
+.department-panel{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 20px;margin-bottom:18px;box-shadow:var(--shadow)}.department-panel label{font-weight:800;color:var(--navy);white-space:nowrap}.department-panel input{flex:1;min-width:180px;padding:11px 13px;border:1px solid #cfdbe5;border-radius:10px;background:#fff}.department-panel small{color:var(--muted);font-size:12px;line-height:1.45}.download-panel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.download-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 5px 16px rgba(30,65,96,.06)}.download-box h3{margin:0 0 5px;color:var(--navy);font-size:16px}.download-box p{margin:0 0 13px;color:var(--muted);font-size:12px;line-height:1.5}.download-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.download-buttons .btn{min-height:42px}.btn.xlsx{background:#1f6f43;color:#fff}.btn.xlsx:hover{background:#185937}.btn.pdf{background:#a63131;color:#fff}.btn.pdf:hover{background:#842626}.mode-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}.mode-note{margin-bottom:12px;padding:10px 13px;border-radius:10px;background:#edf5fb;border:1px solid #cfe0ef;color:#315b7e;font-size:13px}.mode-note.temp{background:#fff7e8;border-color:#efd28c;color:#77540b}.result thead tr:first-child th{border-bottom:1px solid rgba(255,255,255,.35)}.result thead tr:nth-child(2) th{top:37px;background:#245781}.result th[rowspan="2"]{vertical-align:middle}
+@media(max-width:1000px){.grid,.steps,.download-panel{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.header{flex-direction:column;align-items:flex-start}.department-panel{align-items:stretch;flex-direction:column;gap:8px}}
+@media print{header,.steps,.grid,.card:has(#insideBody),.section-head .toolbar,.download-panel,.hint,.validation-box{display:none!important}main{padding:0}.section{margin:0}.summary{box-shadow:none}.table-wrap{overflow:visible;border:0}table{min-width:0}th{position:static}}
+</style>
+</head>
+<body>
+<header><div class="header"><div><h1>근무지 내·외 출장비 정산 도구</h1><div class="sub">출장 정산목록 업로드 → 검토·보정 → 구분별 출장목록 및 개인별 지급내역 생성</div></div><div class="mock">로컬 실행형 · 구분별 이어쓰기 · 일비 일괄배분 · 정상/임시 합산 · XLSX/PDF 4종 출력</div></div></header>
+<main>
+<div class="steps"><div class="step active"><b>1</b>출장목록 업로드</div><div class="step"><b>2</b>데이터 검토</div><div class="step"><b>3</b>여비 항목 보정</div><div class="step"><b>4</b>파일 다운로드</div></div>
+<div class="department-panel"><label for="departmentInput">소속</label><input id="departmentInput" oninput="updateDepartment(this.value)" placeholder="예: 회담지원과" type="text"/><small>처음 한 번 입력하면 모든 개인별 합계와 XLSX·PDF 출력물에 공통 적용됩니다.</small></div>
+<div class="grid">
+<section class="card"><div class="card-head"><div><div class="title">① 근무지 내 출장 정산목록</div><div class="desc">근무지 내 출장 자료를 업로드합니다.</div></div><span class="status wait" id="insideStatus">미업로드</span></div><div class="body">
+<label class="upload"><input accept=".xlsx" id="insideFile" type="file"/><div><div class="icon">↑</div><div class="upload-title">XLSX 파일을 선택하세요</div><div class="upload-note">첫 번째 시트뿐 아니라 헤더가 일치하는 모든 시트를 읽습니다.<br/>파일은 브라우저 안에서만 처리됩니다.</div><div class="actions"><span class="btn primary">파일 선택</span><button class="btn soft" onclick="loadDemo('inside',event)" type="button">예시 불러오기</button></div></div></label>
+<div class="file-state" id="insideFileState">선택된 파일이 없습니다.</div><div class="chips"><span class="chip">시작일</span><span class="chip">종료일</span><span class="chip">시간</span><span class="chip">출장지</span><span class="chip">출장자</span><span class="chip">출장목적</span><span class="chip">출장종류</span><span class="chip">결재상태</span><span class="chip">공용차량이용여부</span><span class="chip">지급여부</span><span class="chip">여비</span><span class="chip">예산과목</span></div>
+</div></section>
+<section class="card"><div class="card-head"><div><div class="title">② 근무지 외 출장 정산목록</div><div class="desc">근무지 외 출장 자료를 별도로 업로드합니다.</div></div><span class="status wait" id="outsideStatus">미업로드</span></div><div class="body">
+<label class="upload"><input accept=".xlsx" id="outsideFile" type="file"/><div><div class="icon">↑</div><div class="upload-title">XLSX 파일을 선택하세요</div><div class="upload-note">근무지 내 목록과 독립적으로 처리합니다.<br/>업로드 후 일비·식비·운임을 직접 배분합니다.</div><div class="actions"><span class="btn primary">파일 선택</span><button class="btn soft" onclick="loadDemo('outside',event)" type="button">예시 불러오기</button></div></div></label>
+<div class="file-state" id="outsideFileState">선택된 파일이 없습니다.</div><div class="chips"><span class="chip">시작일</span><span class="chip">종료일</span><span class="chip">시간</span><span class="chip">출장지</span><span class="chip">출장자</span><span class="chip">출장목적</span><span class="chip">출장종류</span><span class="chip">결재상태</span><span class="chip">공용차량이용여부</span><span class="chip">지급여부</span><span class="chip">여비</span><span class="chip">예산과목</span></div>
+</div></section>
+</div>
+<section class="section card"><div class="card-head"><div><div class="title">원본 데이터 검토</div><div class="desc">대상자·금액·지급 여부를 검토하고 수정합니다.</div></div><div class="toolbar"><button class="btn line" onclick="addRow('inside')">근무지 내 행 추가</button><button class="btn line" onclick="addRow('outside')">근무지 외 행 추가</button><button class="btn danger" onclick="resetAll()">전체 초기화</button></div></div><div class="body">
+<div class="hint">근무지 외 출장의 일비·식비·운임은 직접 입력합니다. 각 행의 배분 합계는 해당 행의 원본 여비를 초과할 수 없습니다. 출장자 한 칸에 여러 명이 <b>/</b> 또는 <b>,</b>로 입력된 경우 개인별 합계에서 자동 분리하고 금액을 인원수대로 균등 배분합니다.</div>
+<div class="section-head"><div><div class="section-title">근무지 내 출장</div><div class="section-note">여비 열을 출장자별로 합산합니다.</div></div></div>
+<div class="table-wrap"><table style="min-width:1220px"><thead><tr><th>시작일</th><th>종료일</th><th>시간</th><th>출장지</th><th>출장자</th><th>출장목적</th><th>출장종류</th><th>결재상태</th><th>공용차량</th><th>지급여부</th><th>여비</th><th>예산과목</th><th>삭제</th></tr></thead><tbody id="insideBody"></tbody></table><div class="empty" id="insideEmpty">근무지 내 출장 자료가 없습니다.</div></div>
+<div class="section-head" style="margin-top:21px"><div><div class="section-title">근무지 외 출장</div><div class="section-note">배분 합계와 원본 여비의 잔액을 실시간 검증합니다.</div></div><div class="toolbar"><button class="btn soft" onclick="allocateOutsideAllToDaily()">전체 여비를 일비로 배분</button></div></div>
+<div class="validation-box" id="outsideValidation">모든 근무지 외 출장 행이 원본 여비 한도 이내입니다.</div>
+<div class="table-wrap"><table style="min-width:1580px"><thead><tr><th>시작일</th><th>종료일</th><th>시간</th><th>출장지</th><th>출장자</th><th>출장목적</th><th>출장종류</th><th>결재상태</th><th>공용차량</th><th>지급여부</th><th>원본 여비</th><th>일비</th><th>식비</th><th>운임</th><th>배분합 / 잔액</th><th>예산과목</th><th>삭제</th></tr></thead><tbody id="outsideBody"></tbody></table><div class="empty" id="outsideEmpty">근무지 외 출장 자료가 없습니다.</div></div>
+</div></section>
+<section class="section"><div class="section-head"><div><div class="section-title">개인별 출장비 지급내역</div><div class="section-note">다중 출장자를 분리한 뒤 이름별 한 행으로 통합 집계합니다.</div></div><div class="toolbar"><button class="btn line mode-btn active" id="normalModeBtn" onclick="setSummaryMode('normal')">정상 합산</button><button class="btn line mode-btn" id="temporaryModeBtn" onclick="setSummaryMode('temporary')">임시 합산</button><button class="btn soft" onclick="recalculate()">집계 새로고침</button></div></div>
+<div class="mode-note" id="summaryModeNote">정상 합산: 결재상태가 완료이고 지급여부가 지급인 행만 집계합니다.</div>
+<div class="summary"><div class="metric"><small>대상 인원</small><strong id="metricPeople">0명</strong></div><div class="metric"><small>근무지 내 여비</small><strong id="metricInside">0원</strong></div><div class="metric"><small>근무지 외 여비</small><strong id="metricOutside">0원</strong></div><div class="metric"><small>총 지급예정액</small><strong id="metricTotal">0원</strong></div></div>
+<div class="table-wrap"><table class="result"><thead>
+<tr><th rowspan="2">연번</th><th rowspan="2">소속</th><th rowspan="2">대상</th><th rowspan="2">근무지내여비</th><th colspan="3">근무지외 출장</th><th rowspan="2">근무지외 여비 합</th><th rowspan="2">개인별 금액</th></tr>
+<tr><th>일비</th><th>식비</th><th>운임</th></tr>
+</thead><tbody id="resultBody"></tbody></table></div>
+<div class="download-panel">
+<div class="download-box"><h3>근무지 내·외 출장목록 다운로드</h3><p>하나의 표로 병합하지 않습니다. 근무지 내 출장의 제목·표·합계를 먼저 작성하고, 그 아래에 근무지 외 출장의 제목·표·합계를 이어서 작성합니다.</p><div class="download-buttons"><button class="btn xlsx" onclick="downloadMergedXlsx()">통합목록 XLSX</button><button class="btn pdf" onclick="downloadMergedPdf()">통합목록 PDF</button></div><div id="mergeDownloadStatus" class="file-state" style="margin-top:10px">근무지 내 0건 + 근무지 외 0건</div></div>
+<div class="download-box"><h3>개인별 합계 다운로드</h3><p>현재 선택한 정상 합산 또는 임시 합산 기준으로 2단 헤더 목표 양식을 생성합니다.</p><div class="download-buttons"><button class="btn xlsx" onclick="downloadSummary('xlsx')">개인별 합계 XLSX</button><button class="btn pdf" onclick="downloadSummary('pdf')">개인별 합계 PDF</button></div></div>
+</div>
+</section>
+</main>
+
+<script>
+const REQUIRED_HEADERS=['시작일','종료일','시간','출장지','출장자','출장목적','출장종류','결재상태','공용차량이용여부','지급여부','여비','예산과목'];
+const CORE_HEADERS=['시간','출장지','출장자','출장목적','출장종류','결재상태','공용차량이용여부','지급여부','여비','예산과목'];
+const state={inside:[],outside:[],department:'',files:{inside:'',outside:''},summaryMode:'normal'};
+const demoInside=[
+{startDate:'2026-07-02',endDate:'2026-07-02',time:'10:00~12:00',place:'정부서울청사',person:'김민수/이서현',purpose:'업무협의',type:'근무지내',approval:'완료',car:'미이용',paid:'지급',fare:20000,budget:'국내여비'},
+{startDate:'2026-07-05',endDate:'2026-07-05',time:'14:00~17:00',place:'광화문',person:'이서현',purpose:'유관기관 방문',type:'근무지내',approval:'완료',car:'이용',paid:'지급',fare:10000,budget:'국내여비'},
+{startDate:'2026-07-09',endDate:'2026-07-09',time:'09:30~11:30',place:'서울역',person:'김민수',purpose:'자료 전달',type:'근무지내',approval:'완료',car:'미이용',paid:'지급',fare:20000,budget:'국내여비'}];
+const demoOutside=[
+{startDate:'2026-07-04',endDate:'2026-07-04',time:'08:00~19:00',place:'대전광역시',person:'김민수, 박지훈',purpose:'정책협의회 참석',type:'근무지외',approval:'완료',car:'미이용',paid:'지급',fare:70000,daily:25000,meal:20000,transport:25000,budget:'국내여비'},
+{startDate:'2026-07-08',endDate:'2026-07-08',time:'09:00~18:00',place:'파주시',person:'박지훈',purpose:'현장점검',type:'근무지외',approval:'완료',car:'이용',paid:'지급',fare:45000,daily:25000,meal:20000,transport:0,budget:'국내여비'},
+{startDate:'2026-07-10',endDate:'2026-07-10',time:'07:30~20:00',place:'강릉시',person:'이서현',purpose:'시설점검',type:'근무지외',approval:'완료',car:'미이용',paid:'지급',fare:98000,daily:25000,meal:23000,transport:50000,budget:'국내여비'}];
+['inside','outside'].forEach(t=>document.getElementById(t+'File').addEventListener('change',e=>onFile(t,e)));
+
+async function onFile(type,e){
+  const f=e.target.files[0]; if(!f)return;
+  const fs=document.getElementById(type+'FileState'); const st=document.getElementById(type+'Status');
+  fs.textContent=f.name+' · 분석 중'; fs.className='file-state'; st.textContent='분석 중'; st.className='status wait';
+  try{
+    if(!/\.xlsx$/i.test(f.name)) throw new Error('현재 버전은 XLSX 파일만 지원합니다.');
+    const rows=await parseXlsxTravelFile(f,type);
+    state[type]=rows; state.files[type]=f.name;
+    fs.textContent=`${f.name} · ${rows.length.toLocaleString('ko-KR')}건 불러옴`; fs.className='file-state ready';
+    st.textContent='업로드 완료'; st.className='status ok'; render();
+  }catch(err){
+    console.error(err); state[type]=[]; state.files[type]='';
+    fs.textContent='불러오기 실패: '+(err.message||err); fs.className='file-state error'; st.textContent='오류'; st.className='status wait'; render();
+  }
+}
+function loadDemo(type,e){e.preventDefault();e.stopPropagation();state[type]=JSON.parse(JSON.stringify(type==='inside'?demoInside:demoOutside));state.files[type]=(type==='inside'?'근무지내':'근무지외')+'_출장정산목록_예시.xlsx';const s=document.getElementById(type+'FileState');s.textContent=state.files[type]+' · 예시 '+state[type].length+'건';s.className='file-state ready';const st=document.getElementById(type+'Status');st.textContent='업로드 완료';st.className='status ok';render()}
+function addRow(type){state[type].push(type==='inside'?{startDate:'',endDate:'',time:'',place:'',person:'',purpose:'',type:'근무지내',approval:'완료',car:'미이용',paid:'지급',fare:0,budget:'국내여비'}:{startDate:'',endDate:'',time:'',place:'',person:'',purpose:'',type:'근무지외',approval:'완료',car:'미이용',paid:'지급',fare:0,daily:0,meal:0,transport:0,budget:'국내여비'});render()}
+function removeRow(type,i){state[type].splice(i,1);render()}
+function outsideBreakdown(r){return (Number(r.daily)||0)+(Number(r.meal)||0)+(Number(r.transport)||0)}
+function outsideRowValid(r){return outsideBreakdown(r)<=(Number(r.fare)||0)}
+function allocateOutsideAllToDaily(){
+ if(!state.outside.length){alert('근무지 외 출장 자료가 없습니다.');return}
+ if(!confirm('모든 근무지 외 출장 행의 원본 여비를 일비로 일괄 배분합니다. 기존 식비·운임 입력값은 0원으로 변경됩니다. 계속하시겠습니까?'))return;
+ state.outside.forEach(r=>{r.daily=Math.max(0,Number(r.fare)||0);r.meal=0;r.transport=0});
+ render();
+ const vb=document.getElementById('outsideValidation');
+ if(vb){vb.textContent=`근무지 외 출장 ${state.outside.length}건의 원본 여비를 모두 일비로 배분했습니다.`;vb.className='validation-box';}
+}
+function update(type,i,key,value,el){const isMoney=['fare','daily','meal','transport'].includes(key);const old=state[type][i][key];const parsed=isMoney?Math.max(0,Number(String(value).replace(/[^0-9.-]/g,''))||0):value;if(type==='outside'&&isMoney){const candidate={...state.outside[i],[key]:parsed};const allocated=outsideBreakdown(candidate);const limit=Number(candidate.fare)||0;if(allocated>limit){alert('일비·식비·운임 합계('+money(allocated)+'원)는 원본 여비('+money(limit)+'원)를 초과할 수 없습니다.');if(el)el.value=old;return}}state[type][i][key]=parsed;render()}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}function money(v){return(Number(v)||0).toLocaleString('ko-KR')}
+function inp(t,i,k,v,c=''){return`<input class="${c}" value="${esc(v)}" onchange="update('${t}',${i},'${k}',this.value,this)">`}function sel(t,i,k,v,ops){return`<select onchange="update('${t}',${i},'${k}',this.value)">${ops.map(x=>`<option ${x===v?'selected':''}>${x}</option>`).join('')}</select>`}
+function render(){
+ document.getElementById('insideBody').innerHTML=state.inside.map((r,i)=>`<tr><td>${inp('inside',i,'startDate',r.startDate)}</td><td>${inp('inside',i,'endDate',r.endDate)}</td><td>${inp('inside',i,'time',r.time)}</td><td>${inp('inside',i,'place',r.place)}</td><td>${inp('inside',i,'person',r.person)}</td><td>${inp('inside',i,'purpose',r.purpose)}</td><td>${inp('inside',i,'type',r.type)}</td><td>${sel('inside',i,'approval',r.approval,['완료','진행중','반려'])}</td><td>${sel('inside',i,'car',r.car,['미이용','이용'])}</td><td>${sel('inside',i,'paid',r.paid,['지급','미지급','제외'])}</td><td>${inp('inside',i,'fare',r.fare,'money')}</td><td>${inp('inside',i,'budget',r.budget)}</td><td><button class="btn danger" onclick="removeRow('inside',${i})">삭제</button></td></tr>`).join('');
+ document.getElementById('insideEmpty').style.display=state.inside.length?'none':'block';
+ document.getElementById('outsideBody').innerHTML=state.outside.map((r,i)=>{const allocated=outsideBreakdown(r),limit=Number(r.fare)||0,remaining=limit-allocated,valid=outsideRowValid(r);return`<tr class="${valid?'':'invalid-row'}"><td>${inp('outside',i,'startDate',r.startDate)}</td><td>${inp('outside',i,'endDate',r.endDate)}</td><td>${inp('outside',i,'time',r.time)}</td><td>${inp('outside',i,'place',r.place)}</td><td>${inp('outside',i,'person',r.person)}</td><td>${inp('outside',i,'purpose',r.purpose)}</td><td>${inp('outside',i,'type',r.type)}</td><td>${sel('outside',i,'approval',r.approval,['완료','진행중','반려'])}</td><td>${sel('outside',i,'car',r.car,['미이용','이용'])}</td><td>${sel('outside',i,'paid',r.paid,['지급','미지급','제외'])}</td><td>${inp('outside',i,'fare',r.fare,'money')}</td><td>${inp('outside',i,'daily',r.daily,'money')}</td><td>${inp('outside',i,'meal',r.meal,'money')}</td><td>${inp('outside',i,'transport',r.transport,'money')}</td><td><div class="allocation ${valid?'ok':'bad'}"><strong>${money(allocated)}원</strong><small>${valid?'잔액 '+money(remaining)+'원':'한도 초과 '+money(Math.abs(remaining))+'원'}</small></div></td><td>${inp('outside',i,'budget',r.budget)}</td><td><button class="btn danger" onclick="removeRow('outside',${i})">삭제</button></td></tr>`}).join('');
+ document.getElementById('outsideEmpty').style.display=state.outside.length?'none':'block';
+ const invalidCount=state.outside.filter(r=>!outsideRowValid(r)).length;const vb=document.getElementById('outsideValidation');vb.textContent=invalidCount?`한도를 초과한 근무지 외 출장 행이 ${invalidCount}건 있습니다. 해당 행은 개인별 지급내역 집계에서 제외됩니다.`:'모든 근무지 외 출장 행이 원본 여비 한도 이내입니다.';vb.className='validation-box'+(invalidCount?' bad':'');
+ const mergeStatus=document.getElementById('mergeDownloadStatus');
+ if(mergeStatus&&!mergeStatus.classList.contains('error')){mergeStatus.textContent=`근무지 내 ${state.inside.length}건 + 근무지 외 ${state.outside.length}건 = 총 ${state.inside.length+state.outside.length}건`;mergeStatus.className='file-state';}
+ recalculate();
+}
+function splitPersons(value){
+ const names=String(value??'').split(/[\/,，、]+/).map(v=>v.trim()).filter(Boolean);
+ return [...new Set(names)];
+}
+function dividedAmount(total,count,index){
+ const amount=Math.max(0,Math.round(Number(total)||0));
+ if(!count)return 0;
+ const base=Math.floor(amount/count),remainder=amount-base*count;
+ return base+(index<remainder?1:0);
+}
+function ensurePerson(people,name){people[name]??={name,inside:0,daily:0,meal:0,transport:0};return people[name]}
+function updateDepartment(value){state.department=String(value??'').trim();recalculate()}
+function setSummaryMode(mode){
+ state.summaryMode=mode==='temporary'?'temporary':'normal';
+ document.getElementById('normalModeBtn')?.classList.toggle('active',state.summaryMode==='normal');
+ document.getElementById('temporaryModeBtn')?.classList.toggle('active',state.summaryMode==='temporary');
+ const note=document.getElementById('summaryModeNote');
+ if(note){const temp=state.summaryMode==='temporary';note.textContent=temp?'임시 합산: 결재상태와 지급여부를 무시하고 모든 출장 행을 임시 집계합니다.':'정상 합산: 결재상태가 완료이고 지급여부가 지급인 행만 집계합니다.';note.className='mode-note'+(temp?' temp':'');}
+ recalculate();
+}
+function getSummaryRows(){
+ const people={}; const valid=r=>r.person&&(state.summaryMode==='temporary'||(r.approval==='완료'&&r.paid==='지급'));
+ state.inside.filter(valid).forEach(r=>{
+   const names=splitPersons(r.person);names.forEach((name,i)=>{ensurePerson(people,name).inside+=dividedAmount(r.fare,names.length,i)});
+ });
+ state.outside.filter(r=>valid(r)&&outsideRowValid(r)).forEach(r=>{
+   const names=splitPersons(r.person);names.forEach((name,i)=>{const p=ensurePerson(people,name);p.daily+=dividedAmount(r.daily,names.length,i);p.meal+=dividedAmount(r.meal,names.length,i);p.transport+=dividedAmount(r.transport,names.length,i)});
+ });
+ return Object.values(people).sort((a,b)=>a.name.localeCompare(b.name,'ko')).map((r,i)=>({no:i+1,department:state.department,name:r.name,inside:r.inside,daily:r.daily,meal:r.meal,transport:r.transport,outside:r.daily+r.meal+r.transport,grand:r.inside+r.daily+r.meal+r.transport}));
+}
+function recalculate(){
+ const rows=getSummaryRows(),total={inside:0,daily:0,meal:0,transport:0,outside:0,grand:0};
+ let html=rows.map(r=>{['inside','daily','meal','transport','outside','grand'].forEach(k=>total[k]+=r[k]);return`<tr><td>${r.no}</td><td>${esc(r.department||'미입력')}</td><td><strong>${esc(r.name)}</strong></td><td>${money(r.inside)}</td><td>${money(r.daily)}</td><td>${money(r.meal)}</td><td>${money(r.transport)}</td><td>${money(r.outside)}</td><td><strong>${money(r.grand)}</strong></td></tr>`}).join('');
+ html+=rows.length?`<tr class="total"><td colspan="3">합계</td><td>${money(total.inside)}</td><td>${money(total.daily)}</td><td>${money(total.meal)}</td><td>${money(total.transport)}</td><td>${money(total.outside)}</td><td>${money(total.grand)}</td></tr>`:`<tr><td colspan="9" class="empty">집계할 출장자가 없습니다.</td></tr>`;
+ document.getElementById('resultBody').innerHTML=html;document.getElementById('metricPeople').textContent=rows.length+'명';document.getElementById('metricInside').textContent=money(total.inside)+'원';document.getElementById('metricOutside').textContent=money(total.outside)+'원';document.getElementById('metricTotal').textContent=money(total.grand)+'원';
+}
+function resetAll(){if(!confirm('업로드 및 입력 데이터를 모두 초기화하시겠습니까?'))return;state.inside=[];state.outside=[];state.department='';state.files={inside:'',outside:''};state.summaryMode='normal';document.getElementById('departmentInput').value='';setSummaryMode('normal');['inside','outside'].forEach(t=>{document.getElementById(t+'File').value='';const fs=document.getElementById(t+'FileState');fs.textContent='선택된 파일이 없습니다.';fs.className='file-state';const st=document.getElementById(t+'Status');st.textContent='미업로드';st.className='status wait'});render()}
+
+function mergedRow(r,division){
+ return [cleanCell(r.startDate),cleanCell(r.endDate),division,cleanCell(r.time),cleanCell(r.place),cleanCell(r.person),cleanCell(r.purpose),cleanCell(r.type),cleanCell(r.approval),cleanCell(r.car),cleanCell(r.paid),Number(r.fare)||0,cleanCell(r.budget),division==='근무지 내'?(Number(r.fare)||0):0,division==='근무지 외'?(Number(r.fare)||0):0];
+}
+function getMergedRows(){
+ const rows=[];
+ state.inside.forEach(r=>rows.push(mergedRow(r,'근무지 내')));
+ state.outside.forEach(r=>rows.push(mergedRow(r,'근무지 외')));
+ return rows;
+}
+function cleanCell(v){return typeof v==='string'?v.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g,'').trim():v}
+
+function validateDownload(kind){
+ if(!state.inside.length&&!state.outside.length){alert('다운로드할 출장 자료가 없습니다.');return false}
+ if(kind==='summary'){
+   if(!state.department.trim()){alert('화면 상단의 소속을 입력하세요.');return false}
+   const invalid=state.outside.filter(r=>!outsideRowValid(r));if(invalid.length){alert('원본 여비 한도를 초과한 근무지 외 출장 행이 '+invalid.length+'건 있어 개인별 합계를 생성할 수 없습니다.');return false}
+   if(!getSummaryRows().length){alert(state.summaryMode==='temporary'?'임시 합산할 대상자가 없습니다.':'결재상태가 완료이고 지급여부가 지급인 대상자가 없습니다.');return false}
+ }
+ return true;
+}
+function getMergedExportData(){
+ const headers=['시작일','종료일','출장구분','시간','출장지','출장자','출장목적','출장종류','결재상태','공용차량이용여부','지급여부','여비','예산과목','근무지내 합계','근무지외 합계'];
+ const rows=[];
+ for(const r of state.inside) rows.push(mergedRow(r,'근무지 내'));
+ for(const r of state.outside) rows.push(mergedRow(r,'근무지 외'));
+ const insideTotal=state.inside.reduce((a,r)=>a+(Number(r.fare)||0),0);
+ const outsideTotal=state.outside.reduce((a,r)=>a+(Number(r.fare)||0),0);
+ const totals=['','','합계','','','','','','','','',insideTotal+outsideTotal,'',insideTotal,outsideTotal];
+ return {headers,rows,totals,insideTotal,outsideTotal};
+}
+function setMergeStatus(message,isError=false){
+ const el=document.getElementById('mergeDownloadStatus');
+ if(!el)return;
+ el.textContent=message;
+ el.className='file-state'+(isError?' error':' ready');
+}
+async function downloadMergedXlsx(){
+ if(!validateDownload('merge'))return;
+ try{
+  const d=getMergedExportData(),date=fileDate();
+  setMergeStatus(`XLSX 생성 중 · 근무지 내 ${state.inside.length}건 + 근무지 외 ${state.outside.length}건`);
+  await downloadXlsx('근무지내외_출장목록_통합_'+date+'.xlsx','근무지 내·외 출장목록 통합',d.headers,d.rows,[13,13,11,18,17,15,28,14,12,17,12,14,16,16,16],999,d.totals,{moneyCols:[11,13,14]});
+  setMergeStatus(`XLSX 완료 · 총 ${d.rows.length}건 · ${money(d.insideTotal+d.outsideTotal)}원`);
+ }catch(err){console.error(err);setMergeStatus('XLSX 생성 실패: '+(err?.message||String(err)),true);alert('병합본 XLSX 생성 실패: '+(err?.message||String(err)));}
+}
+async function downloadMergedPdf(){
+ if(!validateDownload('merge'))return;
+ try{
+  const d=getMergedExportData(),date=fileDate();
+  setMergeStatus(`PDF 생성 중 · 근무지 내 ${state.inside.length}건 + 근무지 외 ${state.outside.length}건`);
+  await downloadTablePdf('근무지내외_출장목록_통합_'+date+'.pdf','근무지 내·외 출장목록 통합',d.headers,[...d.rows,d.totals],{landscape:true,moneyCols:[11,13,14],widths:[.07,.07,.06,.09,.07,.06,.12,.06,.05,.07,.05,.06,.07,.05,.05],lastRowTotal:true});
+  setMergeStatus(`PDF 완료 · 총 ${d.rows.length}건 · ${money(d.insideTotal+d.outsideTotal)}원`);
+ }catch(err){console.error(err);setMergeStatus('PDF 생성 실패: '+(err?.message||String(err)),true);alert('병합본 PDF 생성 실패: '+(err?.message||String(err)));}
+}
+async function downloadSummary(format){
+ if(!validateDownload('summary'))return;
+ const s=getSummaryRows(); const date=fileDate(); const modeLabel=state.summaryMode==='temporary'?'임시합산':'정상합산';
+ const headers=['연번','소속','대상','근무지내여비','일비','식비','운임','근무지외 여비 합','개인별 금액'];
+ const rows=s.map(r=>[r.no,r.department,r.name,r.inside,r.daily,r.meal,r.transport,r.outside,r.grand]);
+ const totals=['','','합계',...['inside','daily','meal','transport','outside','grand'].map(k=>s.reduce((a,r)=>a+r[k],0))];
+ const groupedHeader={
+   top:['연번','소속','대상','근무지내여비','근무지외 출장','','','근무지외 여비 합','개인별 금액'],
+   sub:['','','','','일비','식비','운임','',''],
+   merges:['A4:A5','B4:B5','C4:C5','D4:D5','E4:G4','H4:H5','I4:I5']
+ };
+ if(format==='xlsx')await downloadXlsx('개인별_출장비_합계_'+modeLabel+'_'+date+'.xlsx','개인별 출장비 지급내역',headers,rows,[8,16,14,16,14,14,14,18,16],3,totals,{groupedHeader});
+ else await downloadTablePdf('개인별_출장비_합계_'+modeLabel+'_'+date+'.pdf','개인별 출장비 지급내역',headers,[...rows,totals],{landscape:true,moneyCols:[3,4,5,6,7,8],widths:[.05,.12,.09,.11,.13,.13,.13,.12,.12],lastRowTotal:true,groupedHeader:{groups:[{label:'연번',start:0,span:1,rowSpan:2},{label:'소속',start:1,span:1,rowSpan:2},{label:'대상',start:2,span:1,rowSpan:2},{label:'근무지내여비',start:3,span:1,rowSpan:2},{label:'근무지외 출장',start:4,span:3,rowSpan:1},{label:'근무지외 여비 합',start:7,span:1,rowSpan:2},{label:'개인별 금액',start:8,span:1,rowSpan:2}],sub:[{label:'일비',start:4},{label:'식비',start:5},{label:'운임',start:6}]}});
+}
+function fileDate(){const d=new Date();return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+
+/* ---------- XLSX 생성: 외부 라이브러리 없는 최소 OOXML ZIP ---------- */
+async function downloadXlsx(filename,title,headers,rows,widths,moneyStart,totalRow=null,opt={}){
+ const maxCol=headers.length; const allRows=[...rows]; if(totalRow)allRows.push(totalRow);
+ const grouped=opt.groupedHeader||null,moneyCols=opt.moneyCols||null,headerRows=grouped?2:1,dataStart=4+headerRows,freezeRows=dataStart-1;
+ let sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="${freezeRows}" topLeftCell="A${dataStart}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>`;
+ sheet+=xlsxRow(1,[title],headers.length,'title'); sheet+=xlsxRow(2,['생성일',new Date().toLocaleString('ko-KR')],headers.length,'meta');
+ if(grouped){sheet+=xlsxRow(4,grouped.top,headers.length,'header');sheet+=xlsxRow(5,grouped.sub,headers.length,'header')}
+ else sheet+=xlsxRow(4,headers,headers.length,'header');
+ allRows.forEach((r,idx)=>{const isTotal=totalRow&&idx===allRows.length-1;sheet+=xlsxRow(dataStart+idx,r,headers.length,isTotal?'total':'data',moneyStart,moneyCols)});
+ const merges=[`A1:${colName(maxCol)}1`,...(grouped?.merges||[])];
+ const filter=grouped?'':`<autoFilter ref="A4:${colName(maxCol)}${3+headerRows+allRows.length}"/>`;
+ sheet+=`</sheetData><mergeCells count="${merges.length}">${merges.map(ref=>`<mergeCell ref="${ref}"/>`).join('')}</mergeCells>${filter}<pageMargins left="0.25" right="0.25" top="0.5" bottom="0.5" header="0.2" footer="0.2"/><pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>`;
+ const files={
+  '[Content_Types].xml':`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>`,
+  '_rels/.rels':`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>`,
+  'xl/workbook.xml':`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="지급내역" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+  'xl/_rels/workbook.xml.rels':`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
+  'xl/styles.xml':xlsxStyles(), 'xl/worksheets/sheet1.xml':sheet,
+  'docProps/core.xml':`<?xml version="1.0" encoding="UTF-8"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${xmlEsc(title)}</dc:title><dc:creator>여비 정산 도구</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString()}</dcterms:created></cp:coreProperties>`,
+  'docProps/app.xml':`<?xml version="1.0" encoding="UTF-8"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>여비 정산 도구</Application></Properties>`
+ };
+ const zipBytes=makeZip(files);
+ const blob=new Blob([zipBytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+ downloadBlob(blob,filename);
+}
+function xlsxRow(rowNum,values,colCount,kind,moneyStart=999,moneyCols=null){let cells='';for(let i=0;i<values.length;i++){const v=values[i]??'',isMoney=moneyCols?moneyCols.includes(i):i>=moneyStart;let style=kind==='title'?1:kind==='meta'?2:kind==='header'?3:kind==='total'?(isMoney?6:5):(isMoney?4:2);const ref=colName(i+1)+rowNum;if(typeof v==='number'&&Number.isFinite(v))cells+=`<c r="${ref}" s="${style}"><v>${v}</v></c>`;else cells+=`<c r="${ref}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(String(v))}</t></is></c>`}return`<row r="${rowNum}" ${kind==='title'?'ht="28" customHeight="1"':''}>${cells}</row>`}
+function xlsxStyles(){return`<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="#,##0"/></numFmts><fonts count="3"><font><sz val="10"/><name val="맑은 고딕"/></font><font><b/><sz val="16"/><color rgb="FFFFFFFF"/><name val="맑은 고딕"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="맑은 고딕"/></font></fonts><fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF173F6B"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEAF2F8"/></patternFill></fill></fills><borders count="2"><border/><border><left style="thin"><color rgb="FFD9E3EC"/></left><right style="thin"><color rgb="FFD9E3EC"/></right><top style="thin"><color rgb="FFD9E3EC"/></top><bottom style="thin"><color rgb="FFD9E3EC"/></bottom></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="7"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="2" fillId="2" borderId="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="164" fontId="0" fillId="0" borderId="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="3" borderId="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="164" fontId="0" fillId="3" borderId="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`}
+function colName(n){let s='';while(n){n--;s=String.fromCharCode(65+n%26)+s;n=Math.floor(n/26)}return s}function xmlEsc(s){return String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;')}
+const CRC_TABLE=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u8){let c=0xffffffff;for(const b of u8)c=CRC_TABLE[(c^b)&255]^(c>>>8);return(c^0xffffffff)>>>0}
+function u16(n){return new Uint8Array([n&255,(n>>>8)&255])}function u32(n){return new Uint8Array([n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255])}function joinBytes(parts){const len=parts.reduce((a,p)=>a+p.length,0),out=new Uint8Array(len);let o=0;for(const p of parts){out.set(p,o);o+=p.length}return out}
+function makeZip(files){const enc=new TextEncoder(),locals=[],centrals=[];let offset=0,count=0;const now=new Date(),time=((now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1)),date=(((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate());for(const [name,content] of Object.entries(files)){const nb=enc.encode(name),data=typeof content==='string'?enc.encode(content):content,crc=crc32(data);const local=joinBytes([u32(0x04034b50),u16(20),u16(0x0800),u16(0),u16(time),u16(date),u32(crc),u32(data.length),u32(data.length),u16(nb.length),u16(0),nb,data]);locals.push(local);const central=joinBytes([u32(0x02014b50),u16(20),u16(20),u16(0x0800),u16(0),u16(time),u16(date),u32(crc),u32(data.length),u32(data.length),u16(nb.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),nb]);centrals.push(central);offset+=local.length;count++}const centralData=joinBytes(centrals),localData=joinBytes(locals),eocd=joinBytes([u32(0x06054b50),u16(0),u16(0),u16(count),u16(count),u32(centralData.length),u32(localData.length),u16(0)]);return joinBytes([localData,centralData,eocd])}
+
+/* ---------- PDF 생성: 표를 캔버스에 그려 이미지 PDF로 저장 ---------- */
+async function downloadTablePdf(filename,title,headers,rows,opt={}){
+ await document.fonts.ready;
+ const landscape=opt.landscape!==false,W=landscape?1800:1273,H=landscape?1273:1800,margin=55,top=145,bottom=70,rowH=54,headerH=54;
+ const grouped=opt.groupedHeader||null,headerRows=grouped?2:1,totalHeaderH=headerH*headerRows;
+ const moneyCols=new Set(opt.moneyCols||[]),widthFractions=opt.widths||headers.map(()=>1/headers.length),usableW=W-margin*2,widths=widthFractions.map(f=>f*usableW),perPage=Math.max(1,Math.floor((H-top-bottom-totalHeaderH)/rowH)),pages=[];
+ const xAt=index=>margin+widths.slice(0,index).reduce((a,b)=>a+b,0),spanWidth=(start,span)=>widths.slice(start,start+span).reduce((a,b)=>a+b,0);
+ for(let start=0,pageNo=1;start<rows.length||(!rows.length&&pageNo===1);start+=perPage,pageNo++){
+  const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const c=canvas.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,W,H);c.fillStyle='#173f6b';c.font='bold 38px "Malgun Gothic",sans-serif';c.textAlign='left';c.fillText(title,margin,58);c.fillStyle='#6d7a87';c.font='20px "Malgun Gothic",sans-serif';c.fillText('생성일: '+new Date().toLocaleString('ko-KR'),margin,96);c.textAlign='right';c.fillText(pageNo+' / '+Math.max(1,Math.ceil(rows.length/perPage)),W-margin,96);
+  c.font='bold 19px "Malgun Gothic",sans-serif';
+  if(grouped){
+    grouped.groups.forEach(g=>{const x=xAt(g.start),w=spanWidth(g.start,g.span),h=headerH*(g.rowSpan||1);c.fillStyle='#173f6b';c.fillRect(x,top,w,h);c.strokeStyle='#d9e3ec';c.strokeRect(x,top,w,h);c.fillStyle='#fff';drawCellText(c,g.label,x,top,w,h,true)});
+    grouped.sub.forEach(g=>{const x=xAt(g.start),w=widths[g.start],y=top+headerH;c.fillStyle='#245781';c.fillRect(x,y,w,headerH);c.strokeStyle='#d9e3ec';c.strokeRect(x,y,w,headerH);c.fillStyle='#fff';drawCellText(c,g.label,x,y,w,headerH,true)});
+  }else{
+    let x=margin;headers.forEach((h,i)=>{c.fillStyle='#173f6b';c.fillRect(x,top,widths[i],headerH);c.strokeStyle='#d9e3ec';c.strokeRect(x,top,widths[i],headerH);c.fillStyle='#fff';drawCellText(c,String(h),x,top,widths[i],headerH,true);x+=widths[i]});
+  }
+  const pageRows=rows.slice(start,start+perPage);pageRows.forEach((r,ri)=>{let x=margin;const y=top+totalHeaderH+ri*rowH,isTotal=opt.lastRowTotal&&(start+ri===rows.length-1);r.forEach((v,i)=>{c.fillStyle=isTotal?'#eaf2f8':(ri%2?'#f8fafc':'#fff');c.fillRect(x,y,widths[i],rowH);c.strokeStyle='#d9e3ec';c.strokeRect(x,y,widths[i],rowH);c.fillStyle='#1d2b39';c.font=(isTotal?'bold ':'')+'18px "Malgun Gothic",sans-serif';const txt=moneyCols.has(i)&&typeof v==='number'?money(v):String(v??'');drawCellText(c,txt,x,y,widths[i],rowH,!moneyCols.has(i));x+=widths[i]})});
+  c.fillStyle='#788692';c.font='16px "Malgun Gothic",sans-serif';c.textAlign='center';c.fillText('근무지 내·외 출장비 정산 도구',W/2,H-30);pages.push(canvas);
+ }
+ const jpegPages=pages.map(canvas=>dataUrlBytes(canvas.toDataURL('image/jpeg',.92)));downloadBlob(new Blob([makeImagePdf(jpegPages,pages[0].width,pages[0].height,landscape)],{type:'application/pdf'}),filename);
+}
+function drawCellText(c,text,x,y,w,h,center){const pad=9,maxWidth=w-pad*2;let s=text;if(c.measureText(s).width>maxWidth){while(s.length>1&&c.measureText(s+'…').width>maxWidth)s=s.slice(0,-1);s+='…'}c.textAlign=center?'center':'right';c.textBaseline='middle';c.fillText(s,center?x+w/2:x+w-pad,y+h/2,maxWidth)}
+function dataUrlBytes(url){const b=atob(url.split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function makeImagePdf(images,pixelW,pixelH,landscape){const enc=new TextEncoder(),parts=[],offsets=[0];let len=0;const pageW=landscape?842:595,pageH=landscape?595:842;function add(bytes){parts.push(bytes);len+=bytes.length}function text(s){return enc.encode(s)}function obj(n,bodyParts){offsets[n]=len;add(text(n+' 0 obj\n'));for(const p of bodyParts)add(typeof p==='string'?text(p):p);add(text('\nendobj\n'))}
+ add(joinBytes([text('%PDF-1.4\n%'),new Uint8Array([226,227,207,211]),text('\n')]));const pageIds=images.map((_,i)=>3+i*3);obj(1,[`<< /Type /Catalog /Pages 2 0 R >>`]);obj(2,[`<< /Type /Pages /Kids [${pageIds.map(n=>n+' 0 R').join(' ')}] /Count ${images.length} >>`]);images.forEach((img,i)=>{const page=3+i*3,content=page+1,image=page+2;obj(page,[`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im0 ${image} 0 R >> >> /Contents ${content} 0 R >>`]);const stream=`q ${pageW} 0 0 ${pageH} 0 0 cm /Im0 Do Q`;obj(content,[`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`]);obj(image,[`<< /Type /XObject /Subtype /Image /Width ${pixelW} /Height ${pixelH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.length} >>\nstream\n`,img,'\nendstream'])});const xref=len;const count=3+images.length*3;add(text(`xref\n0 ${count}\n0000000000 65535 f \n`));for(let i=1;i<count;i++)add(text(String(offsets[i]).padStart(10,'0')+' 00000 n \n'));add(text(`trailer\n<< /Size ${count} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`));return joinBytes(parts)}
+
+/* ---------- XLSX 읽기 ---------- */
+async function parseXlsxTravelFile(file,type){
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  assertReadableSpreadsheet(bytes);
+  const rawEntries=await unzipXlsx(bytes);
+  const entries=createEntryStore(rawEntries);
+  if(entries.has('EncryptionInfo')||entries.has('EncryptedPackage')){
+    throw new Error('암호화된 엑셀 파일입니다. 암호 또는 문서보안을 해제한 XLSX로 다시 저장해 주세요.');
+  }
+
+  const workbookPath=findOfficeDocument(entries);
+  const wb=parseXml(textEntry(entries,workbookPath));
+  const relPath=findWorkbookRels(entries,workbookPath);
+  const relDoc=parseXml(textEntry(entries,relPath));
+  const relMap={};
+  elementsByLocalName(relDoc,'Relationship').forEach(r=>{
+    if((r.getAttribute('TargetMode')||'').toLowerCase()==='external')return;
+    const id=r.getAttribute('Id');
+    const target=r.getAttribute('Target');
+    if(id&&target)relMap[id]=resolvePart(workbookPath,target);
+  });
+
+  let shared=[];
+  const sharedPath=findRelatedPart(entries,relMap,/sharedStrings\.xml$/i,'sharedStrings.xml');
+  if(sharedPath){
+    const sd=parseXml(textEntry(entries,sharedPath));
+    shared=elementsByLocalName(sd,'si').map(si=>elementsByLocalName(si,'t').map(t=>t.textContent).join(''));
+  }
+
+  const stylesPath=findRelatedPart(entries,relMap,/styles\.xml$/i,'styles.xml');
+  const styles=stylesPath?parseStyles(parseXml(textEntry(entries,stylesPath))):null;
+  let result=[];
+  const sheets=elementsByLocalName(wb,'sheet');
+  for(const sh of sheets){
+    const id=getRelationshipId(sh);
+    let path=id?relMap[id]:'';
+    if(!path){
+      const sheetName=(sh.getAttribute('name')||'').trim();
+      path=findWorksheetFallback(entries,sheetName);
+    }
+    path=entries.resolve(path);
+    if(!path)continue;
+    const rows=parseSheet(parseXml(textEntry(entries,path)),shared,styles);
+    const mapped=mapTravelRows(rows,type);
+    if(mapped.length)result.push(...mapped);
+  }
+  if(!result.length){
+    if(!sheets.length)throw new Error('엑셀 통합문서에서 시트 정보를 찾지 못했습니다. 파일을 Excel에서 열어 새 XLSX로 다시 저장해 주세요.');
+    throw new Error('필수 헤더가 있는 시트를 찾지 못했습니다: '+REQUIRED_HEADERS.join(', '));
+  }
+  return result;
+}
+function assertReadableSpreadsheet(data){
+  const ascii=new TextDecoder('ascii').decode(data.slice(0,16));
+  if(ascii.startsWith('SCDSA'))throw new Error('문서보안(DRM)이 적용된 파일입니다. 보안을 해제하거나 새 XLSX로 복사 저장해 주세요.');
+  const ole=data.length>=8&&[0xD0,0xCF,0x11,0xE0,0xA1,0xB1,0x1A,0xE1].every((v,i)=>data[i]===v);
+  if(ole)throw new Error('암호화된 엑셀 또는 구형 XLS 파일입니다. 암호·문서보안을 해제한 XLSX로 다시 저장해 주세요.');
+}
+function createEntryStore(raw){
+  const exact={},lower={};
+  Object.entries(raw).forEach(([k,v])=>{
+    const n=normPath(k);
+    exact[n]=v;
+    lower[n.toLowerCase()]=n;
+  });
+  return{
+    exact,
+    keys:()=>Object.keys(exact),
+    has(path){return!!this.resolve(path)},
+    resolve(path){
+      if(!path)return'';
+      const n=normPath(path);
+      if(exact[n])return n;
+      if(lower[n.toLowerCase()])return lower[n.toLowerCase()];
+      const suffix='/'+n.toLowerCase();
+      const matches=Object.keys(exact).filter(k=>('/'+k.toLowerCase()).endsWith(suffix));
+      return matches.length===1?matches[0]:'';
+    },
+    get(path){const r=this.resolve(path);return r?exact[r]:undefined}
+  };
+}
+function parseXml(s){
+  const d=new DOMParser().parseFromString(s,'application/xml');
+  const e=elementsByLocalName(d,'parsererror')[0];
+  if(e)throw new Error('엑셀 XML 해석에 실패했습니다.');
+  return d;
+}
+function elementsByLocalName(root,name){
+  if(!root)return[];
+  if(root.getElementsByTagNameNS){
+    const list=[...root.getElementsByTagNameNS('*',name)];
+    if(list.length)return list;
+  }
+  return[...root.getElementsByTagName(name)];
+}
+function getRelationshipId(el){
+  if(!el)return'';
+  for(const a of [...el.attributes]){
+    if(a.localName==='id'&&(a.prefix==='r'||/relationships/i.test(a.namespaceURI||'')))return a.value;
+  }
+  return el.getAttribute('r:id')||el.getAttribute('id')||'';
+}
+function findOfficeDocument(entries){
+  const rootRels=entries.resolve('_rels/.rels');
+  if(rootRels){
+    const d=parseXml(textEntry(entries,rootRels));
+    const r=elementsByLocalName(d,'Relationship').find(x=>/(\/officeDocument$|\/officeDocument\/)/i.test(x.getAttribute('Type')||''));
+    if(r){
+      const resolved=entries.resolve(r.getAttribute('Target')||'');
+      if(resolved)return resolved;
+    }
+  }
+  const contentTypes=entries.resolve('[Content_Types].xml');
+  if(contentTypes){
+    const d=parseXml(textEntry(entries,contentTypes));
+    const override=elementsByLocalName(d,'Override').find(x=>/spreadsheetml\.(sheet|template|addin|sheetMacroEnabled)\.main\+xml|spreadsheetml\.sheet\.main\+xml/i.test(x.getAttribute('ContentType')||''));
+    if(override){
+      const resolved=entries.resolve(override.getAttribute('PartName')||'');
+      if(resolved)return resolved;
+    }
+  }
+  const candidates=entries.keys().filter(k=>/(^|\/)workbook\.xml$/i.test(k));
+  if(candidates.length)return candidates.sort((a,b)=>a.length-b.length)[0];
+  if(entries.keys().some(k=>/(^|\/)workbook\.bin$/i.test(k)))throw new Error('XLSB 형식은 지원하지 않습니다. XLSX로 다시 저장해 주세요.');
+  const sample=entries.keys().slice(0,8).join(', ');
+  throw new Error('표준 XLSX 통합문서 파일(workbook.xml)을 찾지 못했습니다. 암호화·DRM 여부 또는 확장자를 확인해 주세요.'+(sample?' [내부 항목: '+sample+']':''));
+}
+function findWorkbookRels(entries,workbookPath){
+  const calculated=relsPath(workbookPath);
+  const direct=entries.resolve(calculated);
+  if(direct)return direct;
+  const base=workbookPath.split('/').pop();
+  const matches=entries.keys().filter(k=>k.toLowerCase().endsWith('/_rels/'+base.toLowerCase()+'.rels'));
+  if(matches.length)return matches[0];
+  throw new Error('엑셀 통합문서 관계 파일을 찾지 못했습니다: '+calculated);
+}
+function findRelatedPart(entries,relMap,pattern,fallbackName){
+  for(const p of Object.values(relMap)){
+    if(pattern.test(p)){
+      const r=entries.resolve(p);
+      if(r)return r;
+    }
+  }
+  const matches=entries.keys().filter(k=>k.toLowerCase().endsWith('/'+fallbackName.toLowerCase())||k.toLowerCase()===fallbackName.toLowerCase());
+  return matches.length?matches[0]:'';
+}
+function findWorksheetFallback(entries,sheetName){
+  const paths=entries.keys().filter(k=>/(^|\/)worksheets\/sheet\d+\.xml$/i.test(k));
+  if(paths.length===1)return paths[0];
+  return'';
+}
+function relsPath(path){const a=normPath(path).split('/');const f=a.pop();return[...a,'_rels',f+'.rels'].join('/')}
+function resolvePart(base,target){
+  target=decodePath(target);
+  if(target.startsWith('/'))return normPath(target.slice(1));
+  const a=normPath(base).split('/');a.pop();return normPath(a.join('/')+'/'+target)
+}
+function decodePath(p){
+  p=String(p??'').replace(/\\/g,'/').replace(/^file:\/\//i,'');
+  try{return decodeURIComponent(p)}catch{return p}
+}
+function normPath(p){
+  p=decodePath(p).split(/[?#]/)[0];
+  const out=[];for(const x of p.split('/')){if(!x||x==='.')continue;if(x==='..')out.pop();else out.push(x)}return out.join('/')
+}
+function textEntry(entries,path){
+  const bytes=entries.get?entries.get(path):entries[path];
+  if(!bytes)throw new Error('엑셀 내부 파일을 찾지 못했습니다: '+path);
+  if(bytes.length>=2&&bytes[0]===0xFF&&bytes[1]===0xFE)return new TextDecoder('utf-16le').decode(bytes);
+  if(bytes.length>=2&&bytes[0]===0xFE&&bytes[1]===0xFF)return new TextDecoder('utf-16be').decode(bytes);
+  return new TextDecoder('utf-8').decode(bytes)
+}
+function parseSheet(doc,shared,styles){
+  const out=[];
+  const sheetData=elementsByLocalName(doc,'sheetData')[0];
+  if(!sheetData)return out;
+  elementsByLocalName(sheetData,'row').forEach(row=>{
+    const arr=[];
+    elementsByLocalName(row,'c').forEach(c=>{
+      const ref=c.getAttribute('r')||'';
+      const col=lettersToCol(ref.match(/[A-Z]+/i)?.[0]||'A')-1;
+      const t=c.getAttribute('t'),styleIndex=Number(c.getAttribute('s')||0);
+      let v='';
+      if(t==='inlineStr'){
+        const inline=elementsByLocalName(c,'is')[0];
+        v=inline?elementsByLocalName(inline,'t').map(x=>x.textContent).join(''):'';
+      }else{
+        const valueNode=elementsByLocalName(c,'v')[0];
+        const raw=valueNode?.textContent??'';
+        if(t==='s')v=shared[Number(raw)]??'';
+        else if(t==='b')v=raw==='1'?'TRUE':'FALSE';
+        else if(t==='str'||t==='e')v=raw;
+        else if(raw!==''&&!isNaN(Number(raw))){v=Number(raw);if(styles?.dateStyles?.has(styleIndex))v=formatExcelDate(v)}
+        else v=raw;
+      }
+      arr[col]=v;
+    });
+    out.push(arr);
+  });
+  return out;
+}
+function parseStyles(doc){
+  const custom={};
+  elementsByLocalName(doc,'numFmt').forEach(n=>custom[Number(n.getAttribute('numFmtId'))]=n.getAttribute('formatCode')||'');
+  const dateIds=new Set([14,15,16,17,18,19,20,21,22,27,30,36,45,46,47,50,57]);
+  const dateStyles=new Set();
+  const cellXfs=elementsByLocalName(doc,'cellXfs')[0];
+  if(cellXfs)elementsByLocalName(cellXfs,'xf').forEach((xf,i)=>{const id=Number(xf.getAttribute('numFmtId')||0),fmt=custom[id]||'';if(dateIds.has(id)||(/[ymdhis]/i.test(fmt.replace(/\[[^\]]*\]|"[^"]*"/g,''))&&id!==0))dateStyles.add(i)});
+  return{dateStyles}
+}
+function formatExcelDate(serial){const ms=Date.UTC(1899,11,30)+serial*86400000,d=new Date(ms);const date=`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`,time=`${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}`;return serial%1?date+' '+time:date}
+function lettersToCol(s){let n=0;for(const ch of s.toUpperCase())n=n*26+ch.charCodeAt(0)-64;return n}
+function normHeader(v){return String(v??'').replace(/[\s\n\r·∙ㆍ\-_/]/g,'').trim()}
+function mapTravelRows(rows,type){let hi=-1,map={};for(let i=0;i<Math.min(rows.length,40);i++){const m={};rows[i].forEach((v,j)=>m[normHeader(v)]=j);const hasDates=m[normHeader('시작일')]!==undefined&&m[normHeader('종료일')]!==undefined;const coreHits=CORE_HEADERS.filter(h=>m[normHeader(h)]!==undefined).length;if(hasDates&&coreHits>=8){hi=i;map=m;break}}if(hi<0)return[];const idx=h=>map[normHeader(h)];const result=[];for(let i=hi+1;i<rows.length;i++){const r=rows[i]||[];const obj={startDate:r[idx('시작일')]??'',endDate:r[idx('종료일')]??'',time:r[idx('시간')]??'',place:r[idx('출장지')]??'',person:r[idx('출장자')]??'',purpose:r[idx('출장목적')]??'',type:r[idx('출장종류')]??(type==='inside'?'근무지내':'근무지외'),approval:r[idx('결재상태')]??'',car:r[idx('공용차량이용여부')]??'',paid:r[idx('지급여부')]??'',fare:parseMoney(r[idx('여비')]),budget:r[idx('예산과목')]??''};if(Object.values(obj).every(v=>v===''||v===0))continue;if(type==='outside'){obj.daily=0;obj.meal=0;obj.transport=0}result.push(obj)}return result}
+function parseMoney(v){if(typeof v==='number')return v;return Number(String(v??'').replace(/[^0-9.-]/g,''))||0}
+async function unzipXlsx(data){const dv=new DataView(data.buffer,data.byteOffset,data.byteLength);let eocd=-1;for(let i=data.length-22;i>=Math.max(0,data.length-65557);i--){if(dv.getUint32(i,true)===0x06054b50){eocd=i;break}}if(eocd<0)throw new Error('유효한 XLSX ZIP 구조가 아닙니다.');const count=dv.getUint16(eocd+10,true),cdOff=dv.getUint32(eocd+16,true);let p=cdOff;const entries={};for(let n=0;n<count;n++){if(dv.getUint32(p,true)!==0x02014b50)throw new Error('엑셀 ZIP 중앙 디렉터리가 손상되었습니다.');const method=dv.getUint16(p+10,true),compSize=dv.getUint32(p+20,true),nameLen=dv.getUint16(p+28,true),extraLen=dv.getUint16(p+30,true),commentLen=dv.getUint16(p+32,true),localOff=dv.getUint32(p+42,true),name=new TextDecoder().decode(data.slice(p+46,p+46+nameLen));const ln=dv.getUint16(localOff+26,true),le=dv.getUint16(localOff+28,true),start=localOff+30+ln+le,comp=data.slice(start,start+compSize);let raw;if(method===0)raw=comp;else if(method===8){if(typeof DecompressionStream==='undefined')throw new Error('이 브라우저는 XLSX 압축 해제를 지원하지 않습니다. 최신 Chrome 또는 Edge를 사용하세요.');const ds=new DecompressionStream('deflate-raw');raw=new Uint8Array(await new Response(new Blob([comp]).stream().pipeThrough(ds)).arrayBuffer())}else throw new Error('지원하지 않는 XLSX 압축 방식입니다.');entries[normPath(name)]=raw;p+=46+nameLen+extraLen+commentLen}return entries}
+
+
+/* ---------- v10: 구분별 이어쓰기 출력 ---------- */
+function getSectionedExportData(){
+ const insideHeaders=['시작일','종료일','시간','출장지','출장자','출장목적','출장종류','결재상태','공용차량이용여부','지급여부','여비','예산과목'];
+ const outsideHeaders=['시작일','종료일','시간','출장지','출장자','출장목적','출장종류','결재상태','공용차량이용여부','지급여부','여비','일비','식비','운임','예산과목'];
+ const insideRows=state.inside.map(r=>[
+   cleanCell(r.startDate),cleanCell(r.endDate),cleanCell(r.time),cleanCell(r.place),cleanCell(r.person),cleanCell(r.purpose),cleanCell(r.type),cleanCell(r.approval),cleanCell(r.car),cleanCell(r.paid),Number(r.fare)||0,cleanCell(r.budget)
+ ]);
+ const outsideRows=state.outside.map(r=>[
+   cleanCell(r.startDate),cleanCell(r.endDate),cleanCell(r.time),cleanCell(r.place),cleanCell(r.person),cleanCell(r.purpose),cleanCell(r.type),cleanCell(r.approval),cleanCell(r.car),cleanCell(r.paid),Number(r.fare)||0,Number(r.daily)||0,Number(r.meal)||0,Number(r.transport)||0,cleanCell(r.budget)
+ ]);
+ const insideTotal=state.inside.reduce((a,r)=>a+(Number(r.fare)||0),0);
+ const outsideFareTotal=state.outside.reduce((a,r)=>a+(Number(r.fare)||0),0);
+ const outsideDailyTotal=state.outside.reduce((a,r)=>a+(Number(r.daily)||0),0);
+ const outsideMealTotal=state.outside.reduce((a,r)=>a+(Number(r.meal)||0),0);
+ const outsideTransportTotal=state.outside.reduce((a,r)=>a+(Number(r.transport)||0),0);
+ return {
+   inside:{title:'근무지 내 출장',headers:insideHeaders,rows:insideRows,moneyCols:[10],totalValues:{0:'합계',10:insideTotal}},
+   outside:{title:'근무지 외 출장',headers:outsideHeaders,rows:outsideRows,moneyCols:[10,11,12,13],totalValues:{0:'합계',10:outsideFareTotal,11:outsideDailyTotal,12:outsideMealTotal,13:outsideTransportTotal}},
+   insideTotal,outsideFareTotal,outsideDailyTotal,outsideMealTotal,outsideTransportTotal
+ };
+}
+
+function sectionCellXml(ref,value,style){
+ if(typeof value==='number'&&Number.isFinite(value))return `<c r="${ref}" s="${style}"><v>${value}</v></c>`;
+ return `<c r="${ref}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(String(value??''))}</t></is></c>`;
+}
+function sectionRowXml(rowNum,values,kind,moneyCols=[]){
+ let cells='';
+ const mset=new Set(moneyCols);
+ values.forEach((v,i)=>{
+   if(v===''||v===null||v===undefined)return;
+   const isMoney=mset.has(i);
+   const style=kind==='title'?1:kind==='meta'?2:kind==='header'?3:kind==='total'?(isMoney?6:5):(isMoney?4:2);
+   cells+=sectionCellXml(colName(i+1)+rowNum,v,style);
+ });
+ return `<row r="${rowNum}"${kind==='title'?' ht="28" customHeight="1"':''}>${cells}</row>`;
+}
+function sparseValues(obj,maxCols){
+ const a=Array(maxCols).fill('');
+ Object.entries(obj).forEach(([k,v])=>a[Number(k)]=v);
+ return a;
+}
+async function downloadSectionedXlsx(filename,data){
+ const maxCols=15;
+ const widths=[13,13,18,17,15,28,14,12,17,12,14,14,14,14,16];
+ let row=1,body='',merges=[];
+ body+=sectionRowXml(row,['근무지 내·외 출장목록'], 'title');merges.push(`A${row}:O${row}`);row++;
+ body+=sectionRowXml(row,['생성일',new Date().toLocaleString('ko-KR')],'meta');row+=2;
+ for(const section of [data.inside,data.outside]){
+   body+=sectionRowXml(row,[section.title],'title');merges.push(`A${row}:O${row}`);row++;
+   body+=sectionRowXml(row,section.headers,'header');row++;
+   section.rows.forEach(r=>{body+=sectionRowXml(row,r,'data',section.moneyCols);row++});
+   body+=sectionRowXml(row,sparseValues(section.totalValues,maxCols),'total',section.moneyCols);
+   merges.push(`A${row}:J${row}`);row+=2;
+ }
+ const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"/></sheetViews><cols>${widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${body}</sheetData><mergeCells count="${merges.length}">${merges.map(ref=>`<mergeCell ref="${ref}"/>`).join('')}</mergeCells><pageMargins left="0.25" right="0.25" top="0.5" bottom="0.5" header="0.2" footer="0.2"/><pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>`;
+ const files={
+  '[Content_Types].xml':`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>`,
+  '_rels/.rels':`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>`,
+  'xl/workbook.xml':`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="출장목록" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+  'xl/_rels/workbook.xml.rels':`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
+  'xl/styles.xml':xlsxStyles(),'xl/worksheets/sheet1.xml':sheet,
+  'docProps/core.xml':`<?xml version="1.0" encoding="UTF-8"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>근무지 내·외 출장목록</dc:title><dc:creator>여비 정산 도구</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString()}</dcterms:created></cp:coreProperties>`,
+  'docProps/app.xml':`<?xml version="1.0" encoding="UTF-8"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>여비 정산 도구</Application></Properties>`
+ };
+ downloadBlob(new Blob([makeZip(files)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),filename);
+}
+
+function sectionPdfPages(section,overallTitle){
+ const W=1800,H=1273,margin=48,top=170,bottom=60,rowH=50,headerH=54;
+ const fractions=section.headers.length===12?[.07,.07,.09,.08,.07,.13,.07,.06,.09,.06,.07,.08]:[.06,.06,.08,.07,.06,.09,.06,.05,.09,.05,.06,.06,.06,.06,.08];
+ const usableW=W-margin*2,widths=fractions.map(f=>f*usableW),moneyCols=new Set(section.moneyCols),perPage=Math.max(1,Math.floor((H-top-bottom-headerH-rowH)/rowH));
+ const rows=[...section.rows,sparseValues(section.totalValues,section.headers.length)],pages=[];
+ for(let start=0;start<rows.length||(!rows.length&&start===0);start+=perPage){
+   const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const c=canvas.getContext('2d');
+   c.fillStyle='#fff';c.fillRect(0,0,W,H);
+   c.fillStyle='#173f6b';c.font='bold 36px "Malgun Gothic",sans-serif';c.textAlign='left';c.fillText(overallTitle,margin,52);
+   c.fillStyle='#276da9';c.font='bold 27px "Malgun Gothic",sans-serif';c.fillText(section.title,margin,105);
+   c.fillStyle='#6d7a87';c.font='18px "Malgun Gothic",sans-serif';c.fillText('생성일: '+new Date().toLocaleString('ko-KR'),margin,138);
+   let x=margin;c.font='bold 14px "Malgun Gothic",sans-serif';section.headers.forEach((h,i)=>{c.fillStyle='#173f6b';c.fillRect(x,top,widths[i],headerH);c.strokeStyle='#d9e3ec';c.strokeRect(x,top,widths[i],headerH);c.fillStyle='#fff';drawCellText(c,String(h),x,top,widths[i],headerH,true);x+=widths[i]});
+   const pageRows=rows.slice(start,start+perPage);pageRows.forEach((r,ri)=>{let xx=margin;const y=top+headerH+ri*rowH,isTotal=start+ri===rows.length-1;r.forEach((v,i)=>{c.fillStyle=isTotal?'#eaf2f8':(ri%2?'#f8fafc':'#fff');c.fillRect(xx,y,widths[i],rowH);c.strokeStyle='#d9e3ec';c.strokeRect(xx,y,widths[i],rowH);c.fillStyle='#1d2b39';c.font=(isTotal?'bold ':'')+'14px "Malgun Gothic",sans-serif';const txt=moneyCols.has(i)&&typeof v==='number'?money(v):String(v??'');drawCellText(c,txt,xx,y,widths[i],rowH,!moneyCols.has(i));xx+=widths[i]})});
+   c.fillStyle='#788692';c.font='15px "Malgun Gothic",sans-serif';c.textAlign='center';c.fillText('근무지 내·외 출장비 정산 도구',W/2,H-25);pages.push(canvas);
+ }
+ return pages;
+}
+async function downloadSectionedPdf(filename,data){
+ await document.fonts.ready;
+ const pages=[...sectionPdfPages(data.inside,'근무지 내·외 출장목록'),...sectionPdfPages(data.outside,'근무지 내·외 출장목록')];
+ const images=pages.map(c=>dataUrlBytes(c.toDataURL('image/jpeg',.92)));
+ downloadBlob(new Blob([makeImagePdf(images,pages[0].width,pages[0].height,true)],{type:'application/pdf'}),filename);
+}
+
+async function downloadMergedXlsx(){
+ if(!validateDownload('merge'))return;
+ try{
+  const d=getSectionedExportData(),date=fileDate();
+  setMergeStatus(`XLSX 생성 중 · 근무지 내 ${d.inside.rows.length}건 + 근무지 외 ${d.outside.rows.length}건`);
+  await downloadSectionedXlsx('근무지내외_출장목록_'+date+'.xlsx',d);
+  setMergeStatus(`XLSX 완료 · 근무지 내 ${d.inside.rows.length}건 / 근무지 외 ${d.outside.rows.length}건`);
+ }catch(err){console.error(err);setMergeStatus('XLSX 생성 실패: '+(err?.message||String(err)),true);alert('통합목록 XLSX 생성 실패: '+(err?.message||String(err)));}
+}
+async function downloadMergedPdf(){
+ if(!validateDownload('merge'))return;
+ try{
+  const d=getSectionedExportData(),date=fileDate();
+  setMergeStatus(`PDF 생성 중 · 근무지 내 ${d.inside.rows.length}건 + 근무지 외 ${d.outside.rows.length}건`);
+  await downloadSectionedPdf('근무지내외_출장목록_'+date+'.pdf',d);
+  setMergeStatus(`PDF 완료 · 근무지 내 ${d.inside.rows.length}건 / 근무지 외 ${d.outside.rows.length}건`);
+ }catch(err){console.error(err);setMergeStatus('PDF 생성 실패: '+(err?.message||String(err)),true);alert('통합목록 PDF 생성 실패: '+(err?.message||String(err)));}
+}
+
+setSummaryMode('normal');
+</script>
+</body>
+</html>

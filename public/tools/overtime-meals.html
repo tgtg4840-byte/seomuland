@@ -1,0 +1,3543 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>통일부 특근매식비 정산 프로그램 - 근무시간표 수정 기능 패치</title>
+  <meta name="author" content="통일부 남북회담본부 회담지원과 황진우 주무관" />
+
+  <script>
+  /*
+    Offline spreadsheet engine for this internal single-file tool.
+    Supports ordinary .xlsx and .csv files used by the 정산 프로그램.
+    Note: legacy binary .xls is not supported in this single-file offline build.
+  */
+  (function () {
+    "use strict";
+
+    const enc = new TextEncoder();
+
+    function u8(data) {
+      if (data instanceof Uint8Array) return data;
+      if (data instanceof ArrayBuffer) return new Uint8Array(data);
+      return enc.encode(String(data ?? ""));
+    }
+
+    function readU16LE(bytes, offset) {
+      return bytes[offset] | (bytes[offset + 1] << 8);
+    }
+
+    function readU32LE(bytes, offset) {
+      return (
+        (bytes[offset]) |
+        (bytes[offset + 1] << 8) |
+        (bytes[offset + 2] << 16) |
+        (bytes[offset + 3] << 24)
+      ) >>> 0;
+    }
+
+    function writeU16LE(bytes, offset, value) {
+      bytes[offset] = value & 0xff;
+      bytes[offset + 1] = (value >>> 8) & 0xff;
+    }
+
+    function writeU32LE(bytes, offset, value) {
+      bytes[offset] = value & 0xff;
+      bytes[offset + 1] = (value >>> 8) & 0xff;
+      bytes[offset + 2] = (value >>> 16) & 0xff;
+      bytes[offset + 3] = (value >>> 24) & 0xff;
+    }
+
+    const crcTable = (() => {
+      const table = new Uint32Array(256);
+      for (let n = 0; n < 256; ++n) {
+        let c = n;
+        for (let k = 0; k < 8; ++k) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        table[n] = c >>> 0;
+      }
+      return table;
+    })();
+
+    function crc32(bytes) {
+      let c = 0xffffffff;
+      for (let i = 0; i < bytes.length; ++i) c = crcTable[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+      return (c ^ 0xffffffff) >>> 0;
+    }
+
+    function xmlEscape(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function attrEscape(value) {
+      return xmlEscape(value).replace(/'/g, "&apos;");
+    }
+
+    function decodeText(bytes) {
+      let text = new TextDecoder("utf-8").decode(bytes);
+      if (text.includes("\ufffd")) {
+        try {
+          const alt = new TextDecoder("euc-kr").decode(bytes);
+          if ((alt.match(/\ufffd/g) || []).length < (text.match(/\ufffd/g) || []).length) text = alt;
+        } catch (error) {}
+      }
+      return text.replace(/^\ufeff/, "");
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let field = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; ++i) {
+        const ch = text[i];
+
+        if (inQuotes) {
+          if (ch === '"') {
+            if (text[i + 1] === '"') {
+              field += '"';
+              i++;
+            } else {
+              inQuotes = false;
+            }
+          } else {
+            field += ch;
+          }
+          continue;
+        }
+
+        if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ",") {
+          row.push(field);
+          field = "";
+        } else if (ch === "\n") {
+          row.push(field);
+          rows.push(row);
+          row = [];
+          field = "";
+        } else if (ch === "\r") {
+          // ignore CR; LF will close the row
+        } else {
+          field += ch;
+        }
+      }
+
+      if (field !== "" || row.length) {
+        row.push(field);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function findEOCD(bytes) {
+      for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 66000); --i) {
+        if (readU32LE(bytes, i) === 0x06054b50) return i;
+      }
+      throw new Error("ZIP 중앙 디렉터리를 찾을 수 없습니다.");
+    }
+
+    async function inflateRaw(bytes) {
+      if (typeof DecompressionStream === "undefined") {
+        throw new Error("이 브라우저는 XLSX 압축 해제를 지원하지 않습니다. 최신 Chrome 또는 Edge로 실행하세요.");
+      }
+
+      const formats = ["deflate-raw", "deflate"];
+      let lastError = null;
+
+      for (const format of formats) {
+        try {
+          const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(format));
+          const buffer = await new Response(stream).arrayBuffer();
+          return new Uint8Array(buffer);
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      throw lastError || new Error("XLSX 압축 해제에 실패했습니다.");
+    }
+
+    async function unzip(arrayBuffer) {
+      const bytes = new Uint8Array(arrayBuffer);
+      if (bytes[0] !== 0x50 || bytes[1] !== 0x4b) {
+        return null;
+      }
+
+      const eocd = findEOCD(bytes);
+      const totalEntries = readU16LE(bytes, eocd + 10);
+      const centralOffset = readU32LE(bytes, eocd + 16);
+      const files = {};
+      let ptr = centralOffset;
+
+      for (let i = 0; i < totalEntries; ++i) {
+        if (readU32LE(bytes, ptr) !== 0x02014b50) throw new Error("ZIP 중앙 디렉터리 형식이 올바르지 않습니다.");
+
+        const method = readU16LE(bytes, ptr + 10);
+        const compressedSize = readU32LE(bytes, ptr + 20);
+        const fileNameLength = readU16LE(bytes, ptr + 28);
+        const extraLength = readU16LE(bytes, ptr + 30);
+        const commentLength = readU16LE(bytes, ptr + 32);
+        const localOffset = readU32LE(bytes, ptr + 42);
+        const nameBytes = bytes.slice(ptr + 46, ptr + 46 + fileNameLength);
+        const name = decodeText(nameBytes);
+
+        if (readU32LE(bytes, localOffset) !== 0x04034b50) throw new Error("ZIP 로컬 헤더 형식이 올바르지 않습니다.");
+
+        const localNameLength = readU16LE(bytes, localOffset + 26);
+        const localExtraLength = readU16LE(bytes, localOffset + 28);
+        const dataStart = localOffset + 30 + localNameLength + localExtraLength;
+        const compressed = bytes.slice(dataStart, dataStart + compressedSize);
+
+        let data;
+        if (method === 0) data = compressed;
+        else if (method === 8) data = await inflateRaw(compressed);
+        else throw new Error("지원하지 않는 XLSX 압축 방식입니다: " + method);
+
+        files[name.replace(/\\/g, "/")] = data;
+        ptr += 46 + fileNameLength + extraLength + commentLength;
+      }
+
+      return files;
+    }
+
+    function parseXml(text) {
+      return new DOMParser().parseFromString(text, "application/xml");
+    }
+
+    function elements(parent, tagName) {
+      return Array.from(parent.getElementsByTagName(tagName));
+    }
+
+    function decodeCellRef(ref) {
+      const match = String(ref || "").match(/^([A-Z]+)(\d+)$/i);
+      if (!match) return { row: 0, col: 0 };
+
+      const letters = match[1].toUpperCase();
+      let col = 0;
+      for (let i = 0; i < letters.length; ++i) col = col * 26 + (letters.charCodeAt(i) - 64);
+
+      return { row: Number(match[2]) - 1, col: col - 1 };
+    }
+
+    function encodeCellRef(row, col) {
+      let n = col + 1;
+      let letters = "";
+      while (n > 0) {
+        const r = (n - 1) % 26;
+        letters = String.fromCharCode(65 + r) + letters;
+        n = Math.floor((n - 1) / 26);
+      }
+      return letters + String(row + 1);
+    }
+
+    function parseSharedStrings(files) {
+      const raw = files["xl/sharedStrings.xml"];
+      if (!raw) return [];
+
+      const doc = parseXml(decodeText(raw));
+      return elements(doc, "si").map((si) => elements(si, "t").map((t) => t.textContent || "").join(""));
+    }
+
+    function isDateNumFmtId(id) {
+      const n = Number(id);
+      return (
+        (n >= 14 && n <= 22) ||
+        (n >= 27 && n <= 36) ||
+        (n >= 45 && n <= 47) ||
+        (n >= 50 && n <= 58)
+      );
+    }
+
+    function parseStyles(files) {
+      const raw = files["xl/styles.xml"];
+      if (!raw) return { styleNumFmtIds: [] };
+
+      const doc = parseXml(decodeText(raw));
+      const numFmtMap = {};
+      elements(doc, "numFmt").forEach((n) => {
+        numFmtMap[n.getAttribute("numFmtId")] = n.getAttribute("formatCode") || "";
+      });
+
+      const cellXfs = elements(doc, "cellXfs")[0];
+      const styleNumFmtIds = cellXfs ? Array.from(cellXfs.children).filter((el) => el.tagName.endsWith("xf")).map((xf) => {
+        const id = xf.getAttribute("numFmtId") || "0";
+        const code = numFmtMap[id] || "";
+        return { id, code };
+      }) : [];
+
+      return { styleNumFmtIds };
+    }
+
+    function looksLikeDateStyle(style) {
+      if (!style) return false;
+      if (isDateNumFmtId(style.id)) return true;
+      const code = String(style.code || "").toLowerCase();
+      if (!code) return false;
+      if (/[ymdhs]/.test(code) && !/^\s*0+\s*$/.test(code)) return true;
+      return false;
+    }
+
+    function excelSerialToDate(serial) {
+      const ms = Math.round((Number(serial) - 25569) * 86400 * 1000);
+      return new Date(ms);
+    }
+
+    function formatExcelTime(serial) {
+      const day = Math.floor(Number(serial));
+      const frac = Number(serial) - day;
+      const totalMinutes = Math.round(frac * 24 * 60);
+      const h = String(Math.floor(totalMinutes / 60) % 24).padStart(2, "0");
+      const m = String(totalMinutes % 60).padStart(2, "0");
+      return `${h}:${m}`;
+    }
+
+    function parseWorksheet(files, path, sharedStrings, styles) {
+      const raw = files[path];
+      if (!raw) return { __aoa: [] };
+
+      const doc = parseXml(decodeText(raw));
+      const aoa = [];
+      const rowEls = elements(doc, "row");
+
+      rowEls.forEach((rowEl) => {
+        const cells = Array.from(rowEl.children).filter((el) => el.tagName.endsWith("c"));
+        cells.forEach((cell) => {
+          const ref = cell.getAttribute("r") || "";
+          const pos = decodeCellRef(ref);
+          const rowIndex = pos.row;
+          const colIndex = pos.col;
+          if (!aoa[rowIndex]) aoa[rowIndex] = [];
+
+          const type = cell.getAttribute("t");
+          const styleIndex = cell.getAttribute("s");
+          const style = styles.styleNumFmtIds[Number(styleIndex || 0)];
+          const vEl = Array.from(cell.children).find((el) => el.tagName.endsWith("v"));
+          let value = "";
+
+          if (type === "s") {
+            const idx = Number(vEl ? vEl.textContent : 0);
+            value = sharedStrings[idx] ?? "";
+          } else if (type === "inlineStr") {
+            const isEl = Array.from(cell.children).find((el) => el.tagName.endsWith("is"));
+            value = isEl ? elements(isEl, "t").map((t) => t.textContent || "").join("") : "";
+          } else if (type === "b") {
+            value = vEl && vEl.textContent === "1";
+          } else {
+            const rawValue = vEl ? vEl.textContent || "" : "";
+            if (rawValue === "") value = "";
+            else if (!Number.isNaN(Number(rawValue))) {
+              if (looksLikeDateStyle(style)) {
+                const num = Number(rawValue);
+                value = num > 1 ? excelSerialToDate(num) : formatExcelTime(num);
+              } else {
+                value = Number(rawValue);
+              }
+            } else {
+              value = rawValue;
+            }
+          }
+
+          aoa[rowIndex][colIndex] = value;
+        });
+      });
+
+      return { __aoa: aoa };
+    }
+
+    function normalizeTarget(target) {
+      let t = String(target || "").replace(/\\/g, "/");
+      if (t.startsWith("/")) t = t.slice(1);
+      if (!t.startsWith("xl/")) t = "xl/" + t;
+      return t;
+    }
+
+    async function readAsync(arrayBuffer) {
+      const files = await unzip(arrayBuffer);
+
+      if (!files) {
+        const text = decodeText(new Uint8Array(arrayBuffer));
+        return {
+          SheetNames: ["Sheet1"],
+          Sheets: { Sheet1: { __aoa: parseCSV(text) } }
+        };
+      }
+
+      const workbookXml = files["xl/workbook.xml"];
+      const workbookRelsXml = files["xl/_rels/workbook.xml.rels"];
+      if (!workbookXml || !workbookRelsXml) throw new Error("올바른 XLSX 파일이 아닙니다.");
+
+      const workbookDoc = parseXml(decodeText(workbookXml));
+      const relsDoc = parseXml(decodeText(workbookRelsXml));
+
+      const relMap = {};
+      elements(relsDoc, "Relationship").forEach((rel) => {
+        relMap[rel.getAttribute("Id")] = rel.getAttribute("Target");
+      });
+
+      const sharedStrings = parseSharedStrings(files);
+      const styles = parseStyles(files);
+      const SheetNames = [];
+      const Sheets = {};
+
+      elements(workbookDoc, "sheet").forEach((sheet, index) => {
+        const name = sheet.getAttribute("name") || `Sheet${index + 1}`;
+        const rid = sheet.getAttribute("r:id") || sheet.getAttribute("id");
+        const target = normalizeTarget(relMap[rid]);
+        SheetNames.push(name);
+        Sheets[name] = parseWorksheet(files, target, sharedStrings, styles);
+      });
+
+      return { SheetNames, Sheets };
+    }
+
+    function sheet_to_json(sheet, options) {
+      const defval = options && Object.prototype.hasOwnProperty.call(options, "defval") ? options.defval : "";
+      const aoa = sheet && sheet.__aoa ? sheet.__aoa : [];
+      if (!aoa.length) return [];
+
+      const rawHeaders = aoa[0] || [];
+      const headers = rawHeaders.map((h, i) => {
+        const header = String(h ?? "").trim();
+        return header || `__EMPTY_${i + 1}`;
+      });
+
+      const seen = {};
+      const uniqueHeaders = headers.map((h) => {
+        if (!seen[h]) {
+          seen[h] = 1;
+          return h;
+        }
+        seen[h] += 1;
+        return `${h}_${seen[h]}`;
+      });
+
+      const rows = [];
+      for (let r = 1; r < aoa.length; ++r) {
+        const arr = aoa[r] || [];
+        const obj = {};
+        let hasValue = false;
+
+        uniqueHeaders.forEach((header, c) => {
+          const value = arr[c] === undefined || arr[c] === null ? defval : arr[c];
+          if (String(value ?? "").trim() !== "") hasValue = true;
+          obj[header] = value;
+        });
+
+        if (hasValue) rows.push(obj);
+      }
+
+      return rows;
+    }
+
+    function json_to_sheet(rows) {
+      const data = Array.isArray(rows) ? rows : [];
+      const headers = [];
+      data.forEach((row) => {
+        Object.keys(row || {}).forEach((key) => {
+          if (!headers.includes(key)) headers.push(key);
+        });
+      });
+
+      const aoa = [headers];
+      data.forEach((row) => {
+        aoa.push(headers.map((h) => row && row[h] !== undefined ? row[h] : ""));
+      });
+
+      return { __aoa: aoa };
+    }
+
+    function csvEscape(value) {
+      let text = value instanceof Date ? value.toISOString().slice(0, 10) : String(value ?? "");
+      if (/[",\n\r]/.test(text)) text = '"' + text.replace(/"/g, '""') + '"';
+      return text;
+    }
+
+    function sheet_to_csv(sheet) {
+      const aoa = sheet && sheet.__aoa ? sheet.__aoa : [];
+      return aoa.map((row) => (row || []).map(csvEscape).join(",")).join("\n");
+    }
+
+    function book_new() {
+      return { SheetNames: [], Sheets: {} };
+    }
+
+    function safeSheetName(name, existing) {
+      let s = String(name || "Sheet").replace(/[\\/?*\[\]:]/g, " ").trim() || "Sheet";
+      s = s.slice(0, 31);
+      let base = s;
+      let i = 2;
+      while (existing.includes(s)) {
+        const suffix = `_${i++}`;
+        s = base.slice(0, 31 - suffix.length) + suffix;
+      }
+      return s;
+    }
+
+    function book_append_sheet(workbook, sheet, name) {
+      const safeName = safeSheetName(name, workbook.SheetNames);
+      workbook.SheetNames.push(safeName);
+      workbook.Sheets[safeName] = sheet;
+    }
+
+    function sheetXml(sheet) {
+      const aoa = sheet && sheet.__aoa ? sheet.__aoa : [];
+      const rows = aoa.map((row, r) => {
+        const cells = (row || []).map((value, c) => {
+          if (value === undefined || value === null || value === "") return "";
+          const ref = encodeCellRef(r, c);
+          if (typeof value === "number" && Number.isFinite(value)) {
+            return `<c r="${ref}"><v>${value}</v></c>`;
+          }
+          const text = value instanceof Date ? value.toISOString().slice(0, 10) : String(value);
+          return `<c r="${ref}" t="inlineStr"><is><t>${xmlEscape(text)}</t></is></c>`;
+        }).join("");
+        return `<row r="${r + 1}">${cells}</row>`;
+      }).join("");
+
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">` +
+        `<sheetData>${rows}</sheetData></worksheet>`;
+    }
+
+    function buildXlsxFiles(workbook) {
+      const files = {};
+      const sheetNames = workbook.SheetNames || [];
+
+      files["[Content_Types].xml"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">` +
+        `<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>` +
+        `<Default Extension="xml" ContentType="application/xml"/>` +
+        `<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>` +
+        sheetNames.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("") +
+        `<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>` +
+        `</Types>`;
+
+      files["_rels/.rels"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">` +
+        `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>` +
+        `</Relationships>`;
+
+      files["xl/workbook.xml"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">` +
+        `<sheets>` +
+        sheetNames.map((name, i) => `<sheet name="${attrEscape(name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("") +
+        `</sheets></workbook>`;
+
+      files["xl/_rels/workbook.xml.rels"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">` +
+        sheetNames.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("") +
+        `</Relationships>`;
+
+      files["xl/styles.xml"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">` +
+        `<fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>` +
+        `<fills count="1"><fill><patternFill patternType="none"/></fill></fills>` +
+        `<borders count="1"><border/></borders>` +
+        `<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>` +
+        `<cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>` +
+        `</styleSheet>`;
+
+      sheetNames.forEach((name, i) => {
+        files[`xl/worksheets/sheet${i + 1}.xml`] = sheetXml(workbook.Sheets[name]);
+      });
+
+      return files;
+    }
+
+    function makeZip(files) {
+      const chunks = [];
+      const central = [];
+      let offset = 0;
+      const entries = Object.keys(files);
+
+      entries.forEach((name) => {
+        const nameBytes = enc.encode(name);
+        const data = u8(files[name]);
+        const crc = crc32(data);
+        const local = new Uint8Array(30 + nameBytes.length);
+
+        writeU32LE(local, 0, 0x04034b50);
+        writeU16LE(local, 4, 20);
+        writeU16LE(local, 6, 0);
+        writeU16LE(local, 8, 0);
+        writeU16LE(local, 10, 0);
+        writeU16LE(local, 12, 0);
+        writeU32LE(local, 14, crc);
+        writeU32LE(local, 18, data.length);
+        writeU32LE(local, 22, data.length);
+        writeU16LE(local, 26, nameBytes.length);
+        writeU16LE(local, 28, 0);
+        local.set(nameBytes, 30);
+
+        chunks.push(local, data);
+
+        const cen = new Uint8Array(46 + nameBytes.length);
+        writeU32LE(cen, 0, 0x02014b50);
+        writeU16LE(cen, 4, 20);
+        writeU16LE(cen, 6, 20);
+        writeU16LE(cen, 8, 0);
+        writeU16LE(cen, 10, 0);
+        writeU16LE(cen, 12, 0);
+        writeU16LE(cen, 14, 0);
+        writeU32LE(cen, 16, crc);
+        writeU32LE(cen, 20, data.length);
+        writeU32LE(cen, 24, data.length);
+        writeU16LE(cen, 28, nameBytes.length);
+        writeU16LE(cen, 30, 0);
+        writeU16LE(cen, 32, 0);
+        writeU16LE(cen, 34, 0);
+        writeU16LE(cen, 36, 0);
+        writeU32LE(cen, 38, 0);
+        writeU32LE(cen, 42, offset);
+        cen.set(nameBytes, 46);
+        central.push(cen);
+
+        offset += local.length + data.length;
+      });
+
+      const centralOffset = offset;
+      let centralSize = 0;
+      central.forEach((c) => {
+        chunks.push(c);
+        centralSize += c.length;
+      });
+
+      const eocd = new Uint8Array(22);
+      writeU32LE(eocd, 0, 0x06054b50);
+      writeU16LE(eocd, 4, 0);
+      writeU16LE(eocd, 6, 0);
+      writeU16LE(eocd, 8, entries.length);
+      writeU16LE(eocd, 10, entries.length);
+      writeU32LE(eocd, 12, centralSize);
+      writeU32LE(eocd, 16, centralOffset);
+      writeU16LE(eocd, 20, 0);
+      chunks.push(eocd);
+
+      return new Blob(chunks, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    }
+
+    function writeFile(workbook, filename) {
+      const blob = makeZip(buildXlsxFiles(workbook));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename || "workbook.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    window.XLSX = {
+      readAsync,
+      utils: {
+        sheet_to_json,
+        json_to_sheet,
+        sheet_to_csv,
+        book_new,
+        book_append_sheet
+      },
+      writeFile
+    };
+  })();
+  </script>
+
+  <style>
+    :root {
+      --bg: #eef5ff;
+      --panel: #ffffff;
+      --border: #c9d8ee;
+      --text: #102033;
+      --muted: #5f7188;
+      --soft: #f3f8ff;
+      --warn: #b42318;
+      --blue: #003764;
+      --blue-dark: #002847;
+      --blue-soft: #e8f1f8;
+      --blue-line: #9bb8d0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: linear-gradient(180deg, #e8f1f8 0%, #f8fbff 220px, #ffffff 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 1320px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: 5px solid var(--blue);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 91, 172, 0.08);
+    }
+    h1 { margin: 0; font-size: 26px; line-height: 1.25; color: var(--blue-dark); }
+    h2 { margin: 20px 0 8px; font-size: 17px; }
+    p { margin: 8px 0 18px; color: var(--muted); }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    button, label.button, input[type="text"] {
+      height: 38px;
+      border-radius: 7px;
+      font-size: 14px;
+    }
+    button, label.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 13px;
+      border: 1px solid #c9c9c9;
+      background: #fff;
+      color: #111;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    label.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
+    input[type="file"] { display: none; }
+    input[type="text"] {
+      width: 180px;
+      border: 1px solid #c9c9c9;
+      padding: 0 10px;
+    }
+    input.narrow { width: 130px; }
+    input.tiny { width: 74px; }
+    .status {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--blue-soft);
+      border: 1px solid var(--blue-line);
+      border-radius: 7px;
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .files {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .file-chip {
+      border: 1px solid var(--border);
+      background: var(--blue-soft);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 12px;
+      color: #444;
+    }
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      overflow: auto;
+      max-height: 440px;
+      background: #fff;
+    }
+    .table-wrap.small { max-height: 280px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--blue-soft);
+      border-bottom: 1px solid var(--blue-line);
+      padding: 8px 10px;
+      text-align: left;
+      white-space: nowrap;
+      z-index: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+    td {
+      border-bottom: 1px solid #eeeeee;
+      padding: 7px 10px;
+      white-space: nowrap;
+      max-width: 360px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    td.right { text-align: right; }
+    td.warn { color: var(--warn); font-weight: 700; }
+    .empty { padding: 48px; text-align: center; color: #777; cursor: default; }
+    .note { margin-top: 10px; font-size: 13px; color: #666; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .tab-button {
+      border-radius: 999px;
+      height: 34px;
+      padding: 0 14px;
+      background: #fff;
+    }
+    .tab-button.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-card {
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+      padding: 14px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    .stat-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .dashboard-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dashboard-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0 12px;
+    }
+    .step-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(0, 91, 172, 0.05);
+    }
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .step-description {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .step-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .inline-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 38px;
+    }
+    .inline-control .control-label {
+      white-space: nowrap;
+    }
+    .dashboard {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    @media (max-width: 900px) {
+      .step-grid { grid-template-columns: 1fr; }
+    }
+  
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 20px 0 8px;
+    }
+    .section-header h2 {
+      margin: 0;
+    }
+    .section-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .mini-button {
+      height: 30px;
+      padding: 0 10px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+    .mini-button.danger {
+      color: #b42318;
+      border-color: #f3b5af;
+      background: #fff5f4;
+    }
+    .schedule-input {
+      width: 100%;
+      min-width: 96px;
+      height: 30px;
+      border: 1px solid #c9c9c9;
+      border-radius: 5px;
+      padding: 0 7px;
+      font-size: 12px;
+      background: #fff;
+    }
+    .schedule-input.name { min-width: 80px; }
+    .schedule-input.position { min-width: 70px; }
+    .schedule-input.date { min-width: 105px; }
+    .schedule-input.weekday { min-width: 55px; }
+    .schedule-input.time { min-width: 72px; }
+    .schedule-input.note-cell { min-width: 180px; }
+    td.schedule-edit-cell {
+      padding: 4px 6px;
+      max-width: none;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .action-cell {
+      text-align: center;
+      white-space: nowrap;
+    }
+
+  
+    .control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+      margin-bottom: 12px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .control-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .save-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .button-hint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+  
+    button:hover,
+    label.button:hover {
+      border-color: var(--blue);
+      color: var(--blue-dark);
+      background: var(--blue-soft);
+    }
+    label.primary:hover {
+      background: var(--blue-dark);
+      border-color: var(--blue-dark);
+      color: #fff;
+    }
+    button:disabled:hover {
+      background: #fff;
+      border-color: #c9c9c9;
+      color: #111;
+    }
+
+  
+    input[type="text"]:focus {
+      outline: 2px solid rgba(0, 91, 172, 0.18);
+      border-color: var(--blue);
+    }
+
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --border: #d9e0ea;
+      --text: #172033;
+      --muted: #667085;
+      --soft: #f7f9fc;
+      --warn: #b42318;
+      --blue: #003764;
+      --blue-dark: #001f3a;
+      --blue-soft: #eef5fb;
+      --blue-line: #c8d8e8;
+      --red: #e61e2b;
+      --surface: #f8fafc;
+      --line: #e4e9f1;
+      --shadow: 0 18px 46px rgba(16, 24, 40, 0.08);
+    }
+
+    body {
+      padding: 20px;
+      background: #f5f7fb;
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    main {
+      max-width: 1440px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .app-header {
+      padding: 18px 24px 22px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .gov-line,
+    .app-brand,
+    .hero-row,
+    .hero-chips {
+      display: flex;
+      align-items: center;
+    }
+
+    .gov-line {
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .app-brand {
+      min-width: 0;
+      gap: 10px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .app-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-soft));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .app-wordmark {
+      font-size: 17px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .agency-name {
+      padding-left: 11px;
+      border-left: 1px solid var(--line);
+      color: var(--blue-dark);
+      white-space: nowrap;
+    }
+
+    .system-badge,
+    .hero-chips span,
+    .file-chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+    }
+
+    .system-badge {
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .hero-row {
+      justify-content: space-between;
+      gap: 18px;
+      padding-top: 18px;
+    }
+
+    .hero-copy {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: #111827;
+      font-size: 30px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .app-summary {
+      max-width: 760px;
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .hero-chips {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .hero-chips span {
+      padding: 8px 11px;
+      color: #344054;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    main > .step-grid,
+    main > .control-bar,
+    main > .status,
+    main > .files,
+    main > .tabs,
+    main > .tab-panel,
+    main > .dashboard,
+    main > #note {
+      margin-left: 24px;
+      margin-right: 24px;
+    }
+
+    .step-grid {
+      gap: 14px;
+      margin-top: 20px;
+      margin-bottom: 14px;
+    }
+
+    .step-card {
+      border-color: var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: none;
+      padding: 16px;
+    }
+
+    .step-title {
+      color: #182230;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .step-number {
+      background: #111827;
+    }
+
+    .step-description,
+    .button-hint,
+    .note {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .control-bar {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    button,
+    label.button,
+    input[type="text"] {
+      height: 40px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    button,
+    label.button {
+      border-color: #ccd5e2;
+      background: #fff;
+      color: #182230;
+      font-weight: 700;
+    }
+
+    label.primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    button:hover,
+    label.button:hover {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+    }
+
+    label.primary:hover {
+      background: var(--blue-dark);
+      color: #fff;
+    }
+
+    input[type="text"] {
+      border-color: #ccd5e2;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input[type="text"]:focus {
+      outline: 3px solid rgba(0, 55, 100, 0.12);
+      border-color: var(--blue);
+    }
+
+    .status {
+      align-items: center;
+      padding: 12px 14px;
+      border-color: var(--line);
+      border-left: 4px solid var(--blue);
+      border-radius: 12px;
+      background: #fff;
+      color: #344054;
+    }
+
+    .files {
+      gap: 8px;
+    }
+
+    .file-chip {
+      padding: 6px 10px;
+      color: #344054;
+    }
+
+    .tabs {
+      gap: 6px;
+      margin-top: 18px;
+      border-bottom-color: var(--line);
+      padding-bottom: 0;
+    }
+
+    .tab-button {
+      height: 40px;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .tab-button.active {
+      border-bottom-color: var(--blue);
+      background: transparent;
+      color: var(--blue-dark);
+    }
+
+    .section-header {
+      margin-top: 22px;
+    }
+
+    h2 {
+      color: #182230;
+      letter-spacing: 0;
+    }
+
+    .mini-button {
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    .table-wrap {
+      border-color: var(--line);
+      border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    table {
+      font-size: 13px;
+    }
+
+    th {
+      background: #f1f5f9;
+      border-bottom-color: var(--line);
+      color: #344054;
+      font-weight: 800;
+    }
+
+    td {
+      border-bottom-color: #edf1f6;
+    }
+
+    tbody tr:hover td {
+      background: #fafcff;
+    }
+
+    .dashboard {
+      margin-top: 24px;
+      padding-top: 22px;
+      padding-bottom: 24px;
+      border-top-color: var(--line);
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      min-height: 104px;
+      border-color: var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: none;
+      padding: 13px;
+    }
+
+    .stat-card:first-child {
+      border-top: 3px solid var(--blue);
+    }
+
+    .stat-card:nth-child(2) {
+      border-top: 3px solid #0b7a75;
+    }
+
+    .stat-card:nth-child(3) {
+      border-top: 3px solid var(--red);
+    }
+
+    .stat-label,
+    .stat-sub {
+      color: var(--muted);
+    }
+
+    .stat-value {
+      color: #111827;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .dashboard-row {
+      gap: 14px;
+    }
+
+    @media (max-width: 1180px) {
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 12px;
+      }
+
+      main {
+        border-radius: 14px;
+      }
+
+      .hero-row,
+      .gov-line {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero-chips {
+        justify-content: flex-start;
+      }
+
+      main > .step-grid,
+      main > .control-bar,
+      main > .status,
+      main > .files,
+      main > .tabs,
+      main > .tab-panel,
+      main > .dashboard,
+      main > #note {
+        margin-left: 16px;
+        margin-right: 16px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app-brand {
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  
+    .footer {
+      max-width: 1320px;
+      margin: 14px auto 0;
+      padding: 12px 8px 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+  <main>
+    <header class="app-header">
+      <div class="gov-line">
+        <div class="app-brand" aria-label="특근매식비 정산 프로그램">
+          <span class="app-mark" aria-hidden="true">AX</span>
+          <span class="app-wordmark">특근매식비 정산</span>
+          <span class="agency-name">통일부</span>
+        </div>
+        <span class="system-badge">서무업무 AX</span>
+      </div>
+
+      <div class="hero-row">
+        <div class="hero-copy">
+          <div class="eyebrow">Monthly Settlement Automation</div>
+          <h1>특근매식비 정산 프로그램</h1>
+          <p class="app-summary">매식비 제출내역과 근무시간표를 대조해 집행대상 검증, 개인별 합계, 검토필요 내역을 한 번에 정리합니다.</p>
+        </div>
+        <div class="hero-chips" aria-label="주요 처리 상태">
+          <span>오프라인 XLSX</span>
+          <span>자동 헤더 감지</span>
+          <span>정산연번 생성</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="step-grid">
+      <section class="step-card">
+        <h2 class="step-title"><span class="step-number">1</span>매식비 제출</h2>
+        <p class="step-description">부서원이 제출한 매식비 스프레드시트를 먼저 업로드합니다. 첫 줄이 제목인 파일은 컬럼 행을 자동으로 찾고, 제출 연번은 중복되어도 원본 참고값으로 보존합니다.</p>
+        <div class="step-actions">
+          <label class="button primary">
+            매식비 파일 선택
+            <input id="fileInput" type="file" multiple accept=".xlsx,.csv" />
+          </label>
+          <button id="downloadTemplate">양식 저장</button>
+          <div class="inline-control">
+            <label class="control-label" for="mealHeaderRowInput">헤더 행</label>
+            <input id="mealHeaderRowInput" class="tiny" type="text" inputmode="numeric" placeholder="자동" title="비워두면 일자·성명(구분)·인원수·사용금액 컬럼이 있는 행을 자동으로 찾습니다." />
+          </div>
+        </div>
+      </section>
+
+      <section class="step-card">
+        <h2 class="step-title"><span class="step-number">2</span>근무시간표 제출</h2>
+        <p class="step-description">이름·직급·일자·요일·출근지정시간·퇴근지정시간이 있는 근무시간표를 업로드합니다. 출근지정시간이 비어 있으면 09:00, 퇴근지정시간이 비어 있으면 18:00 정각으로 간주하며, 제목 줄과 완전히 빈 행은 자동 제외됩니다.</p>
+        <div class="step-actions">
+          <label class="button">
+            근무시간표 선택
+            <input id="scheduleInput" type="file" multiple accept=".xlsx,.csv" />
+          </label>
+          <div class="inline-control">
+            <label class="control-label" for="scheduleHeaderRowInput">헤더 행</label>
+            <input id="scheduleHeaderRowInput" class="tiny" type="text" inputmode="numeric" placeholder="자동" title="비워두면 이름·일자·출근지정시간·퇴근지정시간 컬럼이 있는 행을 자동으로 찾습니다." />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="control-bar">
+      <div class="control-group">
+        <label class="control-label" for="searchInput">검색어</label>
+        <input id="searchInput" type="text" placeholder="이름·일자·파일명 검색" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="limitInput">1인 1식 단가</label>
+        <input id="limitInput" class="narrow" type="text" inputmode="numeric" value="9000" placeholder="9000" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="thresholdInput">초과근무 인정기준</label>
+        <input id="thresholdInput" class="narrow" type="text" inputmode="numeric" value="60" placeholder="60분" />
+      </div>
+
+      <div class="control-group">
+        <span class="control-label">저장</span>
+        <div class="save-actions">
+          <button id="downloadXlsx" disabled>전체 XLSX 저장</button>
+          <button id="downloadCsv" disabled>통합목록 CSV 저장</button>
+          <button id="resetButton">초기화</button>
+        </div>
+      </div>
+
+      <div class="button-hint">
+        파일 업로드 전에는 저장 버튼이 비활성화됩니다.<br />
+        전체 XLSX에는 통합목록·근무시간표정리·사용자출퇴근확인·집행대상검증·개인별합계가 포함됩니다.
+      </div>
+    </div>
+
+    <div class="status">
+      <span id="message">1단계 매식비 파일과 2단계 근무시간표를 업로드하면 아래 결과표와 대시보드가 자동 생성됩니다.</span>
+      <span id="stats">매식비파일 0개 · 근무시간표 0건 · 거래 0건 · 대상 0명 · 검토필요 0건</span>
+    </div>
+
+    <div id="fileList" class="files"></div>
+
+
+    <div class="tabs">
+      <button class="tab-button active" data-tab="transactions">통합목록</button>
+      <button class="tab-button" data-tab="schedule">근무시간표</button>
+      <button class="tab-button" data-tab="attendance">사용자 출퇴근확인</button>
+      <button class="tab-button" data-tab="ledger">집행대상검증</button>
+      <button class="tab-button" data-tab="summary">개인별합계</button>
+    </div>
+
+    <section id="tab-transactions" class="tab-panel active">
+      <div class="section-header">
+        <h2>통합 목록</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="exportTransactionsButton" disabled>이 목록 저장</button>
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top: 8px;">
+        <button id="attendanceMealSortButton" type="button">식사순 정렬(조식→중식→석식)</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead id="transactionHead">
+            <tr><th>업로드 후 원본 컬럼이 표시됩니다.</th></tr>
+          </thead>
+          <tbody id="transactionBody">
+            <tr><td class="empty">표시할 데이터가 없습니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section id="tab-schedule" class="tab-panel">
+      <div class="section-header">
+        <h2>근무시간표 정리</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="addScheduleRowButton" type="button">행 추가</button>
+          <button class="mini-button" id="addUnverifiedScheduleRowsButton" type="button">미검증행 추가</button>
+          <button class="mini-button" id="exportScheduleButton" disabled>이 목록 저장</button>
+        </div>
+      </div>
+      <p class="note">업로드한 근무시간표에서 필요한 컬럼을 표시합니다. 이 탭에서 행 추가·삭제, 개별 셀 수정, 비고 입력이 가능하며 수정 즉시 집행대상 검증과 사용자 출퇴근확인에 다시 반영됩니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-schedule-sort="이름">이름</th>
+              <th data-schedule-sort="직급">직급</th>
+              <th data-schedule-sort="일자">일자</th>
+              <th data-schedule-sort="요일">요일</th>
+              <th data-schedule-sort="출근지정시간">출근지정시간</th>
+              <th data-schedule-sort="퇴근지정시간">퇴근지정시간</th>
+              <th data-schedule-sort="비고">비고</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody">
+            <tr><td colspan="8" class="empty">근무시간표를 업로드하거나 행을 추가하면 표시됩니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section id="tab-attendance" class="tab-panel">
+      <div class="section-header">
+        <h2>사용자 출퇴근확인</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="exportAttendanceButton" disabled>이 목록 저장</button>
+        </div>
+      </div>
+      <p class="note">매식비 표의 일자·성명을 기준으로 근무시간표의 일자·이름이 동시에 일치하는 행만 검증합니다. 같은 사람·같은 일자에 조식과 석식 등 여러 식사건이 있으면 근무기록은 1칸으로 통합하고, 식사구분만 함께 표시합니다. 기본 정렬은 일자순, 식사순(조식→중식→석식)입니다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-attendance-sort="이름">이름</th>
+              <th data-attendance-sort="직급">직급</th>
+              <th data-attendance-sort="일자">일자</th>
+              <th data-attendance-sort="식사구분">식사구분</th>
+              <th data-attendance-sort="요일">요일</th>
+              <th data-attendance-sort="출근지정시간">출근지정시간</th>
+              <th data-attendance-sort="퇴근지정시간">퇴근지정시간</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceBody">
+            <tr><td colspan="7" class="empty">매식비와 근무시간표가 겹치는 행이 표시됩니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-ledger" class="tab-panel">
+      <div class="section-header">
+        <h2>집행대상 검증</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="exportLedgerButton" disabled>이 목록 저장</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-ledger-sort="일자">일자</th>
+              <th data-ledger-sort="성명">성명</th>
+              <th data-ledger-sort="구분">구분</th>
+              <th data-ledger-sort="인원수">인원수</th>
+              <th data-ledger-sort="총사용금액">총사용금액</th>
+              <th data-ledger-sort="배분금액">배분금액</th>
+              <th data-ledger-sort="요일">요일</th>
+              <th data-ledger-sort="출근지정시간">출근지정시간</th>
+              <th data-ledger-sort="퇴근지정시간">퇴근지정시간</th>
+              <th data-ledger-sort="근무시간">근무시간</th>
+              <th data-ledger-sort="집행대상판정">집행대상판정</th>
+              <th data-ledger-sort="판정사유">판정사유</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody">
+            <tr><td colspan="12" class="empty">근무시간표와 매식비 파일을 업로드하면 검증 결과가 표시됩니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-summary" class="tab-panel">
+      <div class="section-header">
+        <h2>개인별 합계</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="exportSummaryButton" disabled>이 목록 저장</button>
+        </div>
+      </div>
+      <div class="table-wrap small">
+        <table>
+          <thead>
+            <tr>
+              <th data-summary-sort="성명">성명</th>
+              <th data-summary-sort="참여건수">참여건수</th>
+              <th data-summary-sort="조식">조식</th>
+              <th data-summary-sort="중식">중식</th>
+              <th data-summary-sort="석식">석식</th>
+              <th data-summary-sort="배분금액합계">배분금액합계</th>
+              <th data-summary-sort="대상건수">대상건수</th>
+              <th data-summary-sort="검토필요건수">검토필요건수</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody">
+            <tr><td colspan="8" class="empty">집계할 데이터가 없습니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section class="dashboard">
+      <h2>대시보드</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">총 사용금액</div>
+          <div id="statTotalAmount" class="stat-value">0원</div>
+          <div class="stat-sub">거래 기준 총액</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">거래 건수</div>
+          <div id="statTransactionCount" class="stat-value">0건</div>
+          <div class="stat-sub">검색필터 반영</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">중복 제외 사용인원</div>
+          <div id="statUniqueUsers" class="stat-value">0명</div>
+          <div class="stat-sub">성명 기준 고유 인원</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">지급가능 금액</div>
+          <div id="statEligibleAmount" class="stat-value">0원</div>
+          <div class="stat-sub">대상 판정자 배분금액 합계</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">중복 제외 지급가능 인원</div>
+          <div id="statEligibleUniqueUsers" class="stat-value">0명</div>
+          <div class="stat-sub">대상 판정자 고유 인원</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">검토필요 거래</div>
+          <div id="statReviewCount" class="stat-value">0건</div>
+          <div class="stat-sub">비대상·미확인·오류 포함</div>
+        </div>
+      </div>
+
+      <div class="dashboard-row">
+        <div>
+          <h2>식사구분별 통계</h2>
+          <div class="table-wrap small">
+            <table>
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>거래건수</th>
+                  <th>사용금액</th>
+                  <th>지급가능금액</th>
+                </tr>
+              </thead>
+              <tbody id="mealStatsBody">
+                <tr><td colspan="4" class="empty">집계할 데이터가 없습니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <h2>판정별 통계</h2>
+          <div class="table-wrap small">
+            <table>
+              <thead>
+                <tr>
+                  <th>판정</th>
+                  <th>중복 제외 인원</th>
+                  <th>배분금액</th>
+                  <th>조치</th>
+                </tr>
+              </thead>
+              <tbody id="decisionStatsBody">
+                <tr><td colspan="4" class="empty">집계할 데이터가 없습니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="note" class="note"></div>
+  </main>
+
+  <script>
+    const DATE_HEADERS = ["일자", "날짜", "사용일자", "사용일", "거래일자", "승인일자", "결제일자", "결제일", "집행일자", "집행일", "카드사용일자"];
+    const NAME_MEAL_HEADERS = [
+      "성명(구분)", "성명구분", "성명", "이름", "참석자", "사용자", "이용자",
+      "성명(식사)", "성명+식사", "성명+(조식/중식/석식)", "성명(조식/중식/석식)",
+      "성명및구분", "성명 및 구분", "사용자구분", "사용자 구분", "성명식사구분", "성명 식사 구분"
+    ];
+    const PEOPLE_COUNT_HEADERS = ["인원수", "인원", "사용인원", "참석인원", "식수", "명수", "사용인원수", "참석인원수"];
+    const AMOUNT_HEADERS = ["사용금액", "금액", "결제금액", "승인금액", "매식비", "특근매식비", "사용액", "결제액", "승인액", "집행액", "금액원"];
+    const SERIAL_HEADERS = ["연번", "제출연번", "원본연번", "정산연번", "연번기호", "연번 기호", "기호", "일련번호", "순번", "번호", "No", "NO", "no", "No."];
+    const MEAL_STANDARD_OUTPUT_HEADERS = ["정산연번", "제출연번", "일자", "성명(구분)", "인원수", "사용금액"];
+    const SCHEDULE_STANDARD_OUTPUT_HEADERS = ["이름", "직급", "일자", "요일", "출근지정시간", "퇴근지정시간", "비고"];
+
+    const SCHEDULE_DATE_HEADERS = ["일자", "날짜", "근무일자", "근무일", "사용일자"];
+    const SCHEDULE_NAME_HEADERS = ["이름", "성명", "직원명", "부서원", "사용자"];
+    const SCHEDULE_POSITION_HEADERS = ["직급", "직위", "직책", "급수", "직급명"];
+    const SCHEDULE_WEEKDAY_HEADERS = ["요일", "근무요일", "요일구분"];
+    const SCHEDULE_START_HEADERS = ["출근지정시간", "출근시간", "근무시작", "근무시작시간", "시작시간"];
+    const SCHEDULE_END_HEADERS = ["퇴근지정시간", "퇴근시간", "근무종료", "근무종료시간", "종료시간"];
+    const SCHEDULE_NOTE_HEADERS = ["비고", "메모", "참고", "특이사항", "수정사항", "확인사항"];
+    const MEAL_HEADER_GROUPS = [DATE_HEADERS, NAME_MEAL_HEADERS, PEOPLE_COUNT_HEADERS, AMOUNT_HEADERS, SERIAL_HEADERS];
+    const SCHEDULE_HEADER_GROUPS = [
+      SCHEDULE_NAME_HEADERS,
+      SCHEDULE_POSITION_HEADERS,
+      SCHEDULE_DATE_HEADERS,
+      SCHEDULE_WEEKDAY_HEADERS,
+      SCHEDULE_START_HEADERS,
+      SCHEDULE_END_HEADERS,
+      SCHEDULE_NOTE_HEADERS
+    ];
+
+    const STANDARD_START = 9 * 60;
+    const STANDARD_END = 18 * 60;
+    const STANDARD_WORK_MINUTES = 8 * 60;
+
+    let rows = [];
+    let files = [];
+    let scheduleRows = [];
+    let scheduleRowSeq = 0;
+    let scheduleFiles = [];
+    let scheduleByDateName = new Map();
+    let scheduleByName = new Map();
+
+    let outputHeaders = [];
+    let filteredRows = [];
+    let sortedTransactionRows = [];
+    let ledgerRows = [];
+    let sortedLedgerRows = [];
+    let attendanceRows = [];
+    let sortedAttendanceRows = [];
+    let sortedScheduleRows = [];
+    let summaryRows = [];
+    let sortedSummaryRows = [];
+    let reviewRows = [];
+
+    let transactionSort = { key: null, direction: "asc" };
+    let scheduleSort = { key: "일자", direction: "asc" };
+    let attendanceSort = { key: "일자", direction: "asc" };
+    let ledgerSort = { key: "일자", direction: "asc" };
+    let summarySort = { key: "성명", direction: "asc" };
+    let activeTab = "transactions";
+
+    const $ = (id) => document.getElementById(id);
+
+    const normalizeHeader = (value) =>
+      String(value || "").trim().replace(/\s+/g, "").replace(/[<>]/g, "");
+
+    const normalizeHeaderKey = (value) =>
+      normalizeHeader(value)
+        .toLowerCase()
+        .replace(/[^0-9a-z가-힣]/g, "");
+
+    const isHeaderMatch = (header, candidate) => {
+      const headerKey = normalizeHeaderKey(header);
+      const candidateKey = normalizeHeaderKey(candidate);
+      if (!headerKey || !candidateKey) return false;
+      if (headerKey === candidateKey) return true;
+      return candidateKey.length >= 2 && headerKey.includes(candidateKey);
+    };
+
+    const normalizeNameKey = (value) =>
+      String(value || "").replace(/\s+/g, "").trim();
+
+    const makeScheduleKey = (date, name) => {
+      const normalized = normalizeDate(date);
+      const dateKey = normalized || String(date || "").trim();
+      return `${dateKey}|${normalizeNameKey(name)}`;
+    };
+
+    const findHeader = (headers, candidates) => {
+      return headers.find((header) => candidates.some((candidate) => isHeaderMatch(header, candidate)));
+    };
+
+    const HEADER_SCAN_LIMIT = 25;
+
+    const parseManualHeaderRow = (inputId) => {
+      const input = $(inputId);
+      const value = input ? String(input.value || "").trim() : "";
+      if (!value) return null;
+
+      const rowNumber = Number(value.replace(/[^0-9]/g, ""));
+      return Number.isInteger(rowNumber) && rowNumber > 0 ? rowNumber : null;
+    };
+
+    const buildUniqueHeaders = (row, width) => {
+      const headers = [];
+      for (let i = 0; i < width; i += 1) {
+        const header = String((row || [])[i] ?? "").trim();
+        headers.push(header || `__EMPTY_${i + 1}`);
+      }
+
+      const seen = {};
+      return headers.map((header) => {
+        if (!seen[header]) {
+          seen[header] = 1;
+          return header;
+        }
+        seen[header] += 1;
+        return `${header}_${seen[header]}`;
+      });
+    };
+
+    const countHeaderMatches = (row, candidateGroups) => {
+      const cells = (row || []).map((cell) => String(cell ?? "").trim()).filter(Boolean);
+      if (!cells.length) return 0;
+      return candidateGroups.reduce((count, candidates) => (
+        findHeader(cells, candidates) ? count + 1 : count
+      ), 0);
+    };
+
+    const countNonEmptyCells = (row) =>
+      (row || []).filter((cell) => String(cell ?? "").trim() !== "").length;
+
+    const detectHeaderRowIndex = (aoa, candidateGroups) => {
+      let bestIndex = 0;
+      let bestScore = 0;
+      const scanLimit = Math.min(aoa.length, HEADER_SCAN_LIMIT);
+
+      for (let i = 0; i < scanLimit; i += 1) {
+        const score = countHeaderMatches(aoa[i], candidateGroups);
+        if (score > bestScore) {
+          bestScore = score;
+          bestIndex = i;
+        }
+      }
+
+      if (bestScore >= 2) return bestIndex;
+      if (bestScore >= 1 && countNonEmptyCells(aoa[bestIndex]) >= 3) return bestIndex;
+      return 0;
+    };
+
+    const rowsFromSheet = (sheet, candidateGroups, manualHeaderRowNumber) => {
+      const aoa = sheet && sheet.__aoa ? sheet.__aoa : [];
+      if (!aoa.length) return { rows: [], headers: [], headerRowNumber: 0 };
+
+      const autoHeaderIndex = detectHeaderRowIndex(aoa, candidateGroups);
+      const manualHeaderIndex =
+        manualHeaderRowNumber && manualHeaderRowNumber <= aoa.length
+          ? manualHeaderRowNumber - 1
+          : null;
+      const headerRowIndex = manualHeaderIndex ?? autoHeaderIndex;
+      const width = aoa.reduce((max, row) => Math.max(max, (row || []).length), 0);
+      const headers = buildUniqueHeaders(aoa[headerRowIndex], width);
+      const rows = [];
+
+      for (let r = headerRowIndex + 1; r < aoa.length; r += 1) {
+        const arr = aoa[r] || [];
+        const obj = {};
+        let hasValue = false;
+
+        headers.forEach((header, c) => {
+          const value = arr[c] === undefined || arr[c] === null ? "" : arr[c];
+          if (String(value ?? "").trim() !== "") hasValue = true;
+          obj[header] = value;
+        });
+
+        if (hasValue) {
+          Object.defineProperty(obj, "__sourceRowNumber", {
+            value: r + 1,
+            enumerable: false
+          });
+          rows.push(obj);
+        }
+      }
+
+      return { rows, headers, headerRowNumber: headerRowIndex + 1 };
+    };
+
+    const normalizeDate = (value) => {
+      if (value instanceof Date && !Number.isNaN(value.getTime())) {
+        return value.toISOString().slice(0, 10);
+      }
+
+      const text = String(value || "").trim();
+      if (!text) return "";
+
+      const compactDateMatch = text.match(/^(\d{4})(\d{2})(\d{2})$/);
+      if (compactDateMatch) {
+        const y = compactDateMatch[1];
+        const month = Number(compactDateMatch[2]);
+        const day = Number(compactDateMatch[3]);
+        if (Number.isInteger(month) && Number.isInteger(day) && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          const m = String(month).padStart(2, "0");
+          const d = String(day).padStart(2, "0");
+          return `${y}-${m}-${d}`;
+        }
+      }
+
+      const cleaned = text
+        .replace(/[년월]/g, "-")
+        .replace(/[일.\/]/g, "-")
+        .replace(/\s+/g, "")
+        .replace(/-+/g, "-")
+        .replace(/-$/g, "");
+
+      const parts = cleaned.split("-").filter(Boolean);
+      if (parts.length >= 3) {
+        const y = parts[0].length === 2 ? `20${parts[0]}` : parts[0];
+        const month = Number(parts[1]);
+        const day = Number(parts[2]);
+        if (Number.isInteger(month) && Number.isInteger(day) && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          const m = String(month).padStart(2, "0");
+          const d = String(day).padStart(2, "0");
+          return `${y}-${m}-${d}`;
+        }
+      }
+
+      if (parts.length === 2) {
+        const month = Number(parts[0]);
+        const day = Number(parts[1]);
+        if (Number.isInteger(month) && Number.isInteger(day) && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          const y = String(new Date().getFullYear());
+          const m = String(month).padStart(2, "0");
+          const d = String(day).padStart(2, "0");
+          return `${y}-${m}-${d}`;
+        }
+      }
+
+      return text;
+    };
+
+    const formatDateForOutput = (value) => {
+      const normalized = normalizeDate(value);
+      return /^\d{4}-\d{2}-\d{2}$/.test(String(normalized || ""))
+        ? normalized
+        : String(value || "").trim();
+    };
+
+    const getScheduleDate = (row) =>
+      normalizeDate(row && (row.normalizedDate || row.일자 || row.rawDate || ""));
+
+    const makeScheduleRowId = () => {
+      scheduleRowSeq += 1;
+      return `schedule-${Date.now().toString(36)}-${scheduleRowSeq}`;
+    };
+
+    const weekdayFromDate = (value) => {
+      const normalized = normalizeDate(value);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return "";
+      const [year, month, day] = normalized.split("-").map(Number);
+      const date = new Date(year, month - 1, day);
+      if (Number.isNaN(date.getTime())) return "";
+      return ["일", "월", "화", "수", "목", "금", "토"][date.getDay()] || "";
+    };
+
+    const ensureScheduleRowMeta = (row = {}) => {
+      const normalized = normalizeDate(row.normalizedDate || row.일자 || row.rawDate || "");
+      const rawStart = String(row.출근지정시간 || "").trim();
+      const rawEnd = String(row.퇴근지정시간 || "").trim();
+      const weekday = String(row.요일 || "").trim() || weekdayFromDate(normalized || row.일자 || row.rawDate || "");
+
+      row._scheduleId = row._scheduleId || makeScheduleRowId();
+      row.이름 = String(row.이름 || "").trim();
+      row.직급 = String(row.직급 || "").trim();
+      row.일자 = normalized || String(row.일자 || row.rawDate || "").trim();
+      row.rawDate = row.rawDate || row.일자;
+      row.normalizedDate = normalized || normalizeDate(row.일자);
+      row.요일 = weekday;
+      row.요일Parsed = parseWeekday(weekday);
+      row.출근지정시간 = rawStart || "09:00";
+      row.퇴근지정시간 = rawEnd || "18:00";
+      row.비고 = String(row.비고 || "").trim();
+      return row;
+    };
+
+    const createScheduleRow = (overrides = {}) => ensureScheduleRowMeta({
+      이름: "",
+      직급: "",
+      일자: "",
+      rawDate: "",
+      normalizedDate: "",
+      요일: "",
+      출근지정시간: "09:00",
+      퇴근지정시간: "18:00",
+      비고: "수기 추가",
+      원본파일: "수기입력",
+      원본시트: "근무시간표 정리",
+      원본행: "수기",
+      ...overrides
+    });
+
+    const sortableDateNumber = (value) => {
+      const text = String(value ?? "").trim();
+      if (!text || !/[0-9]/.test(text)) return null;
+      const normalized = normalizeDate(value);
+      return /^\d{4}-\d{2}-\d{2}$/.test(normalized) ? Number(normalized.replace(/-/g, "")) : null;
+    };
+
+    const parseAmount = (value) => {
+      const number = Number(String(value || "").replace(/[^0-9.-]/g, ""));
+      return Number.isFinite(number) ? number : 0;
+    };
+
+    const parsePeopleCount = (value) => {
+      const number = Number(String(value || "").replace(/[^0-9]/g, ""));
+      return Number.isFinite(number) && number > 0 ? number : 0;
+    };
+
+    const MEAL_MARKER_REGEX = /(조식|중식|석식|아침|점심|저녁|\(\s*(조식|중식|석식|조|중|석|아침|점심|저녁)\s*\)|\[\s*(조식|중식|석식|조|중|석|아침|점심|저녁)\s*\])/g;
+
+    const mealFromMarker = (marker) => {
+      const text = String(marker || "");
+      if (/조식|아침|조/.test(text)) return "조식";
+      if (/중식|점심|중/.test(text)) return "중식";
+      if (/석식|저녁|석/.test(text)) return "석식";
+      return "";
+    };
+
+    const detectLastMeal = (value) => {
+      const text = String(value || "");
+      let meal = "";
+      for (const match of text.matchAll(MEAL_MARKER_REGEX)) {
+        const found = mealFromMarker(match[0]);
+        if (found) meal = found;
+      }
+      return meal;
+    };
+
+    const parseMeal = (value) => {
+      const text = String(value || "").trim();
+      if (!text) return "";
+      return detectLastMeal(text) || "석식";
+    };
+
+    const appendDinnerToLastName = (segment) => {
+      const text = String(segment || "");
+      if (!text.trim()) return text;
+
+      const extraPeopleMatch = text.match(/^(.*?\S)(\s*외\s*\d+\s*명.*)$/);
+      if (extraPeopleMatch) return `${extraPeopleMatch[1]}(석식)${extraPeopleMatch[2]}`;
+
+      return text.replace(/(\S+)(\s*)$/, "$1(석식)$2");
+    };
+
+    const getLastParticipantSegment = (value) => {
+      const text = String(value || "");
+      const match = text.match(/^(.*(?:[,，、\/]|\s+및\s+|\s*&\s*))(.*)$/);
+      if (match) return { prefix: match[1], tail: match[2] };
+      return { prefix: "", tail: text };
+    };
+
+    const lastParticipantHasMeal = (segment) => {
+      const text = String(segment || "").trim();
+      if (!text) return false;
+
+      const withoutExtraPeople = text.replace(/\s*외\s*\d+\s*명.*$/, "").trim();
+      const tokens = withoutExtraPeople.split(/\s+/).filter(Boolean);
+      const lastToken = tokens.length ? tokens[tokens.length - 1] : withoutExtraPeople;
+      return Boolean(detectLastMeal(lastToken));
+    };
+
+    const normalizeNameMealText = (value) => {
+      const text = String(value || "").trim().replace(/\s+/g, " ");
+      if (!text) return "";
+
+      const { prefix, tail } = getLastParticipantSegment(text);
+      if (lastParticipantHasMeal(tail)) return text;
+      return `${prefix}${appendDinnerToLastName(tail)}`;
+    };
+
+    const removeMealMarkers = (value) =>
+      String(value || "")
+        .replace(MEAL_MARKER_REGEX, "")
+        .replace(/외\s*\d+\s*명/g, "");
+
+    const parseNameMealEntries = (value) => {
+      const text = normalizeNameMealText(value);
+      const fallbackMeal = parseMeal(text) || "석식";
+
+      return text
+        .split(/[,，、\/]|\s+및\s+|\s+외\s+|\s*&\s*/g)
+        .map((part) => {
+          const meal = detectLastMeal(part) || fallbackMeal;
+          const name = removeMealMarkers(part)
+            .replace(/[+_]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+          return { name, meal };
+        })
+        .filter((entry) => entry.name && !/^\d+\s*명$/.test(entry.name));
+    };
+
+    const parseNames = (value) => parseNameMealEntries(value).map((entry) => entry.name);
+
+    const parseWeekday = (value) => {
+      const text = String(value ?? "").trim();
+      if (!text) return { value: "미확인", isHoliday: null };
+
+      if (/토|토요일|sat|saturday/i.test(text)) return { value: "토", isHoliday: true };
+      if (/일|일요일|sun|sunday/i.test(text)) return { value: "일", isHoliday: true };
+
+      if (/월|화|수|목|금|mon|tue|wed|thu|fri/i.test(text)) {
+        return { value: text, isHoliday: false };
+      }
+
+      return { value: text, isHoliday: null };
+    };
+
+    const parseTimeToMinutes = (value) => {
+      if (value instanceof Date && !Number.isNaN(value.getTime())) {
+        return value.getHours() * 60 + value.getMinutes();
+      }
+
+      if (typeof value === "number" && value >= 0 && value < 1) {
+        return Math.round(value * 24 * 60);
+      }
+
+      const text = String(value || "").trim();
+      if (!text) return null;
+
+      const decimal = Number(text);
+      if (Number.isFinite(decimal) && decimal >= 0 && decimal < 1) {
+        return Math.round(decimal * 24 * 60);
+      }
+
+      const match = text.match(/(\d{1,2})\s*[:시]\s*(\d{1,2})?/);
+      if (match) {
+        const hour = Number(match[1]);
+        const minute = Number(match[2] || 0);
+        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) return hour * 60 + minute;
+      }
+
+      const digits = text.replace(/[^0-9]/g, "");
+      if (digits.length === 3 || digits.length === 4) {
+        const hour = Number(digits.slice(0, -2));
+        const minute = Number(digits.slice(-2));
+        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) return hour * 60 + minute;
+      }
+
+      if (digits.length <= 2 && digits.length > 0) {
+        const hour = Number(digits);
+        if (hour >= 0 && hour <= 23) return hour * 60;
+      }
+
+      return null;
+    };
+
+    const formatMinutesAsTime = (minutes) => {
+      if (!Number.isFinite(minutes)) return "";
+      const normalized = ((minutes % 1440) + 1440) % 1440;
+      const h = String(Math.floor(normalized / 60)).padStart(2, "0");
+      const m = String(normalized % 60).padStart(2, "0");
+      return `${h}:${m}`;
+    };
+
+    const calculateWorkMinutes = (start, end) => {
+      if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+      let elapsed = end - start;
+      if (elapsed < 0) elapsed += 24 * 60;
+      const lunchDeduction = elapsed >= 6 * 60 ? 60 : 0;
+      return Math.max(0, elapsed - lunchDeduction);
+    };
+
+    const minutesToHourText = (minutes) => {
+      if (!Number.isFinite(minutes)) return "";
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      return m ? `${h}시간 ${m}분` : `${h}시간`;
+    };
+
+    const addHeaders = (headers) => {
+      headers.forEach((header) => {
+        if (/^__EMPTY_\d+$/.test(String(header))) return;
+        if (!outputHeaders.includes(header)) outputHeaders.push(header);
+      });
+    };
+
+    const makeBasicStatus = (row) => {
+      const problems = [];
+      const max = Number(String($("limitInput").value).replace(/[^0-9]/g, ""));
+      const nameCount = Array.isArray(row.parsedNames) ? row.parsedNames.length : 0;
+
+      if (!row.normalizedDate) problems.push("일자 누락");
+      if (!row.nameMealText) problems.push("성명(구분) 누락");
+      if (!row.meal) problems.push("구분 누락");
+      if (!row.peopleCount) problems.push("인원수 누락");
+      if (!row.amount) problems.push("사용금액 누락");
+      if (nameCount > 0 && row.peopleCount > 0 && nameCount !== row.peopleCount) problems.push("성명 수와 인원수 불일치");
+      if (max > 0 && row.peopleCount > 0 && row.amount > max * row.peopleCount) problems.push("1인 단가 초과");
+
+      return problems.length ? problems.join(", ") : "정상";
+    };
+
+    const updateScheduleCell = (id, field, value) => {
+      const row = scheduleRows.find((item) => item._scheduleId === id);
+      if (!row) return;
+
+      if (field === "일자") {
+        const normalized = normalizeDate(value);
+        row.rawDate = value;
+        row.일자 = normalized || String(value || "").trim();
+        row.normalizedDate = normalized;
+        if (!String(row.요일 || "").trim()) {
+          row.요일 = weekdayFromDate(normalized);
+          row.요일Parsed = parseWeekday(row.요일);
+        }
+      } else if (field === "요일") {
+        row.요일 = String(value || "").trim();
+        row.요일Parsed = parseWeekday(row.요일);
+      } else if (field === "출근지정시간") {
+        row.출근지정시간 = String(value || "").trim() || "09:00";
+      } else if (field === "퇴근지정시간") {
+        row.퇴근지정시간 = String(value || "").trim() || "18:00";
+      } else if (field === "비고") {
+        row.비고 = String(value || "").trim();
+      } else {
+        row[field] = String(value || "").trim();
+      }
+
+      ensureScheduleRowMeta(row);
+      recalc();
+    };
+
+    const addScheduleRow = (overrides = {}) => {
+      scheduleRows.push(createScheduleRow(overrides));
+      scheduleFiles = Array.from(new Set([...scheduleFiles, "수기입력"]));
+      activeTab = "schedule";
+      recalc();
+      $("message").textContent = "근무시간표 정리에 수기 행을 추가했습니다. 필요한 셀을 수정하십시오.";
+    };
+
+    const deleteScheduleRow = (id) => {
+      const target = scheduleRows.find((row) => row._scheduleId === id);
+      const label = target ? `${target.일자 || "일자 미입력"} / ${target.이름 || "이름 미입력"}` : "선택한 행";
+      if (!confirm(`${label} 근무시간표 행을 삭제하시겠습니까?`)) return;
+      scheduleRows = scheduleRows.filter((row) => row._scheduleId !== id);
+      recalc();
+      $("message").textContent = "근무시간표 행을 삭제했습니다.";
+    };
+
+    const addScheduleRowsFromDecision = (decision = "미검증") => {
+      const targets = ledgerRows.filter((row) => row.집행대상판정 === decision);
+      if (!targets.length) {
+        $("message").textContent = `${decision} 판정 건이 없습니다.`;
+        return;
+      }
+
+      const existingKeys = new Set(scheduleRows.map((row) => makeScheduleKey(getScheduleDate(row) || row.일자, row.이름)));
+      const pending = new Map();
+
+      targets.forEach((row) => {
+        const date = normalizeDate(row.일자) || row.일자 || "";
+        const name = row.성명 || "";
+        const key = makeScheduleKey(date, name);
+        if (!date || !name || existingKeys.has(key) || pending.has(key)) return;
+        pending.set(key, createScheduleRow({
+          이름: name,
+          직급: row.직급 || "",
+          일자: date,
+          rawDate: row.일자,
+          normalizedDate: normalizeDate(row.일자),
+          요일: row.요일 || weekdayFromDate(row.일자),
+          출근지정시간: "09:00",
+          퇴근지정시간: "18:00",
+          비고: `${decision} 보완행`,
+          원본파일: "판정별 통계 보완",
+          원본시트: decision,
+          원본행: "자동추가"
+        }));
+      });
+
+      const additions = Array.from(pending.values());
+      if (!additions.length) {
+        $("message").textContent = `${decision} 판정 건 중 추가할 신규 근무시간표 행이 없습니다.`;
+        return;
+      }
+
+      scheduleRows = [...scheduleRows, ...additions.map(ensureScheduleRowMeta)];
+      scheduleFiles = Array.from(new Set([...scheduleFiles, `${decision} 보완행`]));
+      activeTab = "schedule";
+      recalc();
+      $("message").textContent = `${decision} 판정 건 기준으로 근무시간표 보완행 ${additions.length.toLocaleString()}건을 추가했습니다. 근무시간표 정리 탭에서 수정하십시오.`;
+    };
+
+    const addUnverifiedScheduleRows = () => addScheduleRowsFromDecision("미검증");
+
+    const buildScheduleMaps = () => {
+      scheduleByDateName = new Map();
+      scheduleByName = new Map();
+
+      scheduleRows.forEach((row) => {
+        ensureScheduleRowMeta(row);
+        const nameKey = normalizeNameKey(row.이름);
+        if (!nameKey) return;
+
+        const dateKey = getScheduleDate(row);
+        if (dateKey) {
+          scheduleByDateName.set(makeScheduleKey(dateKey, row.이름), row);
+        }
+
+        if (!scheduleByName.has(nameKey)) scheduleByName.set(nameKey, []);
+        scheduleByName.get(nameKey).push(row);
+      });
+    };
+
+    const findSchedule = (date, name) => {
+      const targetDate = normalizeDate(date);
+      const nameKey = normalizeNameKey(name);
+      if (!targetDate || !nameKey) return null;
+
+      // 근무시간표 검증의 기준은 매식비 표의 일자 + 성명이다.
+      // 이름만 단독으로 일치하는 행은 날짜 오검증을 만들 수 있으므로 인정하지 않는다.
+      return scheduleByDateName.get(makeScheduleKey(targetDate, name)) || null;
+    };
+
+    const evaluatePersonEligibility = (date, name) => {
+      if (!scheduleRows.length) {
+        return {
+          판정: "미검증",
+          사유: "근무시간표 미업로드",
+          일자: date,
+          직급: "",
+          근무시간표일치: "미검증",
+          요일: "",
+          출근지정시간: "",
+          퇴근지정시간: "",
+          근무시간: ""
+        };
+      }
+
+      const schedule = findSchedule(date, name);
+      if (!schedule) {
+        return {
+          판정: "미확인",
+          사유: "근무시간표에 해당 일자·성명 없음",
+          일자: date,
+          직급: "",
+          근무시간표일치: "불일치",
+          요일: "",
+          출근지정시간: "",
+          퇴근지정시간: "",
+          근무시간: ""
+        };
+      }
+
+      const scheduleDate = getScheduleDate(schedule) || normalizeDate(date) || date;
+      const start = parseTimeToMinutes(schedule.출근지정시간);
+      const end = parseTimeToMinutes(schedule.퇴근지정시간);
+      const workMinutes = calculateWorkMinutes(start, end);
+      const threshold = Number(String($("thresholdInput").value).replace(/[^0-9]/g, "")) || 60;
+      const weekday = schedule.요일Parsed;
+
+      if (weekday.isHoliday === true) {
+        return {
+          판정: "대상",
+          사유: `근무시간표상 ${weekday.value}요일 휴일근무`,
+          일자: scheduleDate,
+          직급: schedule.직급,
+          근무시간표일치: "일치",
+          요일: weekday.value,
+          출근지정시간: Number.isFinite(start) ? formatMinutesAsTime(start) : schedule.출근지정시간,
+          퇴근지정시간: Number.isFinite(end) ? formatMinutesAsTime(end) : schedule.퇴근지정시간,
+          근무시간: Number.isFinite(workMinutes) ? minutesToHourText(workMinutes) : ""
+        };
+      }
+
+      if (weekday.isHoliday === null) {
+        return {
+          판정: "검토필요",
+          사유: "근무시간표 요일 누락 또는 해석 불가",
+          일자: scheduleDate,
+          직급: schedule.직급,
+          근무시간표일치: "일치",
+          요일: weekday.value,
+          출근지정시간: Number.isFinite(start) ? formatMinutesAsTime(start) : schedule.출근지정시간,
+          퇴근지정시간: Number.isFinite(end) ? formatMinutesAsTime(end) : schedule.퇴근지정시간,
+          근무시간: Number.isFinite(workMinutes) ? minutesToHourText(workMinutes) : ""
+        };
+      }
+
+      if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(workMinutes)) {
+        return {
+          판정: "미확인",
+          사유: "출퇴근 지정시간 해석 불가",
+          일자: scheduleDate,
+          직급: schedule.직급,
+          근무시간표일치: "일치",
+          요일: weekday.value,
+          출근지정시간: schedule.출근지정시간,
+          퇴근지정시간: schedule.퇴근지정시간,
+          근무시간: ""
+        };
+      }
+
+      const earlyMinutes = Math.max(0, STANDARD_START - start);
+      const lateMinutes = Math.max(0, end - STANDARD_END);
+
+      if (workMinutes <= STANDARD_WORK_MINUTES) {
+        return {
+          판정: "비대상",
+          사유: "평일 정규/유연근무 8시간 이내",
+          일자: scheduleDate,
+          직급: schedule.직급,
+          근무시간표일치: "일치",
+          요일: weekday.value,
+          출근지정시간: formatMinutesAsTime(start),
+          퇴근지정시간: formatMinutesAsTime(end),
+          근무시간: minutesToHourText(workMinutes)
+        };
+      }
+
+      if (earlyMinutes >= threshold || lateMinutes >= threshold) {
+        return {
+          판정: "대상",
+          사유: earlyMinutes >= threshold && lateMinutes >= threshold
+            ? "평일 정규 근무시간 전·후 초과근무"
+            : earlyMinutes >= threshold
+              ? "평일 정규 근무시간 전 초과근무"
+              : "평일 정규 근무시간 후 초과근무",
+          일자: scheduleDate,
+          직급: schedule.직급,
+          근무시간표일치: "일치",
+          요일: weekday.value,
+          출근지정시간: formatMinutesAsTime(start),
+          퇴근지정시간: formatMinutesAsTime(end),
+          근무시간: minutesToHourText(workMinutes)
+        };
+      }
+
+      return {
+        판정: "검토필요",
+        사유: "평일 8시간 초과이나 정규시간 전후 인정기준 미충족",
+        일자: scheduleDate,
+        요일: weekday.value,
+        출근지정시간: formatMinutesAsTime(start),
+        퇴근지정시간: formatMinutesAsTime(end),
+        근무시간: minutesToHourText(workMinutes)
+      };
+    };
+
+    const evaluateTransactionEligibility = (row) => {
+      const names = Array.isArray(row.parsedNames) ? row.parsedNames : [];
+      if (!names.length) return "미확인";
+      if (!scheduleRows.length) return "미검증";
+
+      const results = names.map((name) => evaluatePersonEligibility(row.normalizedDate, name).판정);
+      if (results.every((v) => v === "대상")) return "대상";
+      if (results.every((v) => v === "비대상")) return "비대상";
+      if (results.some((v) => v === "대상")) return "일부대상";
+      return "검토필요";
+    };
+
+    const readMealFile = async (file) => {
+      const buffer = await file.arrayBuffer();
+      const workbook = await XLSX.readAsync(buffer, { type: "array", cellDates: true });
+      const result = [];
+      const manualHeaderRowNumber = parseManualHeaderRow("mealHeaderRowInput");
+
+      workbook.SheetNames.forEach((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
+        const { rows: data, headers } = rowsFromSheet(sheet, MEAL_HEADER_GROUPS, manualHeaderRowNumber);
+        if (!data.length) return;
+
+        addHeaders(headers);
+
+        const dateHeader = findHeader(headers, DATE_HEADERS);
+        const nameMealHeader = findHeader(headers, NAME_MEAL_HEADERS);
+        const peopleCountHeader = findHeader(headers, PEOPLE_COUNT_HEADERS);
+        const amountHeader = findHeader(headers, AMOUNT_HEADERS);
+        const serialHeader = findHeader(headers, SERIAL_HEADERS);
+
+        data.forEach((row, index) => {
+          const rawDate = dateHeader ? row[dateHeader] : "";
+          const rawNameMeal = nameMealHeader ? row[nameMealHeader] : "";
+          const rawPeopleCount = peopleCountHeader ? row[peopleCountHeader] : "";
+          const rawAmount = amountHeader ? row[amountHeader] : "";
+          const rawSerial = serialHeader ? row[serialHeader] : "";
+
+          const hasAnyData = Object.values(row).some((v) => String(v).trim() !== "");
+          if (!hasAnyData) return;
+
+          const normalizedNameMealText = normalizeNameMealText(rawNameMeal);
+          const parsedNameMeals = parseNameMealEntries(normalizedNameMealText);
+
+          const item = {
+            original: { ...row },
+            rawDate,
+            rawNameMeal,
+            rawPeopleCount,
+            rawAmount,
+            rawSerial,
+            normalizedDate: normalizeDate(rawDate),
+            nameMealText: normalizedNameMealText,
+            peopleCount: parsePeopleCount(rawPeopleCount),
+            amount: parseAmount(rawAmount),
+            meal: parseMeal(normalizedNameMealText),
+            parsedNames: parsedNameMeals.map((entry) => entry.name),
+            parsedNameMeals,
+            sourceFile: file.name,
+            sourceSheet: sheetName,
+            sourceRow: row.__sourceRowNumber || index + 2
+          };
+
+          item.basicStatus = makeBasicStatus(item);
+          item.eligibility = evaluateTransactionEligibility(item);
+          result.push(item);
+        });
+      });
+
+      return result;
+    };
+
+    const readScheduleFile = async (file) => {
+      const buffer = await file.arrayBuffer();
+      const workbook = await XLSX.readAsync(buffer, { type: "array", cellDates: true });
+      const result = [];
+      const manualHeaderRowNumber = parseManualHeaderRow("scheduleHeaderRowInput");
+
+      workbook.SheetNames.forEach((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
+        const { rows: data, headers } = rowsFromSheet(sheet, SCHEDULE_HEADER_GROUPS, manualHeaderRowNumber);
+        if (!data.length) return;
+
+        const dateHeader = findHeader(headers, SCHEDULE_DATE_HEADERS);
+        const nameHeader = findHeader(headers, SCHEDULE_NAME_HEADERS);
+        const positionHeader = findHeader(headers, SCHEDULE_POSITION_HEADERS);
+        const weekdayHeader = findHeader(headers, SCHEDULE_WEEKDAY_HEADERS);
+        const startHeader = findHeader(headers, SCHEDULE_START_HEADERS);
+        const endHeader = findHeader(headers, SCHEDULE_END_HEADERS);
+        const noteHeader = findHeader(headers, SCHEDULE_NOTE_HEADERS);
+
+        data.forEach((row, index) => {
+          const rawDate = dateHeader ? row[dateHeader] : "";
+          const date = normalizeDate(rawDate);
+          const name = nameHeader ? String(row[nameHeader] || "").trim() : "";
+          const position = positionHeader ? String(row[positionHeader] || "").trim() : "";
+          const weekdayRaw = weekdayHeader ? String(row[weekdayHeader] || "").trim() : "";
+          const rawStart = startHeader ? String(row[startHeader] || "").trim() : "";
+          const rawEnd = endHeader ? String(row[endHeader] || "").trim() : "";
+          const note = noteHeader ? String(row[noteHeader] || "").trim() : "";
+
+          // 출근·퇴근지정시간 기본값 처리:
+          // 근무시간표에서 출근지정시간이 비어 있으면 09:00,
+          // 퇴근지정시간이 비어 있으면 18:00 정각으로 간주한다.
+          // 단, 이 기본값 때문에 완전히 빈 행이 유효 데이터로 들어오지 않도록
+          // 빈 행 판정에는 rawStart, rawEnd를 사용한다.
+          const start = rawStart || "09:00";
+          const end = rawEnd || "18:00";
+
+          const hasAnyScheduleData = [date, name, position, weekdayRaw, rawStart, rawEnd].some((v) => String(v).trim() !== "");
+          if (!hasAnyScheduleData) return;
+
+          result.push({
+            이름: name,
+            직급: position,
+            일자: date,
+            rawDate,
+            normalizedDate: date,
+            요일: weekdayRaw,
+            요일Parsed: parseWeekday(weekdayRaw),
+            출근지정시간: start,
+            퇴근지정시간: end,
+            비고: note,
+            원본파일: file.name,
+            원본시트: sheetName,
+            원본행: row.__sourceRowNumber || index + 2
+          });
+        });
+      });
+
+      return result;
+    };
+
+    const isCandidateHeader = (header, candidates) => {
+      const normalized = normalizeHeader(header);
+      return candidates.map(normalizeHeader).includes(normalized);
+    };
+
+    const isMealStandardSourceHeader = (header) =>
+      isCandidateHeader(header, DATE_HEADERS) ||
+      isCandidateHeader(header, NAME_MEAL_HEADERS) ||
+      isCandidateHeader(header, PEOPLE_COUNT_HEADERS) ||
+      isCandidateHeader(header, AMOUNT_HEADERS) ||
+      isCandidateHeader(header, SERIAL_HEADERS);
+
+    const getMealDisplayHeaders = () => {
+      const extraHeaders = outputHeaders.filter((header) => !isMealStandardSourceHeader(header));
+      return [...MEAL_STANDARD_OUTPUT_HEADERS, ...extraHeaders];
+    };
+
+    const getMealDisplayRow = (row) => {
+      const out = {
+        "정산연번": row.displaySerial || row.generatedSerial || "",
+        "제출연번": row.rawSerial ?? "",
+        "일자": formatDateForOutput(row.normalizedDate || row.rawDate || ""),
+        "성명(구분)": row.nameMealText || row.rawNameMeal || "",
+        "인원수": row.rawPeopleCount ?? row.peopleCount ?? "",
+        "사용금액": row.rawAmount ?? row.amount ?? "",
+      };
+
+      outputHeaders.forEach((header) => {
+        if (!isMealStandardSourceHeader(header) && !(header in out)) {
+          out[header] = row.original[header] ?? "";
+        }
+      });
+
+      return out;
+    };
+
+    const getMealDisplayValue = (row, key) => {
+      if (key === "정산연번") return row.generatedSerial || row.displaySerial || "";
+      return getMealDisplayRow(row)[key] ?? "";
+    };
+
+    const originalRowsForExport = (items) => items.map(getMealDisplayRow);
+
+    const reviewRowsForExport = (items) =>
+      items.map((row) => {
+        const out = {
+          정산연번: row.generatedSerial || "",
+          제출연번: row.rawSerial ?? ""
+        };
+        outputHeaders.forEach((header) => {
+          if (isCandidateHeader(header, DATE_HEADERS)) {
+            out[header] = formatDateForOutput(row.normalizedDate || row.original[header] || "");
+          } else {
+            out[header] = row.original[header] ?? "";
+          }
+        });
+        out.기본검증 = row.basicStatus;
+        out.집행대상판정 = row.eligibility;
+        out.원본파일 = row.sourceFile;
+        out.원본시트 = row.sourceSheet;
+        out.원본행 = row.sourceRow;
+        return out;
+      });
+
+    const compareValues = (a, b, direction) => {
+      const dir = direction === "asc" ? 1 : -1;
+      const aDate = sortableDateNumber(a);
+      const bDate = sortableDateNumber(b);
+      if (aDate !== null && bDate !== null) return (aDate - bDate) * dir;
+
+      const aNumber = typeof a === "number" ? a : Number(String(a ?? "").replace(/[^0-9.-]/g, ""));
+      const bNumber = typeof b === "number" ? b : Number(String(b ?? "").replace(/[^0-9.-]/g, ""));
+      const aIsNumber = Number.isFinite(aNumber) && String(a ?? "").trim() !== "";
+      const bIsNumber = Number.isFinite(bNumber) && String(b ?? "").trim() !== "";
+
+      if (aIsNumber && bIsNumber) return (aNumber - bNumber) * dir;
+      return String(a ?? "").localeCompare(String(b ?? ""), "ko", { numeric: true }) * dir;
+    };
+
+
+    const mealSortOrder = (meal) => {
+      const text = String(meal || "");
+      if (text.includes("조식")) return 1;
+      if (text.includes("중식")) return 2;
+      if (text.includes("석식")) return 3;
+      return 9;
+    };
+
+    const mergeMealLabels = (meals) => {
+      const order = ["조식", "중식", "석식"];
+      const normalized = Array.from(new Set((meals || []).filter(Boolean)));
+      const known = order.filter((meal) => normalized.includes(meal));
+      const unknown = normalized
+        .filter((meal) => !order.includes(meal))
+        .sort((a, b) => String(a).localeCompare(String(b), "ko", { numeric: true }));
+      return [...known, ...unknown].join(", ");
+    };
+
+    const buildMergedAttendanceRows = (sourceRows) => {
+      const map = new Map();
+
+      (sourceRows || [])
+        .filter((row) => row.근무시간표일치 === "일치")
+        .forEach((row) => {
+          const key = makeScheduleKey(row.일자, row.성명);
+
+          if (!map.has(key)) {
+            map.set(key, {
+              이름: row.성명,
+              직급: row.직급,
+              일자: row.일자,
+              요일: row.요일,
+              출근지정시간: row.출근지정시간,
+              퇴근지정시간: row.퇴근지정시간,
+              mealSet: new Set()
+            });
+          }
+
+          if (row.구분) map.get(key).mealSet.add(row.구분);
+        });
+
+      return Array.from(map.values()).map((row) => ({
+        이름: row.이름,
+        직급: row.직급,
+        일자: row.일자,
+        식사구분: mergeMealLabels(Array.from(row.mealSet)),
+        요일: row.요일,
+        출근지정시간: row.출근지정시간,
+        퇴근지정시간: row.퇴근지정시간,
+        비고: row.비고 || ""
+      }));
+    };
+
+    const compareAttendanceRows = (a, b) => {
+      const dir = attendanceSort.direction === "asc" ? 1 : -1;
+
+      if (attendanceSort.key === "일자") {
+        const dateCompare = compareValues(a.일자, b.일자, attendanceSort.direction);
+        if (dateCompare !== 0) return dateCompare;
+
+        const mealCompare = mealSortOrder(a.식사구분) - mealSortOrder(b.식사구분);
+        if (mealCompare !== 0) return mealCompare;
+
+        return String(a.이름 ?? "").localeCompare(String(b.이름 ?? ""), "ko", { numeric: true });
+      }
+
+      if (attendanceSort.key === "식사순") {
+        const mealCompare = mealSortOrder(a.식사구분) - mealSortOrder(b.식사구분);
+        if (mealCompare !== 0) return mealCompare * dir;
+
+        const dateCompare = compareValues(a.일자, b.일자, "asc");
+        if (dateCompare !== 0) return dateCompare;
+
+        return String(a.이름 ?? "").localeCompare(String(b.이름 ?? ""), "ko", { numeric: true });
+      }
+
+      return compareValues(a[attendanceSort.key], b[attendanceSort.key], attendanceSort.direction);
+    };
+
+    const sortRows = () => {
+      sortedTransactionRows = [...filteredRows];
+      if (transactionSort.key) {
+        sortedTransactionRows.sort((a, b) =>
+          compareValues(getMealDisplayValue(a, transactionSort.key), getMealDisplayValue(b, transactionSort.key), transactionSort.direction)
+        );
+      }
+      sortedTransactionRows.forEach((row, index) => {
+        row.displaySerial = index + 1;
+      });
+
+      sortedScheduleRows = [...scheduleRows];
+      if (scheduleSort.key) {
+        sortedScheduleRows.sort((a, b) => compareValues(a[scheduleSort.key], b[scheduleSort.key], scheduleSort.direction));
+      }
+
+      sortedAttendanceRows = [...attendanceRows];
+      if (attendanceSort.key) {
+        sortedAttendanceRows.sort(compareAttendanceRows);
+      }
+
+      sortedLedgerRows = [...ledgerRows];
+      if (ledgerSort.key) {
+        sortedLedgerRows.sort((a, b) => compareValues(a[ledgerSort.key], b[ledgerSort.key], ledgerSort.direction));
+      }
+
+      sortedSummaryRows = [...summaryRows];
+      if (summarySort.key) {
+        sortedSummaryRows.sort((a, b) => compareValues(a[summarySort.key], b[summarySort.key], summarySort.direction));
+      }
+    };
+
+    const recalc = () => {
+      buildScheduleMaps();
+
+      const keyword = $("searchInput").value.trim().toLowerCase();
+
+      const recalculated = rows.map((row) => ({
+        ...row,
+        basicStatus: makeBasicStatus(row),
+        eligibility: evaluateTransactionEligibility(row)
+      }));
+
+      filteredRows = keyword
+        ? recalculated.filter((row) => {
+            const originalHit = outputHeaders.some((header) =>
+              String(row.original[header] ?? "").toLowerCase().includes(keyword)
+            );
+            const reviewHit = [row.basicStatus, row.eligibility, row.sourceFile, row.sourceSheet, row.sourceRow]
+              .some((value) => String(value).toLowerCase().includes(keyword));
+            return originalHit || reviewHit;
+          })
+        : recalculated;
+
+      ledgerRows = [];
+      filteredRows.forEach((row) => {
+        const nameEntries = Array.isArray(row.parsedNameMeals) && row.parsedNameMeals.length
+          ? row.parsedNameMeals
+          : (Array.isArray(row.parsedNames) ? row.parsedNames : []).map((name) => ({ name, meal: row.meal }));
+        const perPersonAmount = row.peopleCount > 0 ? Math.round((row.amount / row.peopleCount) * 100) / 100 : 0;
+
+        nameEntries.forEach((person) => {
+          const name = person.name;
+          const eligibility = evaluatePersonEligibility(row.normalizedDate, name);
+          ledgerRows.push({
+            정산연번: row.generatedSerial || "",
+            제출연번: row.rawSerial ?? "",
+            일자: row.normalizedDate,
+            성명: name,
+            구분: person.meal || row.meal,
+            인원수: row.peopleCount,
+            총사용금액: row.amount,
+            배분금액: perPersonAmount,
+            "성명(구분)": row.nameMealText,
+            직급: eligibility.직급,
+            요일: eligibility.요일,
+            출근지정시간: eligibility.출근지정시간,
+            퇴근지정시간: eligibility.퇴근지정시간,
+            근무시간: eligibility.근무시간,
+            근무시간표일치: eligibility.근무시간표일치,
+            집행대상판정: eligibility.판정,
+            판정사유: eligibility.사유,
+            기본검증: row.basicStatus,
+            원본파일: row.sourceFile,
+            원본시트: row.sourceSheet,
+            원본행: row.sourceRow
+          });
+        });
+      });
+
+
+      attendanceRows = buildMergedAttendanceRows(ledgerRows);
+
+      const summaryMap = new Map();
+      ledgerRows.forEach((row) => {
+        const key = row.성명 || "성명 미확인";
+
+        if (!summaryMap.has(key)) {
+          summaryMap.set(key, {
+            성명: key,
+            참여건수: 0,
+            조식: 0,
+            중식: 0,
+            석식: 0,
+            배분금액합계: 0,
+            대상건수: 0,
+            검토필요건수: 0
+          });
+        }
+
+        const item = summaryMap.get(key);
+        item.참여건수 += 1;
+        if (row.구분 === "조식") item.조식 += 1;
+        if (row.구분 === "중식") item.중식 += 1;
+        if (row.구분 === "석식") item.석식 += 1;
+        item.배분금액합계 += Number(row.배분금액 || 0);
+        if (row.집행대상판정 === "대상") item.대상건수 += 1;
+        if (row.기본검증 !== "정상" || row.집행대상판정 !== "대상") item.검토필요건수 += 1;
+      });
+
+      summaryRows = Array.from(summaryMap.values());
+
+      const eligibilityActive = scheduleRows.length > 0;
+      reviewRows = filteredRows.filter((row) => {
+        if (row.basicStatus !== "정상") return true;
+        if (eligibilityActive && row.eligibility !== "대상") return true;
+        return false;
+      });
+
+      sortRows();
+      render();
+    };
+
+    const formatNumber = (value) => Number(value || 0).toLocaleString();
+
+    const renderTransactionHead = () => {
+      const displayHeaders = getMealDisplayHeaders();
+
+      if (!displayHeaders.length) {
+        $("transactionHead").innerHTML = "<tr><th>업로드 후 표준 컬럼이 표시됩니다.</th></tr>";
+        return;
+      }
+
+      $("transactionHead").innerHTML = "<tr>" + displayHeaders.map((header) => {
+        const mark = transactionSort.key === header ? (transactionSort.direction === "asc" ? " ▲" : " ▼") : "";
+        return `<th data-transaction-sort="${escapeHtml(header)}">${escapeHtml(header)}${mark}</th>`;
+      }).join("") + "</tr>";
+
+      document.querySelectorAll("[data-transaction-sort]").forEach((th) => {
+        th.addEventListener("click", () => {
+          const key = th.getAttribute("data-transaction-sort");
+          if (transactionSort.key === key) {
+            transactionSort.direction = transactionSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            transactionSort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        });
+      });
+    };
+
+    const bindSortHeaders = () => {
+      document.querySelectorAll("[data-schedule-sort]").forEach((th) => {
+        const key = th.getAttribute("data-schedule-sort");
+        th.textContent = key + (scheduleSort.key === key ? (scheduleSort.direction === "asc" ? " ▲" : " ▼") : "");
+        th.onclick = () => {
+          if (scheduleSort.key === key) {
+            scheduleSort.direction = scheduleSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            scheduleSort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+      });
+
+      const attendanceMealSortButton = $("attendanceMealSortButton");
+      if (attendanceMealSortButton) {
+        attendanceMealSortButton.onclick = () => {
+          if (attendanceSort.key === "식사순") {
+            attendanceSort.direction = attendanceSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            attendanceSort = { key: "식사순", direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+        attendanceMealSortButton.textContent =
+          attendanceSort.key === "식사순" && attendanceSort.direction === "desc"
+            ? "식사순 정렬(석식→중식→조식)"
+            : "식사순 정렬(조식→중식→석식)";
+      }
+
+      document.querySelectorAll("[data-attendance-sort]").forEach((th) => {
+        const key = th.getAttribute("data-attendance-sort");
+        th.textContent = key + (attendanceSort.key === key ? (attendanceSort.direction === "asc" ? " ▲" : " ▼") : "");
+        th.onclick = () => {
+          if (attendanceSort.key === key) {
+            attendanceSort.direction = attendanceSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            attendanceSort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+      });
+
+      document.querySelectorAll("[data-ledger-sort]").forEach((th) => {
+        const key = th.getAttribute("data-ledger-sort");
+        th.textContent = key + (ledgerSort.key === key ? (ledgerSort.direction === "asc" ? " ▲" : " ▼") : "");
+        th.onclick = () => {
+          if (ledgerSort.key === key) {
+            ledgerSort.direction = ledgerSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            ledgerSort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+      });
+
+      document.querySelectorAll("[data-summary-sort]").forEach((th) => {
+        const key = th.getAttribute("data-summary-sort");
+        th.textContent = key + (summarySort.key === key ? (summarySort.direction === "asc" ? " ▲" : " ▼") : "");
+        th.onclick = () => {
+          if (summarySort.key === key) {
+            summarySort.direction = summarySort.direction === "asc" ? "desc" : "asc";
+          } else {
+            summarySort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+      });
+    };
+
+
+
+    const buildDashboardStats = () => {
+      const uniqueUsers = new Set(ledgerRows.map((row) => row.성명).filter(Boolean));
+      const eligibleRows = ledgerRows.filter((row) => row.집행대상판정 === "대상" && row.기본검증 === "정상");
+      const eligibleUniqueUsers = new Set(eligibleRows.map((row) => row.성명).filter(Boolean));
+      const eligibleAmount = eligibleRows.reduce((sum, row) => sum + Number(row.배분금액 || 0), 0);
+
+      const mealMap = new Map();
+      ["조식", "중식", "석식", "미확인"].forEach((meal) => {
+        mealMap.set(meal, { 구분: meal, 거래건수: 0, 사용금액: 0, 지급가능금액: 0 });
+      });
+
+      filteredRows.forEach((row) => {
+        const meal = row.meal || "미확인";
+        if (!mealMap.has(meal)) {
+          mealMap.set(meal, { 구분: meal, 거래건수: 0, 사용금액: 0, 지급가능금액: 0 });
+        }
+        const item = mealMap.get(meal);
+        item.거래건수 += 1;
+        item.사용금액 += Number(row.amount || 0);
+      });
+
+      ledgerRows.forEach((row) => {
+        const meal = row.구분 || "미확인";
+        if (!mealMap.has(meal)) {
+          mealMap.set(meal, { 구분: meal, 거래건수: 0, 사용금액: 0, 지급가능금액: 0 });
+        }
+        if (row.집행대상판정 === "대상" && row.기본검증 === "정상") {
+          mealMap.get(meal).지급가능금액 += Number(row.배분금액 || 0);
+        }
+      });
+
+      const decisionMap = new Map();
+      ledgerRows.forEach((row) => {
+        const key = row.집행대상판정 || "미확인";
+        if (!decisionMap.has(key)) {
+          decisionMap.set(key, { 판정: key, 인원Set: new Set(), 배분금액: 0 });
+        }
+        const item = decisionMap.get(key);
+        if (row.성명) item.인원Set.add(row.성명);
+        item.배분금액 += Number(row.배분금액 || 0);
+      });
+
+      const mealStats = Array.from(mealMap.values()).filter((row) =>
+        row.거래건수 || row.사용금액 || row.지급가능금액
+      );
+
+      const decisionStats = Array.from(decisionMap.values()).map((row) => ({
+        판정: row.판정,
+        중복제외인원: row.인원Set.size,
+        배분금액: row.배분금액
+      }));
+
+      return {
+        uniqueUsers: uniqueUsers.size,
+        eligibleUniqueUsers: eligibleUniqueUsers.size,
+        eligibleAmount,
+        mealStats,
+        decisionStats
+      };
+    };
+
+    const renderDashboardStats = (totalAmount) => {
+      const stats = buildDashboardStats();
+
+      $("statTotalAmount").textContent = `${formatNumber(totalAmount)}원`;
+      $("statTransactionCount").textContent = `${formatNumber(filteredRows.length)}건`;
+      $("statUniqueUsers").textContent = `${formatNumber(stats.uniqueUsers)}명`;
+      $("statEligibleAmount").textContent = `${formatNumber(Math.round(stats.eligibleAmount))}원`;
+      $("statEligibleUniqueUsers").textContent = `${formatNumber(stats.eligibleUniqueUsers)}명`;
+      $("statReviewCount").textContent = `${formatNumber(reviewRows.length)}건`;
+
+      const mealBody = $("mealStatsBody");
+      if (!stats.mealStats.length) {
+        mealBody.innerHTML = `<tr><td colspan="4" class="empty">집계할 데이터가 없습니다.</td></tr>`;
+      } else {
+        mealBody.innerHTML = stats.mealStats.map((row) => `
+          <tr>
+            <td>${escapeHtml(row.구분)}</td>
+            <td class="right">${formatNumber(row.거래건수)}</td>
+            <td class="right">${formatNumber(row.사용금액)}</td>
+            <td class="right">${formatNumber(Math.round(row.지급가능금액))}</td>
+          </tr>
+        `).join("");
+      }
+
+      const decisionBody = $("decisionStatsBody");
+      if (!stats.decisionStats.length) {
+        decisionBody.innerHTML = `<tr><td colspan="4" class="empty">집계할 데이터가 없습니다.</td></tr>`;
+      } else {
+        decisionBody.innerHTML = stats.decisionStats.map((row) => {
+          const canSupplement = row.판정 === "미검증" || row.판정 === "미확인";
+          return `
+            <tr>
+              <td class="${row.판정 === "대상" ? "" : "warn"}">${escapeHtml(row.판정)}</td>
+              <td class="right">${formatNumber(row.중복제외인원)}</td>
+              <td class="right">${formatNumber(Math.round(row.배분금액))}</td>
+              <td>${canSupplement ? `<button class="mini-button" type="button" data-decision-supplement="${escapeHtml(row.판정)}">근무표 보완</button>` : "-"}</td>
+            </tr>
+          `;
+        }).join("");
+
+        decisionBody.querySelectorAll("[data-decision-supplement]").forEach((button) => {
+          button.addEventListener("click", () => addScheduleRowsFromDecision(button.getAttribute("data-decision-supplement")));
+        });
+      }
+    };
+
+    const renderTabs = () => {
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        const target = button.getAttribute("data-tab");
+        button.classList.toggle("active", target === activeTab);
+        button.onclick = () => {
+          activeTab = target;
+          renderTabs();
+        };
+      });
+
+      document.querySelectorAll(".tab-panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.id === `tab-${activeTab}`);
+      });
+    };
+
+    const render = () => {
+      const totalAmount = filteredRows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const targetCount = ledgerRows.filter((row) => row.집행대상판정 === "대상").length;
+
+      $("stats").textContent =
+        `매식비파일 ${files.length.toLocaleString()}개 · 근무시간표 ${scheduleRows.length.toLocaleString()}건 · 거래 ${filteredRows.length.toLocaleString()}건 · 대상 ${targetCount.toLocaleString()}명 · 합계 ${totalAmount.toLocaleString()}원 · 검토필요 ${reviewRows.length.toLocaleString()}건`;
+
+      renderDashboardStats(totalAmount);
+      renderTabs();
+
+      $("downloadXlsx").disabled = filteredRows.length === 0;
+      $("downloadCsv").disabled = filteredRows.length === 0;
+
+      const exportTransactionsButton = $("exportTransactionsButton");
+      const exportScheduleButton = $("exportScheduleButton");
+      const exportAttendanceButton = $("exportAttendanceButton");
+      const exportLedgerButton = $("exportLedgerButton");
+      const exportSummaryButton = $("exportSummaryButton");
+
+      if (exportTransactionsButton) exportTransactionsButton.disabled = sortedTransactionRows.length === 0;
+      if (exportScheduleButton) exportScheduleButton.disabled = sortedScheduleRows.length === 0;
+      if (exportAttendanceButton) exportAttendanceButton.disabled = sortedAttendanceRows.length === 0;
+      if (exportLedgerButton) exportLedgerButton.disabled = sortedLedgerRows.length === 0;
+      if (exportSummaryButton) exportSummaryButton.disabled = sortedSummaryRows.length === 0;
+
+      const mealFileChips = files.map((file) => `<span class="file-chip">매식비: ${escapeHtml(file)}</span>`);
+      const scheduleFileChips = scheduleFiles.map((file) => `<span class="file-chip">근무시간표: ${escapeHtml(file)}</span>`);
+      $("fileList").innerHTML = [...mealFileChips, ...scheduleFileChips].join("");
+
+      renderTransactionHead();
+
+      const transactionBody = $("transactionBody");
+      const mealDisplayHeaders = getMealDisplayHeaders();
+      if (!sortedTransactionRows.length) {
+        const colspan = Math.max(mealDisplayHeaders.length, 1);
+        transactionBody.innerHTML = `<tr><td colspan="${colspan}" class="empty">표시할 데이터가 없습니다.</td></tr>`;
+      } else {
+        transactionBody.innerHTML = sortedTransactionRows.slice(0, 200).map((row) => {
+          const displayRow = getMealDisplayRow(row);
+          return `<tr>${mealDisplayHeaders.map((header) => `<td>${escapeHtml(displayRow[header] ?? "")}</td>`).join("")}</tr>`;
+        }).join("");
+      }
+
+      const scheduleBody = $("scheduleBody");
+      if (!sortedScheduleRows.length) {
+        scheduleBody.innerHTML = `<tr><td colspan="8" class="empty">근무시간표를 업로드하거나 행을 추가하면 표시됩니다.</td></tr>`;
+      } else {
+        scheduleBody.innerHTML = sortedScheduleRows.slice(0, 300).map((row) => `
+          <tr>
+            <td class="schedule-edit-cell"><input class="schedule-input name" value="${escapeHtml(row.이름)}" onchange="updateScheduleCell('${row._scheduleId}', '이름', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input position" value="${escapeHtml(row.직급)}" onchange="updateScheduleCell('${row._scheduleId}', '직급', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input date" value="${escapeHtml(formatDateForOutput(getScheduleDate(row) || row.일자))}" onchange="updateScheduleCell('${row._scheduleId}', '일자', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input weekday" value="${escapeHtml(row.요일)}" onchange="updateScheduleCell('${row._scheduleId}', '요일', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input time" value="${escapeHtml(row.출근지정시간)}" onchange="updateScheduleCell('${row._scheduleId}', '출근지정시간', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input time" value="${escapeHtml(row.퇴근지정시간)}" onchange="updateScheduleCell('${row._scheduleId}', '퇴근지정시간', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input note-cell" value="${escapeHtml(row.비고 || '')}" onchange="updateScheduleCell('${row._scheduleId}', '비고', this.value)" /></td>
+            <td class="action-cell"><button class="mini-button danger" type="button" onclick="deleteScheduleRow('${row._scheduleId}')">삭제</button></td>
+          </tr>
+        `).join("");
+      }
+
+      const attendanceBody = $("attendanceBody");
+      if (!sortedAttendanceRows.length) {
+        attendanceBody.innerHTML = `<tr><td colspan="7" class="empty">매식비와 근무시간표가 겹치는 행이 표시됩니다.</td></tr>`;
+      } else {
+        attendanceBody.innerHTML = sortedAttendanceRows.slice(0, 300).map((row) => `
+          <tr>
+            <td>${escapeHtml(row.이름)}</td>
+            <td>${escapeHtml(row.직급)}</td>
+            <td>${escapeHtml(formatDateForOutput(row.일자))}</td>
+            <td>${escapeHtml(row.식사구분)}</td>
+            <td>${escapeHtml(row.요일)}</td>
+            <td>${escapeHtml(row.출근지정시간)}</td>
+            <td>${escapeHtml(row.퇴근지정시간)}</td>
+          </tr>
+        `).join("");
+      }
+
+      const ledgerBody = $("ledgerBody");
+      if (!sortedLedgerRows.length) {
+        ledgerBody.innerHTML = `<tr><td colspan="12" class="empty">근무시간표와 매식비 파일을 업로드하면 검증 결과가 표시됩니다.</td></tr>`;
+      } else {
+        ledgerBody.innerHTML = sortedLedgerRows.slice(0, 300).map((row) => `
+          <tr>
+            <td>${escapeHtml(formatDateForOutput(row.일자))}</td>
+            <td>${escapeHtml(row.성명)}</td>
+            <td>${escapeHtml(row.구분)}</td>
+            <td class="right">${formatNumber(row.인원수)}</td>
+            <td class="right">${formatNumber(row.총사용금액)}</td>
+            <td class="right">${formatNumber(row.배분금액)}</td>
+            <td>${escapeHtml(row.요일)}</td>
+            <td>${escapeHtml(row.출근지정시간)}</td>
+            <td>${escapeHtml(row.퇴근지정시간)}</td>
+            <td>${escapeHtml(row.근무시간)}</td>
+            <td class="${row.집행대상판정 === "대상" ? "" : "warn"}">${escapeHtml(row.집행대상판정)}</td>
+            <td class="${row.집행대상판정 === "대상" ? "" : "warn"}">${escapeHtml(row.판정사유)}</td>
+          </tr>
+        `).join("");
+      }
+
+      const summaryBody = $("summaryBody");
+      if (!sortedSummaryRows.length) {
+        summaryBody.innerHTML = `<tr><td colspan="8" class="empty">집계할 데이터가 없습니다.</td></tr>`;
+      } else {
+        summaryBody.innerHTML = sortedSummaryRows.map((row) => `
+          <tr>
+            <td>${escapeHtml(row.성명)}</td>
+            <td class="right">${formatNumber(row.참여건수)}</td>
+            <td class="right">${formatNumber(row.조식)}</td>
+            <td class="right">${formatNumber(row.중식)}</td>
+            <td class="right">${formatNumber(row.석식)}</td>
+            <td class="right">${formatNumber(Math.round(row.배분금액합계))}</td>
+            <td class="right">${formatNumber(row.대상건수)}</td>
+            <td class="right ${row.검토필요건수 ? "warn" : ""}">${formatNumber(row.검토필요건수)}</td>
+          </tr>
+        `).join("");
+      }
+
+      bindSortHeaders();
+
+      $("note").textContent =
+        sortedTransactionRows.length > 200 || sortedScheduleRows.length > 300 || sortedAttendanceRows.length > 300 || sortedLedgerRows.length > 300
+          ? "화면에는 일부 행만 표시합니다. 저장 파일에는 현재 검색 결과 전체가 포함됩니다."
+          : "";
+    };
+
+    const escapeHtml = (value) => {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
+
+    const addScheduleRowButton = $("addScheduleRowButton");
+    if (addScheduleRowButton) {
+      addScheduleRowButton.addEventListener("click", () => addScheduleRow());
+    }
+
+    const addUnverifiedScheduleRowsButton = $("addUnverifiedScheduleRowsButton");
+    if (addUnverifiedScheduleRowsButton) {
+      addUnverifiedScheduleRowsButton.addEventListener("click", addUnverifiedScheduleRows);
+    }
+
+    $("fileInput").addEventListener("change", async (event) => {
+      const selected = Array.from(event.target.files || []);
+      if (!selected.length) return;
+
+      try {
+        $("message").textContent = "매식비 파일을 읽는 중입니다.";
+        const parsed = await Promise.all(selected.map(readMealFile));
+        const merged = parsed.flat();
+
+        rows = [...rows, ...merged];
+        rows.forEach((row, index) => {
+          row.generatedSerial = index + 1;
+        });
+        files = [...files, ...selected.map((file) => file.name)];
+
+        if (!transactionSort.key && outputHeaders.length) {
+          transactionSort = { key: "일자", direction: "asc" };
+        }
+
+        $("message").textContent = `${selected.length}개 매식비 파일에서 ${merged.length.toLocaleString()}건을 추가했습니다.`;
+        event.target.value = "";
+        recalc();
+      } catch (error) {
+        console.error(error);
+        $("message").textContent = "파일 처리에 실패했습니다. 일자 / 성명(구분) / 인원수 / 사용금액 컬럼을 확인하세요.";
+      }
+    });
+
+    $("scheduleInput").addEventListener("change", async (event) => {
+      const selected = Array.from(event.target.files || []);
+      if (!selected.length) return;
+
+      try {
+        $("message").textContent = "근무시간표를 읽는 중입니다.";
+        const parsed = await Promise.all(selected.map(readScheduleFile));
+        const merged = parsed.flat();
+
+        scheduleRows = [...scheduleRows, ...merged.map(ensureScheduleRowMeta)];
+        scheduleFiles = [...scheduleFiles, ...selected.map((file) => file.name)];
+
+        $("message").textContent = `${selected.length}개 근무시간표에서 ${merged.length.toLocaleString()}건을 추가했습니다.`;
+        event.target.value = "";
+        recalc();
+      } catch (error) {
+        console.error(error);
+        $("message").textContent = "근무시간표 처리에 실패했습니다. 이름 / 직급 / 일자 / 요일 / 출근지정시간 / 퇴근지정시간 컬럼을 확인하세요.";
+      }
+    });
+
+    $("searchInput").addEventListener("input", recalc);
+    $("limitInput").addEventListener("input", recalc);
+    $("thresholdInput").addEventListener("input", recalc);
+
+
+    const downloadSingleSheet = (rows, sheetName, fileName) => {
+      if (!rows || !rows.length) return;
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), sheetName);
+      XLSX.writeFile(workbook, fileName);
+    };
+
+    const scheduleRowsForExport = (items) =>
+      items.map((row) => ({
+        이름: row.이름,
+        직급: row.직급,
+        일자: formatDateForOutput(getScheduleDate(row) || row.일자),
+        요일: row.요일,
+        출근지정시간: row.출근지정시간,
+        퇴근지정시간: row.퇴근지정시간
+      }));
+
+    const ledgerRowsForExport = (items) =>
+      items.map((row) => ({
+        ...row,
+        일자: formatDateForOutput(row.일자)
+      }));
+
+    const attendanceRowsForExport = (items) =>
+      items.map((row) => ({
+        이름: row.이름,
+        직급: row.직급,
+        일자: formatDateForOutput(row.일자),
+        식사구분: row.식사구분,
+        요일: row.요일,
+        출근지정시간: row.출근지정시간,
+        퇴근지정시간: row.퇴근지정시간
+      }));
+
+    $("downloadXlsx").addEventListener("click", () => {
+      if (!sortedTransactionRows.length) return;
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(originalRowsForExport(sortedTransactionRows)), "통합목록");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(scheduleRowsForExport(sortedScheduleRows)), "근무시간표정리");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(attendanceRowsForExport(sortedAttendanceRows)), "사용자출퇴근확인");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(ledgerRowsForExport(sortedLedgerRows)), "집행대상검증");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(sortedSummaryRows), "개인별합계");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(reviewRowsForExport(reviewRows)), "검토필요");
+      XLSX.writeFile(workbook, "통일부_특근매식비_정산결과.xlsx");
+    });
+
+    $("downloadCsv").addEventListener("click", () => {
+      if (!sortedTransactionRows.length) return;
+
+      const worksheet = XLSX.utils.json_to_sheet(originalRowsForExport(sortedTransactionRows));
+      const csv = XLSX.utils.sheet_to_csv(worksheet);
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "통일부_특근매식비_통합목록.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    $("downloadTemplate").addEventListener("click", () => {
+      const mealSheet = XLSX.utils.json_to_sheet([
+        { 일자: "2026-04-01", "성명(구분)": "홍길동", 인원수: 1, 사용금액: 9000, 연번: 1 },
+        { 일자: "2026-04-05", "성명(구분)": "홍길동, 김철수(석식)", 인원수: 2, 사용금액: 18000, 연번: 2 }
+      ]);
+
+      const scheduleSheet = XLSX.utils.json_to_sheet([
+        { 이름: "홍길동", 직급: "주무관", 일자: "2026-04-01", 요일: "수", 출근지정시간: "09:00", 퇴근지정시간: "20:00" },
+        { 이름: "홍길동", 직급: "주무관", 일자: "2026-04-05", 요일: "일", 출근지정시간: "10:00", 퇴근지정시간: "13:00" },
+        { 이름: "김철수", 직급: "주무관", 일자: "2026-04-05", 요일: "일", 출근지정시간: "10:00", 퇴근지정시간: "13:00" }
+      ]);
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, mealSheet, "매식비제출양식");
+      XLSX.utils.book_append_sheet(workbook, scheduleSheet, "근무시간표양식");
+      XLSX.writeFile(workbook, "통일부_특근매식비_양식.xlsx");
+    });
+
+
+    const bindOptionalClick = (id, handler) => {
+      const element = $(id);
+      if (element) element.addEventListener("click", handler);
+    };
+
+    bindOptionalClick("exportTransactionsButton", () => {
+      downloadSingleSheet(originalRowsForExport(sortedTransactionRows), "통합목록", "통일부_특근매식비_통합목록.xlsx");
+    });
+
+    bindOptionalClick("exportScheduleButton", () => {
+      downloadSingleSheet(scheduleRowsForExport(sortedScheduleRows), "근무시간표정리", "통일부_특근매식비_근무시간표정리.xlsx");
+    });
+
+    bindOptionalClick("exportAttendanceButton", () => {
+      downloadSingleSheet(attendanceRowsForExport(sortedAttendanceRows), "사용자출퇴근확인", "통일부_특근매식비_사용자출퇴근확인.xlsx");
+    });
+
+    bindOptionalClick("exportLedgerButton", () => {
+      downloadSingleSheet(ledgerRowsForExport(sortedLedgerRows), "집행대상검증", "통일부_특근매식비_집행대상검증.xlsx");
+    });
+
+    bindOptionalClick("exportSummaryButton", () => {
+      downloadSingleSheet(sortedSummaryRows, "개인별합계", "통일부_특근매식비_개인별합계.xlsx");
+    });
+
+    $("resetButton").addEventListener("click", () => {
+      rows = [];
+      files = [];
+      scheduleRows = [];
+      scheduleRowSeq = 0;
+      scheduleFiles = [];
+      scheduleByDateName = new Map();
+      scheduleByName = new Map();
+
+      outputHeaders = [];
+      filteredRows = [];
+      sortedTransactionRows = [];
+      ledgerRows = [];
+      sortedLedgerRows = [];
+      attendanceRows = [];
+      sortedAttendanceRows = [];
+      sortedScheduleRows = [];
+      summaryRows = [];
+      sortedSummaryRows = [];
+      reviewRows = [];
+
+      transactionSort = { key: null, direction: "asc" };
+      scheduleSort = { key: "일자", direction: "asc" };
+      attendanceSort = { key: "일자", direction: "asc" };
+      ledgerSort = { key: "일자", direction: "asc" };
+      summarySort = { key: "성명", direction: "asc" };
+      activeTab = "transactions";
+
+      $("searchInput").value = "";
+      $("mealHeaderRowInput").value = "";
+      $("scheduleHeaderRowInput").value = "";
+      $("limitInput").value = "9000";
+      $("thresholdInput").value = "60";
+      $("message").textContent = "초기화했습니다.";
+      render();
+    });
+
+    render();
+  </script>
+  <footer class="footer">© 통일부 남북회담본부 회담지원과 황진우 주무관 제작</footer>
+</body>
+</html>

@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사무용품 주문목록 작성 프로그램</title>
+  <style>
+    :root {
+      --gov-blue: #003764;
+      --gov-blue-2: #005bac;
+      --gov-light: #f3f7fb;
+      --line: #d8e1ea;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --danger: #c2410c;
+      --success: #0f766e;
+      --white: #ffffff;
+      --warning-bg: #fff7ed;
+      --warning-line: #fed7aa;
+      --debt-bg: #fff1f2;
+      --debt-line: #fecdd3;
+      --debt-text: #be123c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "맑은 고딕", Arial, sans-serif;
+      background: var(--gov-light);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--gov-blue), var(--gov-blue-2));
+      color: white;
+      padding: 28px 32px;
+      border-bottom: 4px solid #0b74d1;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    header p {
+      margin: 0;
+      color: #e5f1ff;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 24px auto;
+      padding: 0 20px 40px;
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .panel {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    }
+
+    .side-panel {
+      padding: 18px;
+      height: fit-content;
+      position: sticky;
+      top: 16px;
+    }
+
+    .content-panel {
+      padding: 22px;
+      min-width: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      color: var(--gov-blue);
+    }
+
+    h3 {
+      margin: 18px 0 10px;
+      font-size: 15px;
+      color: var(--gov-blue);
+    }
+
+    .notice {
+      background: #eef6ff;
+      border: 1px solid #c9e4ff;
+      color: #194569;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      padding: 10px 11px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--gov-blue-2);
+      box-shadow: 0 0 0 3px rgba(0, 91, 172, 0.12);
+    }
+
+    input[type="file"] {
+      padding: 9px;
+      font-size: 13px;
+      background: #fbfdff;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 64px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 14px 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.04s ease, background 0.2s ease;
+      font-family: inherit;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--gov-blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #002b4f;
+    }
+
+    .btn-secondary {
+      background: #e8f1fb;
+      color: var(--gov-blue);
+      border: 1px solid #c8dff5;
+    }
+
+    .btn-danger {
+      background: #fff1eb;
+      color: var(--danger);
+      border: 1px solid #fed7c3;
+    }
+
+    .btn-ghost {
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1080px;
+    }
+
+    thead {
+      background: #eef4fb;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 9px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      font-size: 13px;
+      color: var(--gov-blue);
+      white-space: nowrap;
+    }
+
+    td input {
+      border-radius: 7px;
+      padding: 8px;
+    }
+
+    th.number {
+      text-align: right;
+    }
+
+    .row-total {
+      font-weight: 800;
+      text-align: right;
+      color: #111827;
+      white-space: nowrap;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .summary-card {
+      border: 1px solid #dce8f4;
+      background: #f8fbff;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .summary-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .summary-card strong {
+      display: block;
+      color: var(--gov-blue);
+      font-size: 22px;
+      text-align: right;
+    }
+
+    .payment-box {
+      margin-top: 12px;
+      border: 1px solid var(--warning-line);
+      background: var(--warning-bg);
+      border-radius: 12px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    .payment-box .help {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: #9a3412;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .balance-card {
+      border: 1px solid #fdba74;
+      background: white;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .balance-card span {
+      display: block;
+      color: #9a3412;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .balance-card strong {
+      display: block;
+      color: #9a3412;
+      font-size: 22px;
+      text-align: right;
+    }
+
+    .debt-card {
+      border: 1px solid var(--debt-line);
+      background: white;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .debt-card span {
+      display: block;
+      color: var(--debt-text);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .debt-card strong {
+      display: block;
+      color: var(--debt-text);
+      font-size: 22px;
+      text-align: right;
+    }
+
+    .invoice-card {
+      border: 1px solid #bfdbfe;
+      background: white;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .invoice-card span {
+      display: block;
+      color: var(--gov-blue);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .invoice-card strong {
+      display: block;
+      color: var(--gov-blue);
+      font-size: 22px;
+      text-align: right;
+    }
+
+    .deduct-card {
+      border: 1px solid #bbf7d0;
+      background: white;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .deduct-card span {
+      display: block;
+      color: #15803d;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .deduct-card strong {
+      display: block;
+      color: #15803d;
+      font-size: 22px;
+      text-align: right;
+    }
+
+
+
+
+
+
+
+
+    .settlement-status {
+      grid-column: 1 / -1;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .settlement-formula {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) 36px minmax(160px, 1fr) 36px minmax(160px, 1fr) 36px minmax(180px, 1.1fr);
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .formula-box {
+      border: 1px solid #dbeafe;
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 86px;
+    }
+
+    .formula-box label,
+    .formula-box span {
+      display: block;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .formula-box strong {
+      display: block;
+      color: var(--gov-blue);
+      font-size: 22px;
+      text-align: right;
+      margin-top: 7px;
+    }
+
+    .formula-box.result {
+      border-color: #fecdd3;
+      background: #fffafa;
+    }
+
+    .formula-box.result strong {
+      color: var(--debt-text);
+    }
+
+    .formula-box.surplus {
+      border-color: #fed7aa;
+      background: #fffaf3;
+    }
+
+    .formula-box.surplus strong {
+      color: #9a3412;
+    }
+
+    .formula-sign {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--gov-blue);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      min-height: 86px;
+    }
+
+    .settlement-dates {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      .settlement-formula {
+        grid-template-columns: 1fr;
+      }
+
+      .formula-sign {
+        min-height: 42px;
+      }
+
+      .settlement-dates {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .saved-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .saved-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fbfdff;
+    }
+
+    .saved-item strong {
+      display: block;
+      font-size: 14px;
+      color: #111827;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .saved-item small {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .saved-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .saved-actions button {
+      flex: 1 1 calc(50% - 6px);
+      padding: 7px 8px;
+      font-size: 12px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin: 18px 0 8px;
+    }
+
+    .section-head h3 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--gov-blue);
+    }
+
+    .section-head p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .section-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .section-actions button {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .previous-table {
+      background: #fffdf7;
+      border-color: #fde68a;
+    }
+
+    .previous-table thead {
+      background: #fff7cc;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px dashed #cbd5e1;
+    }
+
+    .status {
+      min-height: 22px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .small-help {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .ocr-box {
+      margin-top: 12px;
+      border: 1px solid #e2e8f0;
+      background: #fbfdff;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .ocr-box textarea {
+      min-height: 150px;
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre;
+    }
+
+    .ocr-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .ocr-actions button {
+      flex: 1;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    .ocr-links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .ocr-links a {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      border: 1px solid #c8dff5;
+      background: #e8f1fb;
+      color: var(--gov-blue);
+      border-radius: 8px;
+      padding: 8px 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .ocr-warning {
+      margin-top: 8px;
+      padding: 8px 9px;
+      border: 1px solid #fed7aa;
+      background: #fff7ed;
+      color: #9a3412;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    footer {
+      max-width: 1400px;
+      margin: 0 auto 30px;
+      padding: 0 20px;
+      color: #64748b;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .print-title {
+      display: none;
+    }
+
+    @media (max-width: 1000px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .side-panel {
+        position: static;
+      }
+
+      .field-grid,
+      .summary,
+      .payment-box {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      header,
+      .side-panel,
+      .toolbar,
+      .notice,
+      footer,
+      .no-print {
+        display: none !important;
+      }
+
+      main {
+        display: block;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .content-panel {
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+      }
+
+      .print-title {
+        display: block;
+        text-align: center;
+        font-size: 22px;
+        margin-bottom: 20px;
+        font-weight: 700;
+      }
+
+      input, textarea, select {
+        border: 0;
+        padding: 0;
+      }
+
+      .table-wrap {
+        border-radius: 0;
+      }
+
+      table {
+        min-width: 0;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border: 1px solid #999;
+        gap: 0;
+        margin-bottom: 12px;
+      }
+
+      .field-grid > div {
+        border-right: 1px solid #ccc;
+        padding: 8px;
+      }
+
+      .field-grid > div:last-child {
+        border-right: 0;
+      }
+
+      .payment-box {
+        background: white;
+        border-color: #999;
+      }
+
+      .balance-card,
+      .debt-card {
+        border-color: #ccc;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>사무용품 주문목록 작성 프로그램</h1>
+    <p>구매기안금액과 기안일자를 표시하고, 이전 주문목록과 현재 주문목록을 구분해 주문서를 작성합니다.</p>
+  </header>
+
+  <main>
+    <aside class="panel side-panel">
+      <h2>이전 주문목록</h2>
+      <div class="notice">
+        저장자료는 현재 PC의 현재 브라우저에만 보관됩니다. 내부망 공용 PC에서는 민감정보 입력을 피하고, 필요 시 목록을 삭제하십시오.
+      </div>
+
+      <h3>엑셀파일 불러오기</h3>
+      <input id="excelFile" type="file" accept=".xlsx,.csv" onchange="importOrderFile(this.files[0])" />
+      <div class="small-help">
+        지원 형식: .xlsx, .csv<br />
+        제품번호·제품명·규격·수량·단가 헤더가 있는 첫 번째 시트를 읽습니다.
+      </div>
+
+      <h3>OCR 텍스트 불러오기</h3>
+      <div class="ocr-box">
+        <label for="ocrTarget">반영 위치</label>
+        <select id="ocrTarget">
+          <option value="previous">이전 주문목록에 추가</option>
+          <option value="current">현재 주문목록에 추가</option>
+          <option value="auto">텍스트 제목 기준 자동분류</option>
+        </select>
+
+        <label for="ocrText" style="margin-top: 10px;">OCR 결과 텍스트</label>
+        <textarea id="ocrText" placeholder="OCR로 인식한 표 내용을 붙여넣으십시오.&#10;예:&#10;제품번호 제품명 규격 수량 단가 총액&#10;A001 복사용지 A4 80g 10 3000 30000"></textarea>
+
+        <div class="ocr-actions">
+          <button class="btn-secondary" onclick="importOcrText()">OCR 텍스트 반영</button>
+          <button class="btn-ghost" onclick="document.getElementById('ocrText').value = ''">지우기</button>
+        </div>
+
+        <div class="ocr-links">
+          <a href="https://www.onlineocr.net/" target="_blank" rel="noopener noreferrer">OnlineOCR 열기</a>
+          <a href="https://ocr.space/" target="_blank" rel="noopener noreferrer">OCR.Space 열기</a>
+          <a href="https://www.i2ocr.com/" target="_blank" rel="noopener noreferrer">i2OCR 열기</a>
+          <a href="https://drive.google.com/" target="_blank" rel="noopener noreferrer">Google Drive 열기</a>
+        </div>
+
+        <div class="ocr-warning">
+          외부 OCR 사이트에는 내부문서, 개인정보, 업체 민감자료를 업로드하지 마십시오. 비민감 자료 또는 테스트 자료에 한해 사용하십시오.
+        </div>
+
+        <div class="small-help">
+          OCR 웹사이트에서 인식한 텍스트를 복사한 뒤 위 입력창에 붙여넣고 반영하십시오. 내부망에서 외부 사이트 접속이 차단될 수 있습니다.
+        </div>
+      </div>
+
+      <h3>브라우저 저장목록</h3>
+      <button class="btn-secondary" style="width: 100%;" onclick="renderSavedOrders()">목록 새로고침</button>
+      <div id="savedList" class="saved-list"></div>
+      <div class="status" id="sideStatus"></div>
+    </aside>
+
+    <section class="panel content-panel">
+      <div class="print-title">사무용품 주문서</div>
+      <h2>주문목록 작성</h2>
+
+      <div class="notice">
+        기안금액과 기안일자는 비고 위의 기본정보 영역에 표시됩니다. 거래처 확인용 금액은 <strong>기존 외상금액 + 주문합계 - 선결제 차감액 = 남은 외상금액</strong> 형식으로 표시됩니다.
+      </div>
+
+      <div class="field-grid">
+        <div>
+          <label for="orderName">목록명</label>
+          <input id="orderName" type="text" placeholder="예: 2026년 4월 사무용품 주문" />
+        </div>
+        <div>
+          <label for="orderDate">작성일</label>
+          <input id="orderDate" type="date" />
+        </div>
+        <div>
+          <label for="vendorName">주문처</label>
+          <input id="vendorName" type="text" value="드림디포 안국점" />
+        </div>
+      </div>
+
+      <div class="field-grid">
+        <div>
+          <label for="proposalAmount">기안금액</label>
+          <input id="proposalAmount" type="number" min="0" step="1" placeholder="0" oninput="updateSummary()" />
+        </div>
+        <div>
+          <label for="proposalDate">기안일자</label>
+          <input id="proposalDate" type="date" />
+        </div>
+        <div>
+          <label>기안정보</label>
+          <input type="text" value="구매기안 기준 금액 및 일자" readonly />
+        </div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label for="memo">비고</label>
+        <textarea id="memo" placeholder="배송 요청사항, 담당자 메모 등을 입력하십시오."></textarea>
+      </div>
+
+      <div class="toolbar no-print">
+        <button class="btn-primary" onclick="addRow()">행 추가</button>
+        <button class="btn-secondary" onclick="saveCurrentOrder()">현재 목록 저장</button>
+        <button class="btn-ghost" onclick="downloadCsv()">CSV 다운로드</button>
+        <button class="btn-ghost" onclick="downloadXlsx()">XLSX 다운로드</button>
+        <button class="btn-ghost" onclick="printPdf()">PDF 출력</button>
+        <button class="btn-ghost" onclick="window.print()">일반 인쇄</button>
+        <button class="btn-danger" onclick="clearForm()">새 목록</button>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h3>이전 주문목록</h3>
+          <p>기존 주문분입니다. 현재 주문목록과 구분해 표시하되, 결제액에는 포함됩니다.</p>
+        </div>
+        <div class="section-actions no-print">
+          <button class="btn-secondary" onclick="addPreviousRow()">이전 행 추가</button>
+          <button class="btn-danger" onclick="clearPreviousRows()">이전목록 비우기</button>
+        </div>
+      </div>
+
+      <div class="table-wrap previous-table">
+        <table id="previousOrderTable">
+          <thead>
+            <tr>
+              <th style="width: 60px;">연번</th>
+              <th>제품번호</th>
+              <th>제품명</th>
+              <th>규격</th>
+              <th class="number">수량</th>
+              <th class="number">단가</th>
+              <th class="number">총액</th>
+              <th class="no-print" style="width: 90px;">관리</th>
+            </tr>
+          </thead>
+          <tbody id="previousOrderBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h3>현재 주문목록</h3>
+          <p>이번에 새로 주문하는 품목입니다.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="orderTable">
+          <thead>
+            <tr>
+              <th style="width: 60px;">연번</th>
+              <th>제품번호</th>
+              <th>제품명</th>
+              <th>규격</th>
+              <th class="number">수량</th>
+              <th class="number">단가</th>
+              <th class="number">총액</th>
+              <th class="no-print" style="width: 90px;">관리</th>
+            </tr>
+          </thead>
+          <tbody id="orderBody"></tbody>
+        </table>
+      </div>
+
+      <div class="summary">
+        <div class="summary-card">
+          <span>총 품목 수</span>
+          <strong id="itemCount">0</strong>
+        </div>
+        <div class="summary-card">
+          <span>총 수량</span>
+          <strong id="totalQty">0</strong>
+        </div>
+        <div class="summary-card">
+          <span>이전 주문액</span>
+          <strong id="previousTotal">0원</strong>
+        </div>
+        <div class="summary-card">
+          <span>현재 주문액</span>
+          <strong id="currentTotal">0원</strong>
+        </div>
+        <div class="summary-card">
+          <span>주문합계</span>
+          <strong id="grandTotal">0원</strong>
+        </div>
+      </div>
+
+      <div class="payment-box">
+        <p class="help">거래처 확인용 금액 흐름입니다. 아래 계산식대로 <strong>기존 외상금액 + 주문합계 - 선결제 차감액 = 남은 외상금액</strong>으로 표시됩니다.</p>
+
+        <div class="settlement-formula">
+          <div class="formula-box">
+            <label for="existingDebt">기존 외상금액</label>
+            <input id="existingDebt" type="number" min="0" step="1" placeholder="0" oninput="updateSummary()" />
+          </div>
+
+          <div class="formula-sign">+</div>
+
+          <div class="formula-box">
+            <span>주문합계</span>
+            <strong id="formulaOrderTotal">0원</strong>
+          </div>
+
+          <div class="formula-sign">−</div>
+
+          <div class="formula-box">
+            <label for="prepayment">선결제 차감액</label>
+            <input id="prepayment" type="number" min="0" step="1" placeholder="0" oninput="updateSummary()" />
+          </div>
+
+          <div class="formula-sign">=</div>
+
+          <div class="formula-box result">
+            <span id="settlementResultLabel">남은 외상금액</span>
+            <strong id="debtAmount">0원</strong>
+          </div>
+        </div>
+
+        <div class="settlement-dates">
+          <div>
+            <label for="existingDebtDate">기존 외상일자</label>
+            <input id="existingDebtDate" type="date" />
+          </div>
+          <div>
+            <label for="prepaymentDate">선결제일자</label>
+            <input id="prepaymentDate" type="date" />
+          </div>
+        </div>
+
+        <div class="settlement-status" id="settlementStatus">금액상태: 기존 외상금액, 주문합계, 선결제 차감액을 확인하십시오.</div>
+      </div>
+
+      <div class="status" id="mainStatus"></div>
+    </section>
+  </main>
+
+  <footer>사무용품 주문목록 작성 프로그램</footer>
+
+  <script>
+    const STORAGE_KEY = "officeSupplyOrderApp.savedOrders.v3";
+    const DEFAULT_VENDOR = "드림디포 안국점";
+
+    let rows = [];
+    let previousRows = [];
+    let currentOrderId = null;
+    let crcTable = null;
+
+    function formatNumber(value) {
+      const number = Number(value) || 0;
+      return number.toLocaleString("ko-KR");
+    }
+
+    function formatWon(value) {
+      return `${formatNumber(value)}원`;
+    }
+
+    function parseNumber(value) {
+      if (value === null || value === undefined) return 0;
+      return Number(String(value).replaceAll(",", "").trim()) || 0;
+    }
+
+    function todayIso() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function makeId() {
+      return "id_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2);
+    }
+
+    function newRow(data = {}) {
+      return {
+        id: makeId(),
+        productNo: data.productNo || "",
+        productName: data.productName || "",
+        spec: data.spec || "",
+        qty: Number(data.qty) || 0,
+        unitPrice: Number(data.unitPrice) || 0
+      };
+    }
+
+    function getSavedOrders() {
+      try {
+        const v3 = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const v2 = JSON.parse(localStorage.getItem("officeSupplyOrderApp.savedOrders.v1")) || [];
+        const merged = [...v3];
+        v2.forEach(oldItem => {
+          if (!merged.some(item => item.id === oldItem.id)) merged.push(oldItem);
+        });
+        return merged;
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function setSavedOrders(orders) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    }
+
+    function collectMeta() {
+      return {
+        orderName: document.getElementById("orderName").value.trim(),
+        orderDate: document.getElementById("orderDate").value,
+        vendorName: document.getElementById("vendorName").value.trim() || DEFAULT_VENDOR,
+        memo: document.getElementById("memo").value.trim(),
+        proposalAmount: parseNumber(document.getElementById("proposalAmount").value),
+        proposalDate: document.getElementById("proposalDate").value,
+        existingDebt: parseNumber(document.getElementById("existingDebt").value),
+        existingDebtDate: document.getElementById("existingDebtDate").value,
+        prepayment: parseNumber(document.getElementById("prepayment").value),
+        prepaymentDate: document.getElementById("prepaymentDate").value
+      };
+    }
+
+    function applyMeta(meta) {
+      document.getElementById("orderName").value = meta.orderName || "";
+      document.getElementById("orderDate").value = meta.orderDate || todayIso();
+      document.getElementById("vendorName").value = meta.vendorName || DEFAULT_VENDOR;
+      document.getElementById("memo").value = meta.memo || "";
+      document.getElementById("proposalAmount").value = meta.proposalAmount ? Number(meta.proposalAmount) : "";
+      document.getElementById("proposalDate").value = meta.proposalDate || "";
+      document.getElementById("existingDebt").value = meta.existingDebt ? Number(meta.existingDebt) : "";
+      document.getElementById("existingDebtDate").value = meta.existingDebtDate || "";
+      document.getElementById("prepayment").value = meta.prepayment ? Number(meta.prepayment) : "";
+      document.getElementById("prepaymentDate").value = meta.prepaymentDate || "";
+      updateSummary();
+    }
+
+    function setMainStatus(message, danger = false) {
+      const el = document.getElementById("mainStatus");
+      el.textContent = message;
+      el.style.color = danger ? "var(--danger)" : "var(--success)";
+      if (message) {
+        setTimeout(() => {
+          if (el.textContent === message) el.textContent = "";
+        }, 3500);
+      }
+    }
+
+    function setSideStatus(message, danger = false) {
+      const el = document.getElementById("sideStatus");
+      el.textContent = message;
+      el.style.color = danger ? "var(--danger)" : "var(--success)";
+      if (message) {
+        setTimeout(() => {
+          if (el.textContent === message) el.textContent = "";
+        }, 3500);
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function xmlEscape(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&apos;");
+    }
+
+    function rowTotal(row) {
+      return (Number(row.qty) || 0) * (Number(row.unitPrice) || 0);
+    }
+
+    function renderRows() {
+      const tbody = document.getElementById("orderBody");
+      tbody.innerHTML = "";
+
+      rows.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.dataset.rowId = row.id;
+        tr.innerHTML = buildRowHtml(row, index, false);
+        tbody.appendChild(tr);
+      });
+
+      updateSummary();
+    }
+
+    function renderPreviousRows() {
+      const tbody = document.getElementById("previousOrderBody");
+      tbody.innerHTML = "";
+
+      if (previousRows.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="8" style="text-align:center; color:#6b7280; padding:14px;">이전 주문목록이 없습니다. 저장목록의 '이전분 추가' 또는 엑셀파일 불러오기를 사용하십시오.</td>`;
+        tbody.appendChild(tr);
+        updateSummary();
+        return;
+      }
+
+      previousRows.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.dataset.rowId = row.id;
+        tr.innerHTML = buildRowHtml(row, index, true);
+        tbody.appendChild(tr);
+      });
+
+      updateSummary();
+    }
+
+    function buildRowHtml(row, index, isPrevious) {
+      const updater = isPrevious ? "updatePreviousRow" : "updateRow";
+      const remover = isPrevious ? "removePreviousRow" : "removeRow";
+      return `
+          <td>${index + 1}</td>
+          <td><input value="${escapeHtml(row.productNo)}" placeholder="제품번호" oninput="${updater}('${row.id}', 'productNo', this.value, this)" /></td>
+          <td><input value="${escapeHtml(row.productName)}" placeholder="제품명" oninput="${updater}('${row.id}', 'productName', this.value, this)" /></td>
+          <td><input value="${escapeHtml(row.spec)}" placeholder="규격" oninput="${updater}('${row.id}', 'spec', this.value, this)" /></td>
+          <td><input type="number" min="0" step="1" value="${row.qty || ""}" placeholder="0" oninput="${updater}('${row.id}', 'qty', this.value, this)" /></td>
+          <td><input type="number" min="0" step="1" value="${row.unitPrice || ""}" placeholder="0" oninput="${updater}('${row.id}', 'unitPrice', this.value, this)" /></td>
+          <td class="row-total">${formatWon(rowTotal(row))}</td>
+          <td class="no-print"><button class="btn-danger" onclick="${remover}('${row.id}')">삭제</button></td>
+        `;
+    }
+
+    function updateRow(id, field, value, inputEl) {
+      updateRowInList(rows, id, field, value, inputEl);
+    }
+
+    function updatePreviousRow(id, field, value, inputEl) {
+      updateRowInList(previousRows, id, field, value, inputEl);
+    }
+
+    function updateRowInList(list, id, field, value, inputEl) {
+      const row = list.find(item => item.id === id);
+      if (!row) return;
+
+      if (field === "qty" || field === "unitPrice") {
+        row[field] = parseNumber(value);
+        const tr = inputEl.closest("tr");
+        const totalCell = tr.querySelector(".row-total");
+        totalCell.textContent = formatWon(rowTotal(row));
+      } else {
+        row[field] = value;
+      }
+
+      updateSummary();
+    }
+
+    function addRow(data = {}) {
+      rows.push(newRow(data));
+      renderRows();
+    }
+
+    function addPreviousRow(data = {}) {
+      previousRows.push(newRow(data));
+      renderPreviousRows();
+    }
+
+    function removeRow(id) {
+      rows = rows.filter(row => row.id !== id);
+      if (rows.length === 0) rows.push(newRow());
+      renderRows();
+    }
+
+    function removePreviousRow(id) {
+      previousRows = previousRows.filter(row => row.id !== id);
+      renderPreviousRows();
+    }
+
+    function clearPreviousRows() {
+      if (previousRows.length === 0) {
+        setMainStatus("비울 이전 주문목록이 없습니다.", true);
+        return;
+      }
+      if (!confirm("이전 주문목록을 모두 비우시겠습니까? 결제액 합산에서도 제외됩니다.")) return;
+      previousRows = [];
+      renderPreviousRows();
+      setMainStatus("이전 주문목록을 비웠습니다.");
+    }
+
+    function getCurrentTotal() {
+      return rows.reduce((sum, row) => sum + rowTotal(row), 0);
+    }
+
+    function getPreviousTotal() {
+      return previousRows.reduce((sum, row) => sum + rowTotal(row), 0);
+    }
+
+    function getGrandTotal() {
+      return getCurrentTotal() + getPreviousTotal();
+    }
+
+    function updateSummary() {
+      const validRows = [...rows, ...previousRows].filter(row => row.productNo || row.productName || row.spec || row.qty || row.unitPrice);
+      const totalQty = [...rows, ...previousRows].reduce((sum, row) => sum + (Number(row.qty) || 0), 0);
+      const currentTotal = getCurrentTotal();
+      const previousTotal = getPreviousTotal();
+      const grandTotal = currentTotal + previousTotal;
+      const existingDebt = parseNumber(document.getElementById("existingDebt").value);
+      const prepayment = parseNumber(document.getElementById("prepayment").value);
+      const invoiceTotal = existingDebt + grandTotal;
+      const debtAmount = Math.max(invoiceTotal - prepayment, 0);
+      const prepaymentBalance = Math.max(prepayment - invoiceTotal, 0);
+
+      document.getElementById("itemCount").textContent = formatNumber(validRows.length);
+      document.getElementById("totalQty").textContent = formatNumber(totalQty);
+      document.getElementById("currentTotal").textContent = formatWon(currentTotal);
+      document.getElementById("previousTotal").textContent = formatWon(previousTotal);
+      document.getElementById("grandTotal").textContent = formatWon(grandTotal);
+      document.getElementById("formulaOrderTotal").textContent = formatWon(grandTotal);
+
+      const resultBox = document.getElementById("debtAmount").closest(".formula-box");
+      const resultLabel = document.getElementById("settlementResultLabel");
+
+      if (prepaymentBalance > 0) {
+        resultLabel.textContent = "선결제 잔액";
+        document.getElementById("debtAmount").textContent = formatWon(prepaymentBalance);
+        resultBox.classList.remove("result");
+        resultBox.classList.add("surplus");
+      } else {
+        resultLabel.textContent = "남은 외상금액";
+        document.getElementById("debtAmount").textContent = formatWon(debtAmount);
+        resultBox.classList.remove("surplus");
+        resultBox.classList.add("result");
+      }
+
+      const statusEl = document.getElementById("settlementStatus");
+      if (invoiceTotal === 0 && prepayment === 0) {
+        statusEl.textContent = "금액상태: 기존 외상금액, 주문합계, 선결제 차감액을 확인하십시오.";
+        statusEl.style.color = "#334155";
+      } else if (debtAmount > 0) {
+        statusEl.textContent = `금액상태: ${formatWon(invoiceTotal)}에서 선결제 ${formatWon(prepayment)}을 차감하여 ${formatWon(debtAmount)}이 남았습니다.`;
+        statusEl.style.color = "var(--debt-text)";
+      } else if (prepaymentBalance > 0) {
+        statusEl.textContent = `금액상태: 선결제 차감 후 ${formatWon(prepaymentBalance)}이 남았습니다.`;
+        statusEl.style.color = "#9a3412";
+      } else {
+        statusEl.textContent = "금액상태: 총 청구액과 선결제 차감액이 일치합니다.";
+        statusEl.style.color = "var(--success)";
+      }
+    }
+
+    function cleanRows(list) {
+      return list
+        .map(row => ({
+          productNo: String(row.productNo || "").trim(),
+          productName: String(row.productName || "").trim(),
+          spec: String(row.spec || "").trim(),
+          qty: Number(row.qty) || 0,
+          unitPrice: Number(row.unitPrice) || 0
+        }))
+        .filter(row => row.productNo || row.productName || row.spec || row.qty || row.unitPrice);
+    }
+
+    function getCleanedRows() {
+      return cleanRows(rows);
+    }
+
+    function getCleanedPreviousRows() {
+      return cleanRows(previousRows);
+    }
+
+    function getAllCleanedRows() {
+      return [...getCleanedRows(), ...getCleanedPreviousRows()];
+    }
+
+    function saveCurrentOrder() {
+      const meta = collectMeta();
+      const cleanedRows = getCleanedRows();
+      const cleanedPreviousRows = getCleanedPreviousRows();
+
+      if (!meta.orderName) {
+        setMainStatus("목록명을 입력해야 저장할 수 있습니다.", true);
+        document.getElementById("orderName").focus();
+        return;
+      }
+
+      if (cleanedRows.length === 0 && cleanedPreviousRows.length === 0) {
+        setMainStatus("저장할 품목을 1개 이상 입력하십시오.", true);
+        return;
+      }
+
+      const orders = getSavedOrders();
+      const now = new Date().toISOString();
+      const previousOrder = orders.find(item => item.id === currentOrderId);
+
+      const order = {
+        id: currentOrderId || makeId(),
+        ...meta,
+        rows: cleanedRows,
+        previousRows: cleanedPreviousRows,
+        updatedAt: now,
+        createdAt: previousOrder ? previousOrder.createdAt : now
+      };
+
+      const existingIndex = orders.findIndex(item => item.id === order.id);
+      if (existingIndex >= 0) {
+        orders[existingIndex] = order;
+      } else {
+        orders.unshift(order);
+      }
+
+      setSavedOrders(orders);
+      currentOrderId = order.id;
+      renderSavedOrders();
+      setMainStatus("현재 주문목록을 저장했습니다.");
+    }
+
+    function loadOrder(id) {
+      const order = getSavedOrders().find(item => item.id === id);
+      if (!order) {
+        setSideStatus("해당 목록을 찾을 수 없습니다.", true);
+        return;
+      }
+
+      currentOrderId = order.id;
+      rows = (order.rows || []).map(row => newRow(row));
+      previousRows = (order.previousRows || []).map(row => newRow(row));
+      if (rows.length === 0) rows.push(newRow());
+      renderRows();
+      renderPreviousRows();
+      applyMeta(order);
+      setSideStatus("저장목록을 현재 작성화면으로 불러왔습니다.");
+    }
+
+    function loadOrderAsPrevious(id) {
+      const order = getSavedOrders().find(item => item.id === id);
+      if (!order) {
+        setSideStatus("해당 목록을 찾을 수 없습니다.", true);
+        return;
+      }
+
+      const items = [...(order.previousRows || []), ...(order.rows || [])].map(row => newRow(row));
+      if (items.length === 0) {
+        setSideStatus("이전 주문목록에 추가할 품목이 없습니다.", true);
+        return;
+      }
+
+      previousRows.push(...items);
+      renderPreviousRows();
+      setSideStatus("선택한 저장목록을 이전 주문목록에 추가했습니다. 결제액 합산에 포함됩니다.");
+    }
+
+    function deleteOrder(id) {
+      const order = getSavedOrders().find(item => item.id === id);
+      const name = order && order.orderName ? order.orderName : "선택한 목록";
+      if (!confirm("'" + name + "'을 삭제하시겠습니까?")) return;
+
+      const orders = getSavedOrders().filter(item => item.id !== id);
+      setSavedOrders(orders);
+      if (currentOrderId === id) currentOrderId = null;
+      renderSavedOrders();
+      setSideStatus("저장된 주문목록을 삭제했습니다.");
+    }
+
+    function duplicateOrder(id) {
+      const order = getSavedOrders().find(item => item.id === id);
+      if (!order) return;
+
+      currentOrderId = null;
+      rows = (order.rows || []).map(row => newRow(row));
+      previousRows = (order.previousRows || []).map(row => newRow(row));
+      if (rows.length === 0) rows.push(newRow());
+      renderRows();
+      renderPreviousRows();
+      applyMeta({
+        ...order,
+        orderName: `${order.orderName || "주문목록"} - 복사본`,
+        orderDate: todayIso()
+      });
+      setSideStatus("복사본을 작성화면에 불러왔습니다. 저장하면 새 목록으로 저장됩니다.");
+    }
+
+    function renderSavedOrders() {
+      const container = document.getElementById("savedList");
+      const orders = getSavedOrders().sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+      container.innerHTML = "";
+
+      if (orders.length === 0) {
+        container.innerHTML = `<div class="empty">저장된 주문목록이 없습니다. 작성 후 '현재 목록 저장'을 누르면 여기에 표시됩니다.</div>`;
+        return;
+      }
+
+      orders.forEach(order => {
+        const allRows = [...(order.rows || []), ...(order.previousRows || [])];
+        const total = allRows.reduce((sum, row) => sum + ((Number(row.qty) || 0) * (Number(row.unitPrice) || 0)), 0);
+        const proposalAmount = Number(order.proposalAmount) || 0;
+        const existingDebt = Number(order.existingDebt) || 0;
+        const prepayment = Number(order.prepayment) || 0;
+        const invoiceTotal = total + existingDebt;
+        const debt = Math.max(invoiceTotal - prepayment, 0);
+        const balance = Math.max(prepayment - invoiceTotal, 0);
+        const count = allRows.length;
+        const div = document.createElement("div");
+        div.className = "saved-item";
+        div.innerHTML = `
+          <strong>${escapeHtml(order.orderName || "이름 없는 목록")}</strong>
+          <small>작성일: ${escapeHtml(order.orderDate || "-")}</small>
+          <small>주문처: ${escapeHtml(order.vendorName || DEFAULT_VENDOR)}</small>
+          <small>품목 ${formatNumber(count)}건 · 주문합계 ${formatWon(total)}</small>
+          <small>기안금액 ${proposalAmount ? formatWon(proposalAmount) : "-"} · 기안일자 ${escapeHtml(order.proposalDate || "-")}</small>
+          <small>기존외상 ${formatWon(existingDebt)} · 외상일자 ${escapeHtml(order.existingDebtDate || "-")}</small>
+          <small>선결제차감 ${formatWon(prepayment)} · 선결제일자 ${escapeHtml(order.prepaymentDate || "-")}</small>
+          <small>남은외상 ${formatWon(debt)} · 선결제잔액 ${formatWon(balance)}</small>
+          <div class="saved-actions">
+            <button class="btn-primary" onclick="loadOrder('${order.id}')">전체 불러오기</button>
+            <button class="btn-secondary" onclick="loadOrderAsPrevious('${order.id}')">이전분 추가</button>
+            <button class="btn-secondary" onclick="duplicateOrder('${order.id}')">복사</button>
+            <button class="btn-danger" onclick="deleteOrder('${order.id}')">삭제</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function clearForm() {
+      if (!confirm("현재 작성 중인 내용을 비우고 새 목록을 작성하시겠습니까? 저장하지 않은 내용은 사라집니다.")) return;
+      currentOrderId = null;
+      rows = [newRow()];
+      previousRows = [];
+      renderRows();
+      renderPreviousRows();
+      applyMeta({ orderName: "", orderDate: todayIso(), vendorName: DEFAULT_VENDOR, memo: "", proposalAmount: 0, proposalDate: "", existingDebt: 0, existingDebtDate: "", prepayment: 0, prepaymentDate: "" });
+      document.getElementById("excelFile").value = "";
+      setMainStatus("새 주문목록으로 초기화했습니다.");
+    }
+
+    function csvEscape(value) {
+      const text = String(value ?? "");
+      return `"${text.replaceAll('"', '""')}"`;
+    }
+
+    function rowsToExportBody(list) {
+      return list.map((row, index) => [
+        index + 1,
+        row.productNo,
+        row.productName,
+        row.spec,
+        row.qty,
+        row.unitPrice,
+        row.qty * row.unitPrice
+      ]);
+    }
+
+    function getExportMatrix() {
+      const meta = collectMeta();
+      const currentBody = rowsToExportBody(getCleanedRows());
+      const previousBody = rowsToExportBody(getCleanedPreviousRows());
+
+      const currentTotal = currentBody.reduce((sum, item) => sum + Number(item[6] || 0), 0);
+      const previousTotal = previousBody.reduce((sum, item) => sum + Number(item[6] || 0), 0);
+      const total = currentTotal + previousTotal;
+      const proposalAmount = Number(meta.proposalAmount) || 0;
+      const existingDebt = Number(meta.existingDebt) || 0;
+      const prepayment = Number(meta.prepayment) || 0;
+      const invoiceTotal = total + existingDebt;
+      const deductedPrepayment = Math.min(prepayment, invoiceTotal);
+      const debt = Math.max(invoiceTotal - prepayment, 0);
+      const balance = Math.max(prepayment - invoiceTotal, 0);
+
+      return [
+        ["목록명", meta.orderName],
+        ["작성일", meta.orderDate],
+        ["주문처", meta.vendorName],
+        ["비고", meta.memo],
+        [],
+        ["이전 주문목록"],
+        ["연번", "제품번호", "제품명", "규격", "수량", "단가", "총액"],
+        ...previousBody,
+        [],
+        ["현재 주문목록"],
+        ["연번", "제품번호", "제품명", "규격", "수량", "단가", "총액"],
+        ...currentBody,
+        [],
+        ["", "", "", "", "", "이전 주문액", previousTotal],
+        ["", "", "", "", "", "현재 주문액", currentTotal],
+        ["", "", "", "", "", "주문합계", total],
+        ["", "", "", "", "", "기안금액", proposalAmount],
+        ["", "", "", "", "", "기안일자", meta.proposalDate || ""],
+        ["", "", "", "", "", "기존 외상금액", existingDebt],
+        ["", "", "", "", "", "기존 외상일자", meta.existingDebtDate || ""],
+        ["", "", "", "", "", "총 청구액", invoiceTotal],
+        ["", "", "", "", "", "선결제 차감액", deductedPrepayment],
+        ["", "", "", "", "", "선결제일자", meta.prepaymentDate || ""],
+        ["", "", "", "", "", "남은 외상금액", debt],
+        ["", "", "", "", "", "선결제 잔액", balance]
+      ];
+    }
+
+    function downloadCsv() {
+      const cleanedRows = getAllCleanedRows();
+      if (cleanedRows.length === 0) {
+        setMainStatus("다운로드할 품목이 없습니다.", true);
+        return;
+      }
+
+      const lines = getExportMatrix().map(row => row.map(csvEscape).join(","));
+      const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      triggerDownload(blob, getSafeFileName("csv"));
+      setMainStatus("CSV 파일을 다운로드했습니다.");
+    }
+
+    function printPdf() {
+      const cleanedRows = getAllCleanedRows();
+      if (cleanedRows.length === 0) {
+        setMainStatus("PDF로 출력할 품목이 없습니다.", true);
+        return;
+      }
+
+      const meta = collectMeta();
+      const previousTitle = document.title;
+      const safeName = (meta.orderName || "사무용품_주문서").replace(/[\\/:*?"<>|]/g, "_");
+      document.title = safeName + "_PDF출력";
+
+      window.print();
+
+      setTimeout(() => {
+        document.title = previousTitle;
+      }, 1000);
+
+      setMainStatus("크롬 인쇄창에서 '대상: PDF로 저장'을 선택하면 PDF 파일로 저장할 수 있습니다.");
+    }
+
+    function downloadXlsx() {
+      const cleanedRows = getAllCleanedRows();
+      if (cleanedRows.length === 0) {
+        setMainStatus("다운로드할 품목이 없습니다.", true);
+        return;
+      }
+
+      const xlsxBlob = buildXlsxBlob(getExportMatrix());
+      triggerDownload(xlsxBlob, getSafeFileName("xlsx"));
+      setMainStatus("XLSX 파일을 다운로드했습니다.");
+    }
+
+    function getSafeFileName(ext) {
+      const meta = collectMeta();
+      const safeName = (meta.orderName || "사무용품_주문목록").replace(/[\\/:*?"<>|]/g, "_");
+      return `${safeName}.${ext}`;
+    }
+
+    function triggerDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function columnName(n) {
+      let s = "";
+      while (n > 0) {
+        const m = (n - 1) % 26;
+        s = String.fromCharCode(65 + m) + s;
+        n = Math.floor((n - 1) / 26);
+      }
+      return s;
+    }
+
+    function buildSheetXml(matrix) {
+      const rowsXml = matrix.map((row, rIndex) => {
+        const rowNum = rIndex + 1;
+        const cells = row.map((value, cIndex) => {
+          if (value === undefined || value === null || value === "") return "";
+          const ref = columnName(cIndex + 1) + rowNum;
+          if (typeof value === "number" && Number.isFinite(value)) {
+            return `<c r="${ref}"><v>${value}</v></c>`;
+          }
+          return `<c r="${ref}" t="inlineStr"><is><t>${xmlEscape(value)}</t></is></c>`;
+        }).join("");
+        return `<row r="${rowNum}">${cells}</row>`;
+      }).join("");
+
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <cols>
+    <col min="1" max="1" width="8" customWidth="1"/>
+    <col min="2" max="2" width="18" customWidth="1"/>
+    <col min="3" max="3" width="28" customWidth="1"/>
+    <col min="4" max="4" width="24" customWidth="1"/>
+    <col min="5" max="7" width="14" customWidth="1"/>
+  </cols>
+  <sheetData>${rowsXml}</sheetData>
+</worksheet>`;
+    }
+
+    function buildXlsxBlob(matrix) {
+      const now = new Date().toISOString();
+      const files = [
+        {
+          name: "[Content_Types].xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>`
+        },
+        {
+          name: "_rels/.rels",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>`
+        },
+        {
+          name: "docProps/core.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>사무용품 주문목록</dc:title>
+  <dc:creator>사무용품 주문목록 작성 프로그램</dc:creator>
+  <cp:lastModifiedBy>사무용품 주문목록 작성 프로그램</cp:lastModifiedBy>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified>
+</cp:coreProperties>`
+        },
+        {
+          name: "docProps/app.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+  <Application>사무용품 주문목록 작성 프로그램</Application>
+</Properties>`
+        },
+        {
+          name: "xl/workbook.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="주문목록" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>`
+        },
+        {
+          name: "xl/_rels/workbook.xml.rels",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`
+        },
+        {
+          name: "xl/styles.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="1"><font><sz val="11"/><name val="맑은 고딕"/></font></fonts>
+  <fills count="1"><fill><patternFill patternType="none"/></fill></fills>
+  <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>
+  <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>`
+        },
+        {
+          name: "xl/worksheets/sheet1.xml",
+          content: buildSheetXml(matrix)
+        }
+      ];
+
+      return makeZipBlob(files);
+    }
+
+    function getCrcTable() {
+      if (crcTable) return crcTable;
+      crcTable = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) {
+        let c = n;
+        for (let k = 0; k < 8; k++) {
+          c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+        }
+        crcTable[n] = c >>> 0;
+      }
+      return crcTable;
+    }
+
+    function crc32(bytes) {
+      const table = getCrcTable();
+      let crc = 0 ^ (-1);
+      for (let i = 0; i < bytes.length; i++) {
+        crc = (crc >>> 8) ^ table[(crc ^ bytes[i]) & 0xFF];
+      }
+      return (crc ^ (-1)) >>> 0;
+    }
+
+    function writeU16(arr, value) {
+      arr.push(value & 0xff, (value >>> 8) & 0xff);
+    }
+
+    function writeU32(arr, value) {
+      arr.push(value & 0xff, (value >>> 8) & 0xff, (value >>> 16) & 0xff, (value >>> 24) & 0xff);
+    }
+
+    function dosDateTime(date) {
+      const year = Math.max(date.getFullYear(), 1980);
+      const dosTime = (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
+      const dosDate = ((year - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate();
+      return { dosTime, dosDate };
+    }
+
+    function makeZipBlob(files) {
+      const encoder = new TextEncoder();
+      const fileRecords = [];
+      const output = [];
+      let offset = 0;
+      const now = dosDateTime(new Date());
+
+      files.forEach(file => {
+        const nameBytes = encoder.encode(file.name);
+        const dataBytes = encoder.encode(file.content);
+        const crc = crc32(dataBytes);
+        const local = [];
+
+        writeU32(local, 0x04034b50);
+        writeU16(local, 20);
+        writeU16(local, 0x0800);
+        writeU16(local, 0);
+        writeU16(local, now.dosTime);
+        writeU16(local, now.dosDate);
+        writeU32(local, crc);
+        writeU32(local, dataBytes.length);
+        writeU32(local, dataBytes.length);
+        writeU16(local, nameBytes.length);
+        writeU16(local, 0);
+
+        output.push(new Uint8Array(local), nameBytes, dataBytes);
+        fileRecords.push({ nameBytes, crc, size: dataBytes.length, offset, dosTime: now.dosTime, dosDate: now.dosDate });
+        offset += local.length + nameBytes.length + dataBytes.length;
+      });
+
+      const centralStart = offset;
+      const centralParts = [];
+
+      fileRecords.forEach(record => {
+        const central = [];
+        writeU32(central, 0x02014b50);
+        writeU16(central, 20);
+        writeU16(central, 20);
+        writeU16(central, 0x0800);
+        writeU16(central, 0);
+        writeU16(central, record.dosTime);
+        writeU16(central, record.dosDate);
+        writeU32(central, record.crc);
+        writeU32(central, record.size);
+        writeU32(central, record.size);
+        writeU16(central, record.nameBytes.length);
+        writeU16(central, 0);
+        writeU16(central, 0);
+        writeU16(central, 0);
+        writeU16(central, 0);
+        writeU32(central, 0);
+        writeU32(central, record.offset);
+        centralParts.push(new Uint8Array(central), record.nameBytes);
+        offset += central.length + record.nameBytes.length;
+      });
+
+      const centralSize = offset - centralStart;
+      const end = [];
+      writeU32(end, 0x06054b50);
+      writeU16(end, 0);
+      writeU16(end, 0);
+      writeU16(end, fileRecords.length);
+      writeU16(end, fileRecords.length);
+      writeU32(end, centralSize);
+      writeU32(end, centralStart);
+      writeU16(end, 0);
+
+      output.push(...centralParts, new Uint8Array(end));
+      return new Blob(output, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    }
+
+    function importOcrText() {
+      const text = document.getElementById("ocrText").value;
+      const target = document.getElementById("ocrTarget").value;
+
+      if (!text.trim()) {
+        setSideStatus("OCR 결과 텍스트를 붙여넣으십시오.", true);
+        return;
+      }
+
+      const parsed = parseOcrOrderText(text, target);
+
+      if (parsed.current.length === 0 && parsed.previous.length === 0) {
+        setSideStatus("읽을 수 있는 품목을 찾지 못했습니다. 제품번호·제품명·규격·수량·단가 순서인지 확인하십시오.", true);
+        return;
+      }
+
+      if (parsed.current.length > 0) {
+        const currentIsEmpty = rows.length === 1 && !rows[0].productNo && !rows[0].productName && !rows[0].spec && !rows[0].qty && !rows[0].unitPrice;
+        if (currentIsEmpty) rows = [];
+        rows.push(...parsed.current.map(row => newRow(row)));
+      }
+
+      if (parsed.previous.length > 0) {
+        previousRows.push(...parsed.previous.map(row => newRow(row)));
+      }
+
+      if (rows.length === 0) rows.push(newRow());
+
+      renderRows();
+      renderPreviousRows();
+
+      const totalCount = parsed.current.length + parsed.previous.length;
+      setSideStatus(`OCR 텍스트에서 ${totalCount}개 품목을 불러왔습니다. 현재 ${parsed.current.length}개, 이전 ${parsed.previous.length}개입니다.`);
+    }
+
+    function parseOcrOrderText(text, target) {
+      const result = { current: [], previous: [] };
+      let activeTarget = target === "current" ? "current" : "previous";
+
+      const lines = text
+        .replace(/\r/g, "\n")
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+      lines.forEach(line => {
+        const normalized = normalizeOcrLine(line);
+
+        if (target === "auto") {
+          if (normalized.includes("현재주문목록") || normalized.includes("현재주문") || normalized.includes("신규주문")) {
+            activeTarget = "current";
+            return;
+          }
+          if (normalized.includes("이전주문목록") || normalized.includes("이전주문") || normalized.includes("기존주문")) {
+            activeTarget = "previous";
+            return;
+          }
+        }
+
+        if (isIgnorableOcrLine(normalized)) return;
+
+        const item = parseOcrItemLine(line);
+        if (!item) return;
+
+        if (activeTarget === "current") result.current.push(item);
+        else result.previous.push(item);
+      });
+
+      return result;
+    }
+
+    function normalizeOcrLine(line) {
+      return String(line || "")
+        .replace(/\s/g, "")
+        .replace(/[|｜]/g, "")
+        .replace(/[()]/g, "")
+        .toLowerCase();
+    }
+
+    function isIgnorableOcrLine(normalized) {
+      const ignoreWords = [
+        "연번", "제품번호", "제품명", "규격", "수량", "단가", "총액",
+        "목록명", "작성일", "주문처", "비고",
+        "기안금액", "기안일자", "기존외상", "선결제", "남은외상", "주문합계"
+      ];
+
+      if (!normalized) return true;
+      if (ignoreWords.some(word => normalized.includes(word))) return true;
+      if (/^[\-=*_·.]+$/.test(normalized)) return true;
+      return false;
+    }
+
+    function parseOcrItemLine(line) {
+      let parts = line
+        .replace(/[|｜]/g, "\t")
+        .split(/\t|,| {2,}/)
+        .map(v => v.trim())
+        .filter(Boolean);
+
+      if (parts.length < 4) {
+        parts = line.split(/\s+/).map(v => v.trim()).filter(Boolean);
+      }
+
+      if (parts.length < 4) return null;
+
+      if (/^\d+$/.test(parts[0])) {
+        parts = parts.slice(1);
+      }
+
+      const numericPositions = [];
+      parts.forEach((part, index) => {
+        if (isOcrNumber(part)) numericPositions.push(index);
+      });
+
+      if (numericPositions.length < 2) return null;
+
+      const unitPriceIndex = numericPositions[numericPositions.length - 1];
+      const qtyIndex = numericPositions[numericPositions.length - 2];
+
+      // 마지막 숫자가 총액으로 보이는 경우: 수량, 단가, 총액이 모두 있는 행
+      let actualQtyIndex = qtyIndex;
+      let actualUnitPriceIndex = unitPriceIndex;
+      if (numericPositions.length >= 3) {
+        const maybeTotal = parseNumber(parts[numericPositions[numericPositions.length - 1]]);
+        const maybeUnit = parseNumber(parts[numericPositions[numericPositions.length - 2]]);
+        const maybeQty = parseNumber(parts[numericPositions[numericPositions.length - 3]]);
+        if (maybeQty * maybeUnit === maybeTotal || Math.abs(maybeQty * maybeUnit - maybeTotal) <= 5) {
+          actualQtyIndex = numericPositions[numericPositions.length - 3];
+          actualUnitPriceIndex = numericPositions[numericPositions.length - 2];
+        }
+      }
+
+      const beforeNumbers = parts.slice(0, actualQtyIndex);
+      if (beforeNumbers.length === 0) return null;
+
+      const productNo = beforeNumbers[0] || "";
+      const rest = beforeNumbers.slice(1);
+
+      let productName = "";
+      let spec = "";
+
+      if (rest.length === 0) {
+        productName = productNo;
+      } else if (rest.length === 1) {
+        productName = rest[0];
+      } else {
+        productName = rest[0];
+        spec = rest.slice(1).join(" ");
+      }
+
+      const qty = parseNumber(parts[actualQtyIndex]);
+      const unitPrice = parseNumber(parts[actualUnitPriceIndex]);
+
+      if (!qty && !unitPrice) return null;
+
+      return {
+        productNo,
+        productName,
+        spec,
+        qty,
+        unitPrice
+      };
+    }
+
+    function isOcrNumber(value) {
+      const text = String(value).trim().replace(/[^\d,]/g, "");
+      return /^[0-9]+(?:,[0-9]{3})*$/.test(text) || /^[0-9]+$/.test(text);
+    }
+
+    async function importOrderFile(file) {
+      if (!file) return;
+
+      try {
+        const ext = file.name.split(".").pop().toLowerCase();
+        let matrix;
+        if (ext === "csv") {
+          const text = await file.text();
+          matrix = parseCsv(text);
+        } else if (ext === "xlsx") {
+          matrix = await parseXlsx(file);
+        } else {
+          setSideStatus("지원하지 않는 파일 형식입니다. .xlsx 또는 .csv 파일을 선택하십시오.", true);
+          return;
+        }
+
+        const imported = matrixToOrder(matrix);
+        const importedCount = (imported.rows || []).length + (imported.previousRows || []).length;
+        if (!importedCount) {
+          setSideStatus("불러올 품목을 찾지 못했습니다. 제품번호·제품명·규격·수량·단가 헤더를 확인하십시오.", true);
+          return;
+        }
+
+        currentOrderId = null;
+
+        if (imported.hasExplicitSections) {
+          rows = (imported.rows || []).map(row => newRow(row));
+          previousRows = (imported.previousRows || []).map(row => newRow(row));
+          if (rows.length === 0) rows.push(newRow());
+          setSideStatus("엑셀파일의 현재 주문목록과 이전 주문목록을 구분해 불러왔습니다.");
+        } else {
+          previousRows = (imported.rows || []).map(row => newRow(row));
+          if (rows.length === 0) rows.push(newRow());
+          setSideStatus("엑셀파일을 이전 주문목록에 불러왔습니다. 결제액 합산에 포함됩니다.");
+        }
+
+        renderRows();
+        renderPreviousRows();
+        applyMeta({
+          orderName: imported.meta.orderName || file.name.replace(/\.(xlsx|csv)$/i, ""),
+          orderDate: imported.meta.orderDate || todayIso(),
+          vendorName: imported.meta.vendorName || DEFAULT_VENDOR,
+          memo: imported.meta.memo || "",
+          proposalAmount: imported.meta.proposalAmount || 0,
+          proposalDate: imported.meta.proposalDate || "",
+          existingDebt: imported.meta.existingDebt || 0,
+          existingDebtDate: imported.meta.existingDebtDate || "",
+          prepayment: imported.meta.prepayment || 0,
+          prepaymentDate: imported.meta.prepaymentDate || ""
+        });
+      } catch (error) {
+        console.error(error);
+        setSideStatus("엑셀파일을 불러오지 못했습니다. 암호화 파일, 구형 .xls, 복잡한 병합 양식은 지원하지 않습니다.", true);
+      }
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const next = text[i + 1];
+
+        if (ch === '"' && inQuotes && next === '"') {
+          cell += '"';
+          i++;
+        } else if (ch === '"') {
+          inQuotes = !inQuotes;
+        } else if (ch === "," && !inQuotes) {
+          row.push(cell);
+          cell = "";
+        } else if ((ch === "\n" || ch === "\r") && !inQuotes) {
+          if (ch === "\r" && next === "\n") i++;
+          row.push(cell);
+          rows.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += ch;
+        }
+      }
+
+      row.push(cell);
+      if (row.some(v => String(v).trim() !== "")) rows.push(row);
+      return rows;
+    }
+
+    async function parseXlsx(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const entries = await unzipEntries(arrayBuffer);
+      const sharedStrings = parseSharedStrings(entries["xl/sharedStrings.xml"]);
+      const sheetName = Object.keys(entries).find(name => /^xl\/worksheets\/sheet\d+\.xml$/i.test(name));
+
+      if (!sheetName) throw new Error("worksheet not found");
+      return parseSheetXml(entries[sheetName], sharedStrings);
+    }
+
+    async function unzipEntries(arrayBuffer) {
+      const view = new DataView(arrayBuffer);
+      const bytes = new Uint8Array(arrayBuffer);
+      const decoder = new TextDecoder("utf-8");
+      let eocd = -1;
+
+      for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 66000); i--) {
+        if (view.getUint32(i, true) === 0x06054b50) {
+          eocd = i;
+          break;
+        }
+      }
+
+      if (eocd < 0) throw new Error("zip end not found");
+
+      const totalEntries = view.getUint16(eocd + 10, true);
+      const centralOffset = view.getUint32(eocd + 16, true);
+      let ptr = centralOffset;
+      const entries = {};
+
+      for (let i = 0; i < totalEntries; i++) {
+        if (view.getUint32(ptr, true) !== 0x02014b50) throw new Error("central header error");
+
+        const method = view.getUint16(ptr + 10, true);
+        const compressedSize = view.getUint32(ptr + 20, true);
+        const uncompressedSize = view.getUint32(ptr + 24, true);
+        const nameLen = view.getUint16(ptr + 28, true);
+        const extraLen = view.getUint16(ptr + 30, true);
+        const commentLen = view.getUint16(ptr + 32, true);
+        const localOffset = view.getUint32(ptr + 42, true);
+        const name = decoder.decode(bytes.slice(ptr + 46, ptr + 46 + nameLen));
+
+        const localNameLen = view.getUint16(localOffset + 26, true);
+        const localExtraLen = view.getUint16(localOffset + 28, true);
+        const dataStart = localOffset + 30 + localNameLen + localExtraLen;
+        const compressedData = bytes.slice(dataStart, dataStart + compressedSize);
+
+        let data;
+        if (method === 0) {
+          data = compressedData;
+        } else if (method === 8) {
+          data = await inflateRaw(compressedData, uncompressedSize);
+        } else {
+          throw new Error("unsupported compression method");
+        }
+
+        entries[name] = decoder.decode(data);
+        ptr += 46 + nameLen + extraLen + commentLen;
+      }
+
+      return entries;
+    }
+
+    async function inflateRaw(data, expectedSize) {
+      if (typeof DecompressionStream === "undefined") {
+        throw new Error("DecompressionStream not supported");
+      }
+
+      const stream = new Response(data).body.pipeThrough(new DecompressionStream("deflate-raw"));
+      const buffer = await new Response(stream).arrayBuffer();
+      const result = new Uint8Array(buffer);
+      if (expectedSize && result.length !== expectedSize) {
+        return result;
+      }
+      return result;
+    }
+
+    function parseSharedStrings(xmlText) {
+      if (!xmlText) return [];
+      const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+      return Array.from(doc.getElementsByTagName("si")).map(si =>
+        Array.from(si.getElementsByTagName("t")).map(t => t.textContent || "").join("")
+      );
+    }
+
+    function parseSheetXml(xmlText, sharedStrings) {
+      const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+      const rowEls = Array.from(doc.getElementsByTagName("row"));
+      const matrix = [];
+
+      rowEls.forEach(rowEl => {
+        const rIndex = Number(rowEl.getAttribute("r")) || (matrix.length + 1);
+        const row = matrix[rIndex - 1] || [];
+        Array.from(rowEl.getElementsByTagName("c")).forEach(cellEl => {
+          const ref = cellEl.getAttribute("r") || "";
+          const colIndex = columnIndexFromRef(ref);
+          const type = cellEl.getAttribute("t");
+          let value = "";
+
+          if (type === "inlineStr") {
+            const t = cellEl.getElementsByTagName("t")[0];
+            value = t ? t.textContent : "";
+          } else {
+            const v = cellEl.getElementsByTagName("v")[0];
+            value = v ? v.textContent : "";
+            if (type === "s") {
+              value = sharedStrings[Number(value)] || "";
+            }
+          }
+
+          row[colIndex] = value;
+        });
+        matrix[rIndex - 1] = row;
+      });
+
+      return matrix.map(row => row || []);
+    }
+
+    function columnIndexFromRef(ref) {
+      const letters = String(ref).match(/[A-Z]+/i);
+      if (!letters) return 0;
+      return letters[0].toUpperCase().split("").reduce((sum, ch) => sum * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+    }
+
+    function normalizeHeader(value) {
+      return String(value || "").replace(/\s/g, "").replace(/[()]/g, "").toLowerCase();
+    }
+
+    function findColumn(headerRow, candidates) {
+      const normalized = headerRow.map(normalizeHeader);
+      for (const candidate of candidates) {
+        const idx = normalized.findIndex(h => h.includes(candidate));
+        if (idx >= 0) return idx;
+      }
+      return -1;
+    }
+
+    function isOrderHeader(row) {
+      const joined = row.map(normalizeHeader).join("|");
+      return joined.includes("제품번호")
+        && (joined.includes("제품명") || joined.includes("품명") || joined.includes("상품명"))
+        && joined.includes("수량");
+    }
+
+    function parseOrderSection(cleanedMatrix, headerIndex) {
+      const header = cleanedMatrix[headerIndex];
+      const idxProductNo = findColumn(header, ["제품번호", "상품코드", "품번", "코드"]);
+      const idxProductName = findColumn(header, ["제품명", "품명", "상품명", "물품명"]);
+      const idxSpec = findColumn(header, ["규격", "사양"]);
+      const idxQty = findColumn(header, ["수량", "주문수량", "개수"]);
+      const idxUnitPrice = findColumn(header, ["단가", "가격"]);
+
+      const importedRows = [];
+      for (let i = headerIndex + 1; i < cleanedMatrix.length; i++) {
+        const row = cleanedMatrix[i];
+        const rowText = row.map(normalizeHeader).join("|");
+
+        if (isOrderHeader(row)) break;
+        if (rowText.includes("현재주문목록") || rowText.includes("이전주문목록")) break;
+        if (rowText.includes("결제액") || rowText.includes("주문합계") || rowText.includes("선결제") || rowText.includes("외상금액")) break;
+        if (!row.some(cell => cell !== "")) continue;
+
+        const item = {
+          productNo: idxProductNo >= 0 ? row[idxProductNo] || "" : "",
+          productName: idxProductName >= 0 ? row[idxProductName] || "" : "",
+          spec: idxSpec >= 0 ? row[idxSpec] || "" : "",
+          qty: idxQty >= 0 ? parseNumber(row[idxQty]) : 0,
+          unitPrice: idxUnitPrice >= 0 ? parseNumber(row[idxUnitPrice]) : 0
+        };
+
+        if (item.productNo || item.productName || item.spec || item.qty || item.unitPrice) {
+          importedRows.push(item);
+        }
+      }
+
+      return importedRows;
+    }
+
+    function detectSectionType(cleanedMatrix, headerIndex) {
+      for (let i = headerIndex - 1; i >= Math.max(0, headerIndex - 3); i--) {
+        const rowText = cleanedMatrix[i].map(normalizeHeader).join("|");
+        if (rowText.includes("이전주문목록")) return "previous";
+        if (rowText.includes("현재주문목록")) return "current";
+      }
+      return "generic";
+    }
+
+    function matrixToOrder(matrix) {
+      const meta = {};
+      const cleanedMatrix = matrix.map(row => row.map(cell => String(cell ?? "").trim()));
+
+      cleanedMatrix.forEach(row => {
+        const label = normalizeHeader(row[0]);
+        if (label === "목록명") meta.orderName = row[1] || "";
+        if (label === "작성일") meta.orderDate = row[1] || "";
+        if (label === "주문처") meta.vendorName = row[1] || "";
+        if (label === "비고") meta.memo = row[1] || "";
+        if (label.includes("기안일자")) meta.proposalDate = row[row.length - 1] || row[1] || "";
+        else if (label.includes("기안금액") || label.includes("주문한도")) meta.proposalAmount = parseNumber(row[row.length - 1] || row[1]);
+        else if (label.includes("외상일자")) meta.existingDebtDate = row[row.length - 1] || row[1] || "";
+        else if (label.includes("기존외상")) meta.existingDebt = parseNumber(row[row.length - 1] || row[1]);
+        else if (label.includes("선결제일자")) meta.prepaymentDate = row[row.length - 1] || row[1] || "";
+        else if (label.includes("선결제차감") || label.includes("기존선결제") || label === "선결제") meta.prepayment = parseNumber(row[row.length - 1] || row[1]);
+      });
+
+      const headerIndexes = [];
+      cleanedMatrix.forEach((row, index) => {
+        if (isOrderHeader(row)) headerIndexes.push(index);
+      });
+
+      const result = { meta, rows: [], previousRows: [], hasExplicitSections: false };
+
+      headerIndexes.forEach(headerIndex => {
+        const sectionRows = parseOrderSection(cleanedMatrix, headerIndex);
+        const sectionType = detectSectionType(cleanedMatrix, headerIndex);
+
+        if (sectionType === "current") {
+          result.rows.push(...sectionRows);
+          result.hasExplicitSections = true;
+        } else if (sectionType === "previous") {
+          result.previousRows.push(...sectionRows);
+          result.hasExplicitSections = true;
+        } else {
+          result.rows.push(...sectionRows);
+        }
+      });
+
+      return result;
+    }
+
+    function init() {
+      document.getElementById("orderDate").value = todayIso();
+      document.getElementById("vendorName").value = DEFAULT_VENDOR;
+      rows = [newRow()];
+      previousRows = [];
+      renderRows();
+      renderPreviousRows();
+      renderSavedOrders();
+    }
+
+    init();
+  </script>
+</body>
+</html>

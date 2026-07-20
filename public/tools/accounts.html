@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>기관계좌 관리시스템</title>
+  <style>
+
+    :root {
+      --primary:#1a73e8;
+      --primary-dark:#0b57d0;
+      --primary-soft:#e8f0fe;
+      --surface:#ffffff;
+      --background:#f7f9fc;
+      --text:#202124;
+      --text-sub:#5f6368;
+      --line:#dadce0;
+      --line-soft:#edf0f3;
+      --danger:#d93025;
+      --danger-soft:#fce8e6;
+      --success:#188038;
+      --success-soft:#e6f4ea;
+      --warning:#f29900;
+      --warning-soft:#fef7e0;
+      --shadow-1:0 1px 2px rgba(60,64,67,.18),0 1px 3px rgba(60,64,67,.12);
+      --shadow-2:0 2px 6px rgba(60,64,67,.18),0 1px 2px rgba(60,64,67,.12);
+      --radius:12px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Pretendard","Noto Sans KR","Malgun Gothic",Arial,sans-serif;
+      background:var(--background);
+      color:var(--text);
+      font-size:14px;
+    }
+    .app{max-width:1480px;margin:0 auto;padding:22px 24px 40px}
+    header.hero{
+      background:var(--surface);
+      color:var(--text);
+      border:1px solid var(--line-soft);
+      border-left:6px solid var(--primary);
+      border-radius:var(--radius);
+      padding:22px 26px;
+      box-shadow:var(--shadow-1);
+    }
+    header.hero:after{display:none}
+    .hero h1{margin:0 0 6px;font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+    .hero p{margin:0;line-height:1.55;color:var(--text-sub);font-size:13px}
+    .card{
+      background:var(--surface);
+      border:1px solid var(--line-soft);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-1);
+      padding:20px;
+    }
+    .top-grid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:16px;margin-top:16px}
+    .card h2{
+      margin:0 0 14px;
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:-.02em;
+      color:var(--text);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .field-grid.one{grid-template-columns:1fr}
+    .field-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    label{display:block;color:var(--text-sub);font-size:12px;font-weight:800;margin-bottom:6px}
+    input,select,textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px 12px;
+      font-size:14px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      transition:border-color .12s ease,box-shadow .12s ease;
+    }
+    textarea{min-height:42px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,115,232,.14)}
+    button,.button-like{
+      border:0;
+      border-radius:8px;
+      padding:9px 14px;
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+      background:var(--primary);
+      color:#fff;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      min-height:38px;
+      box-shadow:none;
+      transition:background .12s ease,box-shadow .12s ease,transform .02s ease;
+    }
+    button:hover,.button-like:hover{background:var(--primary-dark);box-shadow:var(--shadow-1);filter:none}
+    button:active,.button-like:active{transform:translateY(1px)}
+    button.secondary,.button-like.secondary{background:#fff;color:var(--primary);border:1px solid var(--line)}
+    button.secondary:hover,.button-like.secondary:hover{background:var(--primary-soft);box-shadow:none}
+    button.danger{background:#fff;color:var(--danger);border:1px solid #f3b4ae}
+    button.danger:hover{background:var(--danger-soft);box-shadow:none}
+    button.green{background:#fff;color:var(--success);border:1px solid #b7dfc1}
+    button.green:hover{background:var(--success-soft);box-shadow:none}
+    button.dark{background:var(--primary-dark)}
+    .button-row,.toolbar .left,.toolbar .right,.tab-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .button-row{margin-top:14px}
+    .notice{margin-top:12px;color:var(--text-sub);line-height:1.55;font-size:12px}
+    .directory-badge{
+      display:inline-flex;
+      align-items:center;
+      border-radius:999px;
+      padding:4px 10px;
+      background:var(--primary-soft);
+      color:var(--primary-dark);
+      font-size:12px;
+      font-weight:800;
+    }
+    .summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
+    .summary-card{
+      border-radius:var(--radius);
+      padding:16px;
+      background:#fff;
+      border:1px solid var(--line-soft);
+      box-shadow:var(--shadow-1);
+      min-height:112px;
+    }
+    .summary-card .label{color:var(--text-sub);font-size:12px;font-weight:900;margin-bottom:10px;letter-spacing:-.01em}
+    .summary-pairs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .summary-pair{border:1px solid var(--line-soft);border-radius:12px;padding:10px;background:#fafcff}
+    .summary-pair .mini-label{display:block;color:var(--text-sub);font-size:11px;font-weight:900;margin-bottom:6px}
+    .summary-pair .mini-value{display:block;font-size:19px;font-weight:900;letter-spacing:-.03em;white-space:nowrap;font-variant-numeric:tabular-nums}
+    .summary-card .sub{margin-top:10px;color:var(--text-sub);font-size:12px}
+    .toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin:18px 0 14px;flex-wrap:wrap}
+    .tabs{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line-soft)}
+    .tab-btn{
+      background:transparent;
+      color:var(--text-sub);
+      border:0;
+      border-radius:8px 8px 0 0;
+      box-shadow:none;
+      min-height:40px;
+    }
+    .tab-btn:hover{background:var(--primary-soft);color:var(--primary-dark);box-shadow:none}
+    .tab-btn.active{background:var(--primary-soft);color:var(--primary-dark);border-bottom:3px solid var(--primary)}
+    .ledger-head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+    .tab-position-control{display:flex;align-items:center;gap:8px;color:var(--text-sub);font-size:12px;font-weight:800}
+    .tab-position-control select{min-height:34px;min-width:128px;padding:7px 10px;font-size:12px}
+    .ledger-layout{display:block;margin-top:12px}
+    .ledger-layout.is-left,.ledger-layout.is-right{display:grid;gap:14px;align-items:start}
+    .ledger-layout.is-left{grid-template-columns:150px minmax(0,1fr)}
+    .ledger-layout.is-right{grid-template-columns:minmax(0,1fr) 150px}
+    .ledger-main{min-width:0}
+    .side-tab-slot{display:none}
+    .ledger-layout.is-left .side-tab-slot.left,.ledger-layout.is-right .side-tab-slot.right{display:block;position:sticky;top:12px}
+    .ledger-layout.is-left .tab-slot.top,.ledger-layout.is-right .tab-slot.top{display:none}
+    .ledger-layout.is-left .tabs,.ledger-layout.is-right .tabs{margin-top:0;display:flex;flex-direction:column;gap:8px;border-bottom:0;border-right:1px solid var(--line-soft);padding:8px;background:#fbfcff;border-radius:var(--radius);box-shadow:var(--shadow-1)}
+    .ledger-layout.is-right .tabs{border-right:0;border-left:1px solid var(--line-soft)}
+    .ledger-layout.is-left .tab-btn,.ledger-layout.is-right .tab-btn{justify-content:flex-start;width:100%;border-radius:8px;border:1px solid transparent;text-align:left}
+    .ledger-layout.is-left .tab-btn.active,.ledger-layout.is-right .tab-btn.active{border:1px solid #d2e3fc;border-left:4px solid var(--primary);border-bottom:1px solid #d2e3fc;background:var(--primary-soft)}
+    .ledger-layout.is-right .tab-btn.active{border-left:1px solid #d2e3fc;border-right:4px solid var(--primary)}
+    .searchbox{min-width:270px}
+    .table-wrap{overflow:auto;border-radius:var(--radius);border:1px solid var(--line-soft);background:#fff;box-shadow:var(--shadow-1)}
+    table{width:100%;min-width:1440px;border-collapse:collapse;font-size:13px;line-height:1.45}
+    table[aria-label="입출금장부"]{min-width:1700px}
+    table[aria-label="현금사용내역"]{min-width:1560px}
+    table[aria-label="통합보기"]{min-width:1660px}
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:1;
+      background:#f8fafd;
+      color:var(--text-sub);
+      text-align:center;
+      padding:13px 12px;
+      white-space:nowrap;
+      border-bottom:1px solid var(--line);
+      border-right:1px solid var(--line-soft);
+      font-weight:800;
+    }
+    tbody td,tfoot td{padding:12px 12px;border-bottom:1px solid var(--line-soft);vertical-align:middle;background:#fff}
+    tbody tr:hover td{background:#f8fbff}
+    tfoot td{background:#fafafa;font-weight:800}
+    .num{text-align:right;font-variant-numeric:tabular-nums}
+    .center{text-align:center}
+    .nowrap{white-space:nowrap}
+    .income{color:var(--success);font-weight:900}
+    .expense{color:var(--danger);font-weight:900}
+    .orange-text{color:#e8710a;font-weight:900}
+    .serial-header{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+    .th-add-btn{
+      min-width:26px;
+      min-height:26px;
+      width:26px;
+      height:26px;
+      padding:0;
+      border-radius:50%;
+      background:var(--primary);
+      color:#fff;
+      border:0;
+      font-size:17px;
+      font-weight:900;
+      line-height:1;
+      box-shadow:none;
+    }
+    .th-add-btn:hover{background:var(--primary-dark);box-shadow:none}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:58px;
+      border-radius:999px;
+      padding:5px 8px;
+      font-size:12px;
+      font-weight:800;
+      background:#f1f3f4;
+      color:var(--text-sub);
+      white-space:nowrap;
+    }
+    .pill.income-pill{background:var(--success-soft);color:var(--success)}
+    .pill.expense-pill{background:var(--danger-soft);color:var(--danger)}
+    .pill.cash-pill{background:var(--warning-soft);color:#b06000}
+    .pill.account-pill{background:var(--primary-soft);color:var(--primary-dark)}
+    .pill.carryover-pill{background:#eeeeee;color:#3c4043}
+    .inline-entry-row td{background:#fcfdff;border-bottom:1px solid rgba(26,115,232,.20)}
+    .carryover-row td{background:#f5f5f5!important;color:#5f6368;border-bottom:1px dashed #cfd4dc}
+    .carryover-row .carryover-title{font-weight:800;color:#3c4043}
+    .cash-opening-candidate-row td{background:#f5f5f5!important;color:#5f6368;border-bottom:1px dashed #cfd4dc}
+    .cash-opening-candidate-row .candidate-title{font-weight:800;color:#3c4043}
+    .cash-opening-applied{display:inline-flex;align-items:center;gap:4px;border-radius:999px;background:#eeeeee;color:#3c4043;padding:4px 8px;font-size:12px;font-weight:800}
+    .cash-opening-notice{margin-top:10px;border:1px dashed #c9ced6;background:#f5f5f5;color:#5f6368;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}
+    .inline-entry-row input,.inline-entry-row select{min-width:0;padding:9px 10px;border-radius:8px;font-size:12.5px}
+    .inline-actions{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+    .inline-actions button{min-height:32px;padding:7px 9px;border-radius:8px;font-size:12px}
+    .move-actions{display:inline-flex;gap:4px;align-items:center;justify-content:center;margin-right:4px}
+    .move-actions button{min-width:30px;min-height:30px;padding:5px 7px;border-radius:8px;font-size:12px}
+    button:disabled,.button-like:disabled{opacity:.42;cursor:not-allowed;box-shadow:none;transform:none}
+    .muted-cell{color:var(--text-sub);font-size:12px}
+    .empty{padding:34px 14px;text-align:center;color:var(--text-sub);background:#fff}
+    .file-input{display:none}
+    .footer{margin-top:18px;color:var(--text-sub);font-size:12px;text-align:center}
+    .hide{display:none!important}
+    .mini-check{display:flex;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:800;color:var(--text-sub);white-space:nowrap}
+    .mini-check input{width:auto}
+    .receipt-box{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;min-width:184px}
+    .receipt-name{max-width:168px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-sub);font-size:12px}
+    .receipt-chip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;background:var(--primary-soft);color:var(--primary-dark);padding:4px 8px;font-size:12px;font-weight:800}
+    .receipt-btn{min-height:30px;padding:6px 8px;border-radius:8px;font-size:12px}
+    .receipt-label{border:1px solid var(--line);background:#fff;color:var(--primary);border-radius:8px;min-height:30px;padding:6px 8px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+    .receipt-label:hover{background:var(--primary-soft)}
+    td:nth-child(3),td:nth-child(10),td:nth-child(11){line-height:1.55}
+    td input[type="text"]{min-width:140px}
+    table[aria-label="입출금장부"] td:nth-child(3) input,table[aria-label="현금사용내역"] td:nth-child(3) input{min-width:180px}
+    table[aria-label="입출금장부"] td:nth-child(11) input,table[aria-label="현금사용내역"] td:nth-child(10) input{min-width:180px}
+    @media(max-width:1180px){.top-grid,.summary-grid{grid-template-columns:1fr}.field-grid,.field-grid.three{grid-template-columns:1fr}.searchbox{min-width:100%}}
+    @media (max-width:1000px){.ledger-layout.is-left,.ledger-layout.is-right{display:block}.side-tab-slot{display:none!important}.ledger-layout.is-left .tab-slot.top,.ledger-layout.is-right .tab-slot.top{display:block}.ledger-layout.is-left .tabs,.ledger-layout.is-right .tabs{margin-top:12px;display:flex;flex-direction:row;flex-wrap:wrap;border-bottom:1px solid var(--line-soft);border-left:0;border-right:0;background:transparent;box-shadow:none;padding:0}.ledger-layout.is-left .tab-btn,.ledger-layout.is-right .tab-btn{width:auto;justify-content:center}.ledger-layout.is-left .tab-btn.active,.ledger-layout.is-right .tab-btn.active{border:0;border-bottom:3px solid var(--primary)}}
+
+    .print-report{display:none}
+    .report-page{background:#fff;color:#111;font-family:"Malgun Gothic","Noto Sans KR",Arial,sans-serif;font-size:11px;line-height:1.45}
+    .report-header{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:12px}
+    .report-title{font-size:22px;font-weight:900;letter-spacing:-.04em;margin:0 0 6px;color:#111}
+    .report-meta{display:grid;grid-template-columns:80px 1fr;gap:4px 10px;color:#333;font-size:11px}
+    .report-meta b{color:#111}
+    .approval-box{border-collapse:collapse;min-width:210px;font-size:11px}
+    .approval-box th,.approval-box td{border:1px solid #444;text-align:center;padding:5px 8px;height:28px;background:#fff}
+    .approval-box th{font-weight:800;background:#f2f3f5}
+    .report-section{margin-top:14px;break-inside:auto;page-break-inside:auto}
+    .report-section h2{font-size:14px;margin:0 0 6px;padding:5px 8px;background:#f1f3f4;border-left:4px solid #444;color:#111;letter-spacing:-.02em}
+    .report-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 10px}
+    .report-summary-item{border:1px solid #c9cdd3;padding:7px 8px;background:#fafafa;min-height:48px}
+    .report-summary-item .r-label{font-size:10px;color:#555;font-weight:800;margin-bottom:3px}
+    .report-summary-item .r-value{font-size:13px;font-weight:900;text-align:right;font-variant-numeric:tabular-nums}
+    .report-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9.6px;margin-top:5px}
+    .report-table th,.report-table td{border:1px solid #c7cbd1;padding:4px 5px;vertical-align:middle;word-break:keep-all;overflow-wrap:anywhere;background:#fff}
+    .report-table th{background:#eef1f5;color:#111;text-align:center;font-weight:900}
+    .report-table tfoot td,.report-total-row td{background:#f7f7f7;font-weight:900}
+    .r-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .r-center{text-align:center}
+    .r-muted{color:#666}
+    .r-income{color:#0b6f2a;font-weight:900}
+    .r-expense{color:#b3261e;font-weight:900}
+    .r-carryover td{background:#f4f4f4;color:#555}
+    .r-note{font-size:10px;color:#555;margin:5px 0 0}
+    .r-page-break{break-before:page;page-break-before:always}
+    .report-footer{margin-top:14px;border-top:1px solid #999;padding-top:6px;font-size:9.5px;color:#555;display:flex;justify-content:space-between;gap:10px}
+    @media print{
+      @page{size:A4 portrait;margin:12mm 10mm}
+      body{background:#fff;color:#111}
+      body.report-print .app{display:none!important}
+      body.report-print .print-report{display:block!important}
+      body:not(.report-print) .no-print{display:none!important}
+      body:not(.report-print) .app{padding:0;max-width:none}
+      body:not(.report-print) header.hero,body:not(.report-print) .card,body:not(.report-print) .summary-card,body:not(.report-print) .table-wrap{box-shadow:none;border-radius:0}
+      body:not(.report-print) table{min-width:0;font-size:10.5px}
+      body:not(.report-print) thead th{background:#f1f3f4!important;color:#111!important}
+      .report-section{break-inside:auto;page-break-inside:auto}
+      .report-table tr{break-inside:avoid;page-break-inside:avoid}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <h1>기관계좌 관리시스템</h1>
+      <p>통장별 디렉토리를 기준으로 입출금장부, 현금사용내역, 통합보기를 월별로 관리합니다.</p>
+    </header>
+
+    <section class="top-grid no-print">
+      <div class="card">
+        <h2>① 통장 디렉토리</h2>
+        <div class="field-grid one">
+          <div><label for="directorySelect">현재 통장</label><select id="directorySelect"></select></div>
+          <div><label for="directoryNameInput">통장명 추가/변경</label><input type="text" id="directoryNameInput" maxlength="40" placeholder="예: 과 운영비, 우편요금 통장, 택시 요금 통장" /></div>
+        </div>
+        <div class="button-row">
+          <button type="button" id="addDirectoryBtn">디렉토리 추가</button>
+          <button type="button" class="secondary" id="renameDirectoryBtn">이름 변경</button>
+          <button type="button" class="danger" id="deleteDirectoryBtn">디렉토리 삭제</button>
+        </div>
+        <p class="notice">※ 디렉토리별로 월초잔고·입출금·현금사용내역이 완전히 분리됩니다.</p>
+      </div>
+
+      <div class="card">
+        <h2>② 월 선택 및 잔고 설정 <span class="directory-badge" id="currentDirectoryBadge">-</span></h2>
+        <div class="field-grid one"><div><label for="monthInput">정산 월</label><input type="month" id="monthInput" /></div></div>
+        <div class="field-grid" style="margin-top:12px;">
+          <div><label for="accountOpeningInput">계좌 월초 잔고</label><input type="number" id="accountOpeningInput" min="0" step="1" placeholder="예: 200000" /></div>
+          <div><label for="cashOpeningInput">현금 월초 잔고</label><input type="number" id="cashOpeningInput" min="0" step="1" placeholder="예: 0" /></div>
+        </div>
+        <div class="button-row"><button type="button" id="saveOpeningBtn">월초 잔고 저장</button><button type="button" class="secondary" id="copyPrevClosingBtn">전월말 잔고 불러오기</button></div>
+        <div id="cashOpeningCandidateNotice" class="cash-opening-notice" style="display:none;"></div>
+      </div>
+
+      <div class="card">
+        <h2>③ 업무 흐름 예시</h2>
+        <div class="notice" style="font-size:13px;color:var(--gray-700);margin-top:0;">
+          <strong>예시:</strong> 기관계좌 디렉토리에 200,000원 입금 후 100,000원을 현금 인출하면, 입출금장부에는 계좌 출금이 기록되고 현금사용내역에는 연회색 기초잔고 반영 후보로 표시됩니다. 우편요금·택시요금 통장은 별도 디렉토리에서 같은 방식으로 관리합니다.
+        </div>
+        <div class="button-row"><button type="button" class="dark" id="sampleBtn">현재 디렉토리에 예시 입력</button><button type="button" class="secondary" id="clearDraftsBtn">미저장 행 초기화</button></div>
+      </div>
+    </section>
+
+    <section class="summary-grid" aria-label="월별 요약 대시보드">
+      <div class="summary-card">
+        <div class="label">월초잔고</div>
+        <div class="summary-pairs">
+          <div class="summary-pair"><span class="mini-label">계좌</span><span class="mini-value" id="summaryOpeningAccount">0원</span></div>
+          <div class="summary-pair"><span class="mini-label">현금</span><span class="mini-value orange-text" id="summaryOpeningCash">0원</span></div>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="label">사용액</div>
+        <div class="summary-pairs">
+          <div class="summary-pair"><span class="mini-label">계좌</span><span class="mini-value expense" id="summaryUsedAccount">0원</span></div>
+          <div class="summary-pair"><span class="mini-label">현금</span><span class="mini-value expense" id="summaryUsedCash">0원</span></div>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="label">현재잔고</div>
+        <div class="summary-pairs">
+          <div class="summary-pair"><span class="mini-label">계좌</span><span class="mini-value" id="summaryCurrentAccount">0원</span></div>
+          <div class="summary-pair"><span class="mini-label">현금</span><span class="mini-value orange-text" id="summaryCurrentCash">0원</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <div class="ledger-head">
+        <h2>④ 장부 내역 <span class="directory-badge" id="ledgerTitleBadge">-</span></h2>
+        <div class="tab-position-control no-print">
+          <label for="tabPositionSelect">장부 토글 위치</label>
+          <select id="tabPositionSelect" title="장부 구분 토글 위치">
+            <option value="top">상단</option>
+            <option value="left">좌측</option>
+            <option value="right">우측</option>
+          </select>
+        </div>
+      </div>
+      <div class="ledger-layout" id="ledgerLayout">
+        <div class="side-tab-slot left no-print" id="tabSlotLeft"></div>
+        <div class="ledger-main">
+          <div class="tab-slot top no-print" id="tabSlotTop">
+            <div class="tabs" id="ledgerTabs" role="tablist" aria-label="장부 구분">
+              <button type="button" class="tab-btn active" data-tab="account">입출금장부</button>
+              <button type="button" class="tab-btn" data-tab="cash">현금사용내역</button>
+              <button type="button" class="tab-btn" data-tab="combined">통합보기</button>
+            </div>
+          </div>
+      <div class="toolbar no-print">
+        <div class="left"><input class="searchbox" type="search" id="searchInput" placeholder="적요·비고·사용유형 검색" /><button type="button" class="secondary" id="clearSearchBtn">검색 초기화</button></div>
+        <div class="right">
+          <button type="button" id="saveAllDraftsBtn">미저장 행 전체 저장</button>
+          <button type="button" class="green" id="exportXlsxBtn">XLSX 보고서</button>
+          <button type="button" class="green" id="printPdfBtn">PDF 출력</button>
+          <button type="button" class="secondary" id="exportJsonBtn">전체 백업 JSON</button>
+          <label class="button-like secondary" for="importJsonInput">복원 JSON</label><input type="file" id="importJsonInput" class="file-input" accept="application/json,.json" />
+          <button type="button" class="danger" id="clearMonthBtn">현재 월 내역 삭제</button>
+        </div>
+      </div>
+
+      <div class="table-wrap" id="accountPanel">
+        <table aria-label="입출금장부"><thead><tr>
+          <th style="width:78px;"><span class="serial-header"><span>연번</span><button type="button" class="th-add-btn no-print" data-add="account" title="입출금장부 행 추가">+</button></span></th>
+          <th style="width:118px;">일자</th><th style="width:230px;">적요</th><th style="width:96px;">입/출금</th><th style="width:135px;">입금</th><th style="width:135px;">출금</th><th style="width:140px;">사용 유형</th><th style="width:150px;">사용후잔액</th><th style="width:180px;">현금반영</th><th style="width:210px;">영수증</th><th style="width:230px;">비고</th><th class="no-print" style="width:180px;">관리</th>
+        </tr></thead><tbody id="accountBody"></tbody><tbody id="accountDraftBody" class="no-print"></tbody><tfoot id="accountFoot"></tfoot></table>
+        <div id="accountEmpty" class="empty" style="display:none;">선택한 월의 입출금장부 내역이 없습니다.</div>
+      </div>
+      <div class="table-wrap hide" id="cashPanel">
+        <table aria-label="현금사용내역"><thead><tr>
+          <th style="width:78px;"><span class="serial-header"><span>연번</span><button type="button" class="th-add-btn no-print" data-add="cash" title="현금사용내역 행 추가">+</button></span></th>
+          <th style="width:118px;">일자</th><th style="width:230px;">적요</th><th style="width:100px;">수입/사용</th><th style="width:135px;">현금수입</th><th style="width:135px;">현금사용</th><th style="width:140px;">사용 유형</th><th style="width:150px;">현금잔액</th><th style="width:210px;">영수증</th><th style="width:240px;">비고</th><th class="no-print" style="width:180px;">관리</th>
+        </tr></thead><tbody id="cashBody"></tbody><tbody id="cashDraftBody" class="no-print"></tbody><tfoot id="cashFoot"></tfoot></table>
+        <div id="cashEmpty" class="empty" style="display:none;">선택한 월의 현금사용내역이 없습니다.</div>
+      </div>
+      <div class="table-wrap hide" id="combinedPanel">
+        <table aria-label="통합보기"><thead><tr>
+          <th style="width:78px;">연번</th><th style="width:118px;">일자</th><th style="width:130px;">장부구분</th><th style="width:260px;">적요</th><th style="width:96px;">입/출</th><th style="width:135px;">금액</th><th style="width:150px;">계좌잔액</th><th style="width:150px;">현금잔액</th><th style="width:155px;">총가용잔액</th><th style="width:180px;">영수증</th><th style="width:260px;">비고</th>
+        </tr></thead><tbody id="combinedBody"></tbody><tfoot id="combinedFoot"></tfoot></table>
+        <div id="combinedEmpty" class="empty" style="display:none;">선택한 월의 통합 내역이 없습니다.</div>
+      </div>
+        </div>
+        <div class="side-tab-slot right no-print" id="tabSlotRight"></div>
+      </div>
+      <p class="notice no-print">※ 통장 디렉토리를 전환하면 해당 통장의 장부만 조회됩니다. 표의 연번 옆 <strong>+</strong> 버튼으로 기존 내역 아래에 신규 행을 추가하고, <strong>미저장 행 전체 저장</strong>으로 일괄 반영합니다. 현금인출 건은 현금사용내역의 연회색 기초잔고 후보 행에서 선택 반영할 수 있습니다. 영수증은 선택 첨부이며, 저장된 행은 관리 칸의 ▲/▼ 버튼으로 위아래 순서를 조정할 수 있습니다. 장부 토글 위치는 상단·좌측·우측 중 선택해 브라우저에 저장할 수 있습니다.</p>
+    </section>
+    <div class="footer no-print">기관계좌 관리시스템 · 단일 HTML · 브라우저 로컬 저장 방식</div>
+  </div>
+  <div id="printReport" class="print-report" aria-hidden="true"></div>
+
+  <script>
+    const STORAGE_KEY = "officeBudgetLedgerMultiDirectory.v1";
+    const LEGACY_SPLIT_KEY = "officeBudgetLedgerSplitCash.v1";
+    const LEGACY_BASIC_KEY = "officeBudgetLedgerMvp.v1";
+    const DEFAULT_DIRECTORY_NAMES = ["과 운영비", "우편요금 통장", "택시 요금 통장"];
+    const MAX_RECEIPT_BYTES = 2 * 1024 * 1024;
+
+    let state = loadState();
+    let activeTab = "account";
+    let accountDrafts = [];
+    let cashDrafts = [];
+    let draftSeq = 0;
+
+    const els = {
+      directorySelect: document.getElementById("directorySelect"), directoryNameInput: document.getElementById("directoryNameInput"), addDirectoryBtn: document.getElementById("addDirectoryBtn"), renameDirectoryBtn: document.getElementById("renameDirectoryBtn"), deleteDirectoryBtn: document.getElementById("deleteDirectoryBtn"),
+      currentDirectoryBadge: document.getElementById("currentDirectoryBadge"), ledgerTitleBadge: document.getElementById("ledgerTitleBadge"),
+      monthInput: document.getElementById("monthInput"), accountOpeningInput: document.getElementById("accountOpeningInput"), cashOpeningInput: document.getElementById("cashOpeningInput"), cashOpeningCandidateNotice: document.getElementById("cashOpeningCandidateNotice"), saveOpeningBtn: document.getElementById("saveOpeningBtn"), copyPrevClosingBtn: document.getElementById("copyPrevClosingBtn"), sampleBtn: document.getElementById("sampleBtn"), clearDraftsBtn: document.getElementById("clearDraftsBtn"),
+      searchInput: document.getElementById("searchInput"), clearSearchBtn: document.getElementById("clearSearchBtn"), saveAllDraftsBtn: document.getElementById("saveAllDraftsBtn"), exportXlsxBtn: document.getElementById("exportXlsxBtn"), printPdfBtn: document.getElementById("printPdfBtn"), exportJsonBtn: document.getElementById("exportJsonBtn"), importJsonInput: document.getElementById("importJsonInput"), clearMonthBtn: document.getElementById("clearMonthBtn"),
+      tabPositionSelect: document.getElementById("tabPositionSelect"), ledgerLayout: document.getElementById("ledgerLayout"), ledgerTabs: document.getElementById("ledgerTabs"), tabSlotTop: document.getElementById("tabSlotTop"), tabSlotLeft: document.getElementById("tabSlotLeft"), tabSlotRight: document.getElementById("tabSlotRight"),
+      accountPanel: document.getElementById("accountPanel"), cashPanel: document.getElementById("cashPanel"), combinedPanel: document.getElementById("combinedPanel"), accountDraftBody: document.getElementById("accountDraftBody"), cashDraftBody: document.getElementById("cashDraftBody"), accountBody: document.getElementById("accountBody"), cashBody: document.getElementById("cashBody"), combinedBody: document.getElementById("combinedBody"), accountFoot: document.getElementById("accountFoot"), cashFoot: document.getElementById("cashFoot"), combinedFoot: document.getElementById("combinedFoot"), accountEmpty: document.getElementById("accountEmpty"), cashEmpty: document.getElementById("cashEmpty"), combinedEmpty: document.getElementById("combinedEmpty"),
+      summaryOpeningAccount: document.getElementById("summaryOpeningAccount"), summaryOpeningCash: document.getElementById("summaryOpeningCash"), summaryUsedAccount: document.getElementById("summaryUsedAccount"), summaryUsedCash: document.getElementById("summaryUsedCash"), summaryCurrentAccount: document.getElementById("summaryCurrentAccount"), summaryCurrentCash: document.getElementById("summaryCurrentCash")
+    };
+
+    function pad2(n){return String(n).padStart(2,"0");}
+    function todayMonth(){const d=new Date();return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`;}
+    function todayDate(){const d=new Date();return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;}
+    function newId(){return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);}
+    function formatWon(v){return Number(v||0).toLocaleString("ko-KR")+"원";}
+    function parseAmount(v){const n=Number(v);return Number.isFinite(n)?Math.round(n):0;}
+    function escapeHtml(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+    function xmlEscape(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&apos;");}
+    function safeFileName(v){return String(v||"장부").replace(/[\\/:*?"<>|]/g,"_").replace(/\s+/g,"_").slice(0,40);}
+
+    function blankLedger(){return {monthly:{},accountEntries:[],cashEntries:[]};}
+    function createDirectory(name){const id=newId();return {dir:{id,name:String(name||"새 통장").trim(),createdAt:new Date().toISOString()},ledger:blankLedger()};}
+    function defaultState(){const directories=[];const ledgers={};DEFAULT_DIRECTORY_NAMES.forEach(name=>{const obj=createDirectory(name);directories.push(obj.dir);ledgers[obj.dir.id]=obj.ledger;});return {version:2,directories,activeDirectoryId:directories[0].id,ledgers,ui:{tabPosition:"top"}};}
+
+    function loadState(){
+      try{
+        const raw=localStorage.getItem(STORAGE_KEY);
+        if(raw)return normalizeState(JSON.parse(raw));
+        const split=localStorage.getItem(LEGACY_SPLIT_KEY);
+        if(split){const legacy=JSON.parse(split);return migrateSingleLedger(legacy,"과 운영비");}
+        const basic=localStorage.getItem(LEGACY_BASIC_KEY);
+        if(basic){const legacy=JSON.parse(basic);return migrateSingleLedger(legacy,"과 운영비");}
+        return defaultState();
+      }catch(e){alert("저장된 데이터를 읽는 중 오류가 발생했습니다. 새 장부로 시작합니다.");return defaultState();}
+    }
+
+    function migrateSingleLedger(input,name){
+      const base=defaultState();
+      const first=base.directories[0];
+      base.ledgers[first.id]=normalizeLedger(input);
+      first.name=name;
+      return normalizeState(base);
+    }
+
+    function normalizeLedger(input){
+      const monthly=input && input.monthly && typeof input.monthly==="object" ? input.monthly : {};
+      const normalizedMonthly={};
+      Object.entries(monthly).forEach(([month,value])=>{normalizedMonthly[month]={accountOpeningBalance:Number(value.accountOpeningBalance??value.openingBalance??0),cashOpeningBalance:Number(value.cashOpeningBalance??0),cashOpeningLinkedAccountIds:Array.isArray(value.cashOpeningLinkedAccountIds)?value.cashOpeningLinkedAccountIds.map(String):[],cashOpeningIgnoredAccountIds:Array.isArray(value.cashOpeningIgnoredAccountIds)?value.cashOpeningIgnoredAccountIds.map(String):[],accountOpeningSummary:String(value.accountOpeningSummary||""),cashOpeningSummary:String(value.cashOpeningSummary||""),openingCarryoverFromMonth:String(value.openingCarryoverFromMonth||""),openingCarryoverAt:String(value.openingCarryoverAt||"")};});
+      return {monthly:normalizedMonthly,accountEntries:Array.isArray(input?.accountEntries)?input.accountEntries:(Array.isArray(input?.entries)?input.entries:[]),cashEntries:Array.isArray(input?.cashEntries)?input.cashEntries:[]};
+    }
+
+    function normalizeState(input){
+      const directories=Array.isArray(input?.directories)?input.directories.filter(d=>d&&d.id).map(d=>({id:String(d.id),name:String(d.name||"이름 없는 통장"),createdAt:d.createdAt||new Date().toISOString()})):[];
+      const ledgers=input?.ledgers && typeof input.ledgers==="object" ? input.ledgers : {};
+      if(!directories.length){return defaultState();}
+      const normalizedLedgers={};
+      directories.forEach(dir=>{normalizedLedgers[dir.id]=normalizeLedger(ledgers[dir.id]||{});});
+      const activeDirectoryId=directories.some(d=>d.id===input.activeDirectoryId)?input.activeDirectoryId:directories[0].id;
+      const allowedTabPositions=["top","left","right"];
+      const ui={tabPosition:allowedTabPositions.includes(input?.ui?.tabPosition)?input.ui.tabPosition:"top"};
+      return {version:2,directories,activeDirectoryId,ledgers:normalizedLedgers,ui};
+    }
+
+    function saveState(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));return true;}catch(e){console.error(e);alert("브라우저 저장소 용량이 부족하여 저장하지 못했습니다. 큰 영수증 파일을 삭제하거나 JSON 백업 후 정리해 주십시오.");return false;}}
+    function currentDirectory(){return state.directories.find(d=>d.id===state.activeDirectoryId)||state.directories[0];}
+    function currentLedger(){const dir=currentDirectory();if(!state.ledgers[dir.id])state.ledgers[dir.id]=blankLedger();return state.ledgers[dir.id];}
+    function currentMonth(){return els.monthInput.value||todayMonth();}
+    function ensureMonth(month=currentMonth()){const ledger=currentLedger();if(!ledger.monthly[month])ledger.monthly[month]={accountOpeningBalance:0,cashOpeningBalance:0,cashOpeningLinkedAccountIds:[],cashOpeningIgnoredAccountIds:[],accountOpeningSummary:"",cashOpeningSummary:"",openingCarryoverFromMonth:"",openingCarryoverAt:""};if(ledger.monthly[month].accountOpeningBalance===undefined)ledger.monthly[month].accountOpeningBalance=0;if(ledger.monthly[month].cashOpeningBalance===undefined)ledger.monthly[month].cashOpeningBalance=0;if(!Array.isArray(ledger.monthly[month].cashOpeningLinkedAccountIds))ledger.monthly[month].cashOpeningLinkedAccountIds=[];if(!Array.isArray(ledger.monthly[month].cashOpeningIgnoredAccountIds))ledger.monthly[month].cashOpeningIgnoredAccountIds=[];if(ledger.monthly[month].accountOpeningSummary===undefined)ledger.monthly[month].accountOpeningSummary="";if(ledger.monthly[month].cashOpeningSummary===undefined)ledger.monthly[month].cashOpeningSummary="";if(ledger.monthly[month].openingCarryoverFromMonth===undefined)ledger.monthly[month].openingCarryoverFromMonth="";if(ledger.monthly[month].openingCarryoverAt===undefined)ledger.monthly[month].openingCarryoverAt="";}
+
+    function renderDirectorySelect(){const active=currentDirectory();els.directorySelect.innerHTML=state.directories.map(d=>`<option value="${escapeHtml(d.id)}" ${d.id===active.id?"selected":""}>${escapeHtml(d.name)}</option>`).join("");els.directoryNameInput.value=active.name;els.currentDirectoryBadge.textContent=active.name;els.ledgerTitleBadge.textContent=active.name;}
+    function switchDirectory(id){if(!state.directories.some(d=>d.id===id))return;state.activeDirectoryId=id;accountDrafts=[];cashDrafts=[];els.searchInput.value="";saveState();render();}
+    function addDirectory(){const name=els.directoryNameInput.value.trim();if(!name){alert("추가할 통장명을 입력해 주십시오.");return;}const obj=createDirectory(name);state.directories.push(obj.dir);state.ledgers[obj.dir.id]=obj.ledger;state.activeDirectoryId=obj.dir.id;accountDrafts=[];cashDrafts=[];saveState();render();}
+    function renameDirectory(){const dir=currentDirectory();const name=els.directoryNameInput.value.trim();if(!name){alert("변경할 통장명을 입력해 주십시오.");return;}dir.name=name;saveState();render();}
+    function deleteDirectory(){const dir=currentDirectory();if(state.directories.length<=1){alert("최소 1개의 통장 디렉토리는 필요합니다.");return;}if(!confirm(`통장 디렉토리 '${dir.name}' 및 해당 장부 데이터를 모두 삭제하시겠습니까?`))return;delete state.ledgers[dir.id];state.directories=state.directories.filter(d=>d.id!==dir.id);state.activeDirectoryId=state.directories[0].id;accountDrafts=[];cashDrafts=[];saveState();render();}
+
+    function normalizeTabPosition(value){return ["top","left","right"].includes(value)?value:"top";}
+    function applyTabPosition(){
+      const pos=normalizeTabPosition(state.ui?.tabPosition);
+      if(!state.ui)state.ui={tabPosition:pos};
+      if(els.tabPositionSelect)els.tabPositionSelect.value=pos;
+      if(els.ledgerLayout){els.ledgerLayout.classList.remove("is-top","is-left","is-right");els.ledgerLayout.classList.add(`is-${pos}`);}
+      const target=pos==="left"?els.tabSlotLeft:(pos==="right"?els.tabSlotRight:els.tabSlotTop);
+      if(target&&els.ledgerTabs&&els.ledgerTabs.parentElement!==target)target.appendChild(els.ledgerTabs);
+    }
+    function setTabPosition(value){
+      const pos=normalizeTabPosition(value);
+      if(!state.ui)state.ui={};
+      state.ui.tabPosition=pos;
+      saveState();
+      applyTabPosition();
+    }
+
+    function baseEntryCompare(a,b){return a.date!==b.date?a.date.localeCompare(b.date):String(a.createdAt||a.id).localeCompare(String(b.createdAt||b.id));}
+    function hasSortOrder(entry){return Number.isFinite(Number(entry.sortOrder));}
+    function entrySortValue(entry){return hasSortOrder(entry)?Number(entry.sortOrder):Number.MAX_SAFE_INTEGER;}
+    function getMonthEntries(kind,month=currentMonth()){const ledger=currentLedger();const source=kind==="account"?ledger.accountEntries:ledger.cashEntries;const list=source.filter(e=>e.date&&e.date.slice(0,7)===month);const ordered=list.some(hasSortOrder);return list.sort((a,b)=>ordered?(entrySortValue(a)-entrySortValue(b)||baseEntryCompare(a,b)):baseEntryCompare(a,b));}
+    function normalizeEntryOrder(kind,month=currentMonth()){const entries=getMonthEntries(kind,month);entries.forEach((entry,idx)=>{entry.sortOrder=(idx+1)*10;});return entries;}
+    function moveEntry(kind,id,direction){const ledger=currentLedger();const source=kind==="account"?ledger.accountEntries:ledger.cashEntries;const entry=source.find(e=>String(e.id)===String(id));if(!entry||!entry.date)return;const month=entry.date.slice(0,7);const entries=normalizeEntryOrder(kind,month);const idx=entries.findIndex(e=>String(e.id)===String(id));const nextIdx=idx+direction;if(idx<0||nextIdx<0||nextIdx>=entries.length)return;const temp=entries[idx].sortOrder;entries[idx].sortOrder=entries[nextIdx].sortOrder;entries[nextIdx].sortOrder=temp;if(saveState())render();}
+    function moveDraft(kind,uid,direction){const arr=getDraftArray(kind);const idx=arr.findIndex(d=>String(d.uid)===String(uid));const nextIdx=idx+direction;if(idx<0||nextIdx<0||nextIdx>=arr.length)return;[arr[idx],arr[nextIdx]]=[arr[nextIdx],arr[idx]];setDraftArray(kind,arr);activeTab=kind;render();}
+    function renderMoveButtons(kind,id,isFirst,isLast){return `<span class="move-actions"><button type="button" class="secondary" title="위로 이동" onclick="moveEntry('${kind}','${id}',-1)" ${isFirst?"disabled":""}>▲</button><button type="button" class="secondary" title="아래로 이동" onclick="moveEntry('${kind}','${id}',1)" ${isLast?"disabled":""}>▼</button></span>`;}
+    function getComputed(kind,month=currentMonth()){ensureMonth(month);const ledger=currentLedger();const opening=kind==="account"?Number(ledger.monthly[month].accountOpeningBalance||0):Number(ledger.monthly[month].cashOpeningBalance||0);let balance=opening;const rows=getMonthEntries(kind,month).map((e,idx)=>{const amount=Number(e.amount||0);const income=e.txType==="income"?amount:0;const expense=e.txType==="expense"?amount:0;balance+=income-expense;return {no:idx+1,...e,income,expense,afterBalance:balance};});const incomeTotal=rows.reduce((s,r)=>s+r.income,0);const expenseTotal=rows.reduce((s,r)=>s+r.expense,0);return {kind,month,opening,rows,incomeTotal,expenseTotal,closing:opening+incomeTotal-expenseTotal,incomeCount:rows.filter(r=>r.income>0).length,expenseCount:rows.filter(r=>r.expense>0).length};}
+    function openingSummary(kind,month=currentMonth()){const meta=monthMeta(month);return kind==="account"?String(meta.accountOpeningSummary||""):String(meta.cashOpeningSummary||"");}
+    function openingCarryoverMemo(month=currentMonth()){const meta=monthMeta(month);return meta.openingCarryoverFromMonth?`${meta.openingCarryoverFromMonth} 월말 잔고 불러오기`:"전월말 잔고 불러오기";}
+    function openingDate(month=currentMonth()){return `${month}-01`;}
+    function openingLabel(kind){return kind==="account"?"전월말 계좌잔고":"전월말 현금잔고";}
+    function flowLabel(row){if(row.txType==="carryover")return "이월";if(row.txType==="income")return row.kind==="account"?"입금":"수입";return row.kind==="account"?"출금":"사용";}
+    function flowPillClass(txType){if(txType==="carryover")return "carryover-pill";return txType==="income"?"income-pill":"expense-pill";}
+    function amountToneClass(txType){if(txType==="income")return "income";if(txType==="expense")return "expense";return "";}
+    function openingRowsForCombined(account,cash,month=currentMonth()){const rows=[];const accountSummary=openingSummary("account",month);const cashSummary=openingSummary("cash",month);if(accountSummary){rows.push({id:`carryover-account-${month}`,date:openingDate(month),kind:"account",txType:"carryover",amount:account.opening,summary:accountSummary,method:"월초잔고",memo:openingCarryoverMemo(month),receipt:null,isCarryover:true,sortKey:"0000-carryover-account"});}if(cashSummary){rows.push({id:`carryover-cash-${month}`,date:openingDate(month),kind:"cash",txType:"carryover",amount:cash.opening,summary:cashSummary,method:"월초잔고",memo:openingCarryoverMemo(month),receipt:null,isCarryover:true,sortKey:"0001-carryover-cash"});}return rows;}
+    function getCombinedRows(month=currentMonth()){const account=getComputed("account",month);const cash=getComputed("cash",month);let accountIndex=0,cashIndex=0,lastAccountBalance=account.opening,lastCashBalance=cash.opening;const events=[...openingRowsForCombined(account,cash,month),...account.rows.map(r=>({...r,kind:"account",sortKey:r.createdAt||r.id})),...cash.rows.map(r=>({...r,kind:"cash",sortKey:r.createdAt||r.id}))].sort((a,b)=>a.date!==b.date?a.date.localeCompare(b.date):String(a.sortKey).localeCompare(String(b.sortKey)));const rows=events.map((event,idx)=>{if(event.kind==="account"){if(event.isCarryover){lastAccountBalance=account.opening;}else{accountIndex++;lastAccountBalance=event.afterBalance;}}else{if(event.isCarryover){lastCashBalance=cash.opening;}else{cashIndex++;lastCashBalance=event.afterBalance;}}return {no:idx+1,...event,accountRowNo:event.kind==="account"&&!event.isCarryover?accountIndex:"",cashRowNo:event.kind==="cash"&&!event.isCarryover?cashIndex:"",accountBalance:lastAccountBalance,cashBalance:lastCashBalance,totalBalance:lastAccountBalance+lastCashBalance};});return {rows,account,cash,totalClosing:account.closing+cash.closing};}
+
+    function monthMeta(month=currentMonth()){ensureMonth(month);return currentLedger().monthly[month];}
+    function isCashWithdrawalEntry(entry){return entry&&entry.txType==="expense"&&entry.method==="현금인출"&&Number(entry.amount||0)>0;}
+    function linkedCashIncomeExists(accountId){return currentLedger().cashEntries.some(e=>String(e.linkedAccountId||"")===String(accountId));}
+    function getCashOpeningCandidates(month=currentMonth()){const meta=monthMeta(month);const applied=new Set((meta.cashOpeningLinkedAccountIds||[]).map(String));const ignored=new Set((meta.cashOpeningIgnoredAccountIds||[]).map(String));return getMonthEntries("account",month).filter(e=>isCashWithdrawalEntry(e)&&!applied.has(String(e.id))&&!ignored.has(String(e.id))&&!linkedCashIncomeExists(e.id));}
+    function getCashOpeningStatus(entry,month=currentMonth()){if(!isCashWithdrawalEntry(entry))return "none";const meta=monthMeta(month);const id=String(entry.id);if((meta.cashOpeningLinkedAccountIds||[]).map(String).includes(id))return "applied";if((meta.cashOpeningIgnoredAccountIds||[]).map(String).includes(id))return "ignored";if(linkedCashIncomeExists(id))return "cash-entry";return "candidate";}
+    function getAppliedCashOpeningTotal(month=currentMonth()){const meta=monthMeta(month);const ids=new Set((meta.cashOpeningLinkedAccountIds||[]).map(String));return getMonthEntries("account",month).filter(e=>ids.has(String(e.id))).reduce((sum,e)=>sum+Number(e.amount||0),0);}
+    function applyCashOpeningFromAccount(id){const ledger=currentLedger();const entry=ledger.accountEntries.find(e=>String(e.id)===String(id));if(!entry||!isCashWithdrawalEntry(entry)){alert("현금인출 출금 건만 기초잔고에 반영할 수 있습니다.");return;}const month=entry.date.slice(0,7);const meta=monthMeta(month);const sid=String(entry.id);if((meta.cashOpeningLinkedAccountIds||[]).map(String).includes(sid)){alert("이미 현금 기초잔고에 반영된 건입니다.");return;}meta.cashOpeningBalance=Number(meta.cashOpeningBalance||0)+Number(entry.amount||0);meta.cashOpeningLinkedAccountIds=[...(meta.cashOpeningLinkedAccountIds||[]).filter(v=>String(v)!==sid),sid];meta.cashOpeningIgnoredAccountIds=(meta.cashOpeningIgnoredAccountIds||[]).filter(v=>String(v)!==sid);if(saveState()){activeTab="cash";render();}}
+    function ignoreCashOpeningCandidate(id){const ledger=currentLedger();const entry=ledger.accountEntries.find(e=>String(e.id)===String(id));if(!entry)return;const month=entry.date.slice(0,7);const meta=monthMeta(month);const sid=String(entry.id);meta.cashOpeningIgnoredAccountIds=[...(meta.cashOpeningIgnoredAccountIds||[]).filter(v=>String(v)!==sid),sid];if(saveState())render();}
+    function restoreCashOpeningCandidate(id){const ledger=currentLedger();const entry=ledger.accountEntries.find(e=>String(e.id)===String(id));if(!entry)return;const month=entry.date.slice(0,7);const meta=monthMeta(month);const sid=String(entry.id);meta.cashOpeningIgnoredAccountIds=(meta.cashOpeningIgnoredAccountIds||[]).filter(v=>String(v)!==sid);if(saveState())render();}
+    function undoCashOpeningFromAccount(id,skipConfirm=false){const ledger=currentLedger();const entry=ledger.accountEntries.find(e=>String(e.id)===String(id));if(!entry)return true;const month=entry.date.slice(0,7);const meta=monthMeta(month);const sid=String(entry.id);if(!(meta.cashOpeningLinkedAccountIds||[]).map(String).includes(sid))return true;if(!skipConfirm&&!confirm(`${entry.date} / ${entry.summary} / ${formatWon(entry.amount)}의 현금 기초잔고 반영을 취소하시겠습니까?`))return false;meta.cashOpeningBalance=Math.max(0,Number(meta.cashOpeningBalance||0)-Number(entry.amount||0));meta.cashOpeningLinkedAccountIds=(meta.cashOpeningLinkedAccountIds||[]).filter(v=>String(v)!==sid);if(saveState())render();return true;}
+    function renderCashReflectionCell(row){if(row.method!=="현금인출"||row.txType!=="expense")return "-";const status=getCashOpeningStatus(row,row.date.slice(0,7));if(status==="applied")return `<div class="receipt-box"><span class="cash-opening-applied">기초잔고 반영</span><button type="button" class="secondary receipt-btn no-print" onclick="undoCashOpeningFromAccount('${row.id}')">취소</button></div>`;if(status==="ignored")return `<div class="receipt-box"><span class="muted-cell">기초반영 제외</span><button type="button" class="secondary receipt-btn no-print" onclick="restoreCashOpeningCandidate('${row.id}')">다시 표시</button></div>`;if(status==="cash-entry")return `<span class="cash-opening-applied">현금수입 반영</span>`;return `<div class="receipt-box"><span class="muted-cell">후보</span><button type="button" class="secondary receipt-btn no-print" onclick="applyCashOpeningFromAccount('${row.id}')">기초잔고 반영</button><button type="button" class="danger receipt-btn no-print" onclick="ignoreCashOpeningCandidate('${row.id}')">제외</button></div>`;}
+    window.applyCashOpeningFromAccount=applyCashOpeningFromAccount;window.ignoreCashOpeningCandidate=ignoreCashOpeningCandidate;window.restoreCashOpeningCandidate=restoreCashOpeningCandidate;window.undoCashOpeningFromAccount=undoCashOpeningFromAccount;window.moveEntry=moveEntry;
+
+        function defaultDraft(kind){return {uid:`draft-${kind}-${Date.now()}-${++draftSeq}`,date:currentMonth()===todayMonth()?todayDate():`${currentMonth()}-01`,txType:"expense",incomeAmount:"",expenseAmount:"",method:kind==="account"?"계좌이체":"현금사용",summary:"",memo:"",receipt:null,cashLink:kind==="account"?false:undefined};}
+    function getDraftArray(kind){return kind==="account"?accountDrafts:cashDrafts;} function setDraftArray(kind,arr){if(kind==="account")accountDrafts=arr;else cashDrafts=arr;}
+    function addDraft(kind){const arr=getDraftArray(kind);arr.push(defaultDraft(kind));setDraftArray(kind,arr);activeTab=kind;render();setTimeout(()=>{const draft=arr[arr.length-1];const row=draft?document.querySelector(`[data-draft-id="${draft.uid}"]`):null;row?.querySelector('[data-field="summary"]')?.focus();},0);}
+    function findDraft(kind,uid){return getDraftArray(kind).find(r=>r.uid===uid);} function updateDraftFromRow(row){if(!row)return null;const kind=row.dataset.kind;const draft=findDraft(kind,row.dataset.draftId);if(!draft)return null;row.querySelectorAll("[data-field]").forEach(input=>{draft[input.dataset.field]=input.type==="checkbox"?input.checked:input.value;});return draft;}
+    function setDraftAmountState(row){const draft=updateDraftFromRow(row);if(!row||!draft)return;const txType=row.querySelector('[data-field="txType"]'),income=row.querySelector('[data-field="incomeAmount"]'),expense=row.querySelector('[data-field="expenseAmount"]'),method=row.querySelector('[data-field="method"]'),cashLink=row.querySelector('[data-field="cashLink"]');const isIncome=txType.value==="income";income.disabled=!isIncome;expense.disabled=isIncome;income.placeholder=isIncome?"입금액":"-";expense.placeholder=isIncome?"-":"출금액";if(isIncome){expense.value="";draft.expenseAmount="";}else{income.value="";draft.incomeAmount="";}if(cashLink){const canLink=!isIncome&&method.value==="현금인출";cashLink.disabled=!canLink;if(!canLink){cashLink.checked=false;draft.cashLink=false;}}}
+    function resetDraft(kind,uid){const arr=getDraftArray(kind);const idx=arr.findIndex(r=>r.uid===uid);if(idx<0)return;arr[idx]={...defaultDraft(kind),uid};setDraftArray(kind,arr);render();}
+    function removeDraft(kind,uid){setDraftArray(kind,getDraftArray(kind).filter(r=>r.uid!==uid));render();}
+    function validateDraft(kind,draft){const month=currentMonth();if(!draft.date||draft.date.slice(0,7)!==month)return `${kind==="account"?"입출금장부":"현금사용내역"}의 일자는 선택한 정산 월(${month}) 안에서 입력해야 합니다.`;const amount=parseAmount(draft.txType==="income"?draft.incomeAmount:draft.expenseAmount);if(amount<=0)return `${draft.txType==="income"?"입금액/현금수입":"출금액/현금사용"}은 1원 이상으로 입력해야 합니다.`;if(!String(draft.summary||"").trim())return "적요를 입력해야 합니다.";return "";}
+    function entryFromDraft(kind,draft){return {id:newId(),date:draft.date,txType:draft.txType,amount:parseAmount(draft.txType==="income"?draft.incomeAmount:draft.expenseAmount),method:draft.method,summary:String(draft.summary||"").trim(),memo:String(draft.memo||"").trim(),receipt:draft.receipt||null,createdAt:new Date().toISOString()};}
+    function saveOneDraft(kind,uid){const draft=findDraft(kind,uid);if(!draft)return false;const error=validateDraft(kind,draft);if(error){alert(error);return false;}const ledger=currentLedger();const entry=entryFromDraft(kind,draft);if(kind==="account"){ledger.accountEntries.push(entry);if(entry.txType==="expense"&&entry.method==="현금인출"&&draft.cashLink){const month=entry.date.slice(0,7);ensureMonth(month);const meta=ledger.monthly[month];meta.cashOpeningBalance=Number(meta.cashOpeningBalance||0)+Number(entry.amount||0);meta.cashOpeningLinkedAccountIds=[...(meta.cashOpeningLinkedAccountIds||[]).filter(v=>String(v)!==String(entry.id)),String(entry.id)];meta.cashOpeningIgnoredAccountIds=(meta.cashOpeningIgnoredAccountIds||[]).filter(v=>String(v)!==String(entry.id));}}else{ledger.cashEntries.push(entry);}removeDraft(kind,uid);return true;}
+    function saveAllDrafts(){const jobs=[...accountDrafts.map(d=>["account",d.uid]),...cashDrafts.map(d=>["cash",d.uid])];if(!jobs.length){alert("저장할 미저장 행이 없습니다.");return;}for(const [kind,uid] of jobs){const draft=findDraft(kind,uid);const error=validateDraft(kind,draft);if(error){alert(error);return;}}jobs.forEach(([kind,uid])=>saveOneDraft(kind,uid));saveState();render();}
+
+    function makeReceiptPayload(file,callback){if(!file)return;if(file.size>MAX_RECEIPT_BYTES){alert("영수증 파일은 건별 2MB 이하만 첨부할 수 있습니다. 저장소 용량 보호를 위한 제한입니다.");return;}const okTypes=["image/png","image/jpeg","image/webp","image/gif","application/pdf"];if(file.type&&!okTypes.includes(file.type)){if(!confirm("권장 형식은 이미지 또는 PDF입니다. 그래도 첨부하시겠습니까?"))return;}const reader=new FileReader();reader.onload=()=>callback({name:file.name,type:file.type||"application/octet-stream",size:file.size,data:reader.result,attachedAt:new Date().toISOString()});reader.onerror=()=>alert("영수증 파일을 읽지 못했습니다.");reader.readAsDataURL(file);}
+    function receiptFileLabel(receipt){if(!receipt)return "-";const size=receipt.size?` · ${Math.ceil(receipt.size/1024).toLocaleString("ko-KR")}KB`:"";return `${receipt.name||"영수증"}${size}`;}
+    function receiptStatusText(row){if(row?.txType==="carryover"||row?.isCarryover)return "미대상";return row.receipt?receiptFileLabel(row.receipt):"미첨부";}
+    function dataUrlToBlob(dataUrl){const [meta,b64]=String(dataUrl||"").split(",");const mime=(meta.match(/data:(.*?);base64/)||[])[1]||"application/octet-stream";const bin=atob(b64||"");const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new Blob([bytes],{type:mime});}
+    function findEntry(kind,id){const ledger=currentLedger();const arr=kind==="account"?ledger.accountEntries:ledger.cashEntries;return arr.find(e=>e.id===id);}
+    function handleDraftReceiptUpload(input,kind,uid){const file=input.files&&input.files[0];if(!file)return;const draft=findDraft(kind,uid);if(!draft)return;makeReceiptPayload(file,receipt=>{draft.receipt=receipt;render();});}
+    function removeDraftReceipt(kind,uid){const draft=findDraft(kind,uid);if(!draft)return;draft.receipt=null;render();}
+    function handleReceiptUpload(input,kind,id){const file=input.files&&input.files[0];if(!file)return;const entry=findEntry(kind,id);if(!entry)return;makeReceiptPayload(file,receipt=>{entry.receipt=receipt;if(saveState())render();});}
+    function viewReceipt(kind,id){const entry=findEntry(kind,id);if(!entry||!entry.receipt){alert("첨부된 영수증이 없습니다.");return;}try{const blob=dataUrlToBlob(entry.receipt.data);const url=URL.createObjectURL(blob);window.open(url,"_blank");setTimeout(()=>URL.revokeObjectURL(url),60000);}catch(e){alert("영수증 파일을 열지 못했습니다.");}}
+    function downloadReceipt(kind,id){const entry=findEntry(kind,id);if(!entry||!entry.receipt){alert("첨부된 영수증이 없습니다.");return;}try{downloadBlob(dataUrlToBlob(entry.receipt.data),entry.receipt.name||"영수증");}catch(e){alert("영수증 파일을 다운로드하지 못했습니다.");}}
+    function deleteReceipt(kind,id){const entry=findEntry(kind,id);if(!entry||!entry.receipt)return;if(!confirm("첨부된 영수증을 삭제하시겠습니까?"))return;entry.receipt=null;if(saveState())render();}
+    function renderReceiptCell(kind,row,editable=true){const rid=`receipt-${kind}-${row.id}`;if(row.receipt){return `<div class="receipt-box"><span class="receipt-chip" title="${escapeHtml(receiptFileLabel(row.receipt))}">첨부</span><span class="receipt-name" title="${escapeHtml(receiptFileLabel(row.receipt))}">${escapeHtml(row.receipt.name||"영수증")}</span>${editable?`<button type="button" class="secondary receipt-btn" onclick="viewReceipt('${kind}','${row.id}')">보기</button><button type="button" class="secondary receipt-btn" onclick="downloadReceipt('${kind}','${row.id}')">저장</button><label class="receipt-label no-print" for="${rid}">교체</label><input type="file" id="${rid}" class="file-input" accept="image/*,application/pdf" onchange="handleReceiptUpload(this,'${kind}','${row.id}')"/><button type="button" class="danger receipt-btn no-print" onclick="deleteReceipt('${kind}','${row.id}')">삭제</button>`:""}</div>`;}return editable?`<div class="receipt-box"><span class="muted-cell">선택</span><label class="receipt-label no-print" for="${rid}">첨부</label><input type="file" id="${rid}" class="file-input" accept="image/*,application/pdf" onchange="handleReceiptUpload(this,'${kind}','${row.id}')"/></div>`:`<span class="muted-cell">미첨부</span>`;}
+    function renderDraftReceiptCell(kind,draft){const rid=`draft-receipt-${draft.uid}`;return `<div class="receipt-box">${draft.receipt?`<span class="receipt-chip">첨부</span><span class="receipt-name" title="${escapeHtml(receiptFileLabel(draft.receipt))}">${escapeHtml(draft.receipt.name||"영수증")}</span><button type="button" class="danger receipt-btn" onclick="removeDraftReceipt('${kind}','${draft.uid}')">삭제</button>`:`<span class="muted-cell">선택</span>`}<label class="receipt-label" for="${rid}">${draft.receipt?"교체":"첨부"}</label><input type="file" id="${rid}" class="file-input" accept="image/*,application/pdf" onchange="handleDraftReceiptUpload(this,'${kind}','${draft.uid}')"/></div>`;}
+    window.handleDraftReceiptUpload=handleDraftReceiptUpload;window.removeDraftReceipt=removeDraftReceipt;window.handleReceiptUpload=handleReceiptUpload;window.viewReceipt=viewReceipt;window.downloadReceipt=downloadReceipt;window.deleteReceipt=deleteReceipt;
+
+    function renderDraftRows(kind){const drafts=getDraftArray(kind);const target=kind==="account"?els.accountDraftBody:els.cashDraftBody;const methodOptions=kind==="account"?["계좌이체","카드결제","자동이체","현금인출","기타"]:["현금사용","계좌현금인출","반납","기타"];target.innerHTML=drafts.map((draft,idx)=>{const txLabel=kind==="account"?"입금|출금":"수입|사용";const accountExtra=kind==="account"?`<td class="center"><label class="mini-check"><input type="checkbox" data-field="cashLink" ${draft.cashLink?"checked":""}/>기초반영</label></td>`:"";return `<tr class="inline-entry-row" data-kind="${kind}" data-draft-id="${escapeHtml(draft.uid)}"><td class="center"><strong>신규${idx+1}</strong></td><td><input type="date" data-field="date" value="${escapeHtml(draft.date)}" /></td><td><input type="text" data-field="summary" maxlength="80" placeholder="적요" value="${escapeHtml(draft.summary)}" /></td><td><select data-field="txType"><option value="income" ${draft.txType==="income"?"selected":""}>${kind==="account"?"입금":"수입"}</option><option value="expense" ${draft.txType==="expense"?"selected":""}>${kind==="account"?"출금":"사용"}</option></select></td><td><input type="number" data-field="incomeAmount" min="0" step="1" placeholder="${txLabel.split("|")[0]}액" value="${escapeHtml(draft.incomeAmount)}" /></td><td><input type="number" data-field="expenseAmount" min="0" step="1" placeholder="${txLabel.split("|")[1]}액" value="${escapeHtml(draft.expenseAmount)}" /></td><td><select data-field="method">${methodOptions.map(opt=>`<option value="${opt}" ${draft.method===opt?"selected":""}>${opt}</option>`).join("")}</select></td><td class="center muted-cell">저장 시 자동계산</td>${accountExtra}<td class="center">${renderDraftReceiptCell(kind,draft)}</td><td><input type="text" data-field="memo" maxlength="200" placeholder="비고" value="${escapeHtml(draft.memo)}" /></td><td class="center nowrap"><div class="inline-actions"><span class="move-actions"><button type="button" class="secondary" data-action="up" title="위로 이동" ${idx===0?"disabled":""}>▲</button><button type="button" class="secondary" data-action="down" title="아래로 이동" ${idx===drafts.length-1?"disabled":""}>▼</button></span><button type="button" data-action="save">저장</button><button type="button" class="secondary" data-action="reset">초기화</button><button type="button" class="danger" data-action="remove">삭제</button></div></td></tr>`;}).join("");target.querySelectorAll("tr.inline-entry-row").forEach(row=>{row.querySelectorAll("[data-field]").forEach(input=>{input.addEventListener("input",()=>updateDraftFromRow(row));input.addEventListener("change",()=>setDraftAmountState(row));});row.querySelector('[data-action="up"]')?.addEventListener("click",()=>{updateDraftFromRow(row);moveDraft(kind,row.dataset.draftId,-1);});row.querySelector('[data-action="down"]')?.addEventListener("click",()=>{updateDraftFromRow(row);moveDraft(kind,row.dataset.draftId,1);});row.querySelector('[data-action="save"]')?.addEventListener("click",()=>{if(saveOneDraft(kind,row.dataset.draftId)){saveState();render();}});row.querySelector('[data-action="reset"]')?.addEventListener("click",()=>resetDraft(kind,row.dataset.draftId));row.querySelector('[data-action="remove"]')?.addEventListener("click",()=>removeDraft(kind,row.dataset.draftId));setDraftAmountState(row);});}
+    function keywordMatch(row,keyword){if(!keyword)return true;const typeText=row.txType==="carryover"?"이월 월초잔고 전월말":(row.txType==="income"?"입금 수입":"출금 사용");return [row.summary,row.memo,row.method,row.receipt?.name,typeText,row.kind==="account"?"입출금장부 계좌":"현금사용내역 현금"].some(v=>String(v||"").toLowerCase().includes(keyword));}
+
+    function render(){applyTabPosition();renderDirectorySelect();const month=currentMonth();ensureMonth(month);const ledger=currentLedger();els.accountOpeningInput.value=ledger.monthly[month].accountOpeningBalance||0;els.cashOpeningInput.value=ledger.monthly[month].cashOpeningBalance||0;const openingCandidates=getCashOpeningCandidates(month);const appliedOpeningTotal=getAppliedCashOpeningTotal(month);if(els.cashOpeningCandidateNotice){if(openingCandidates.length||appliedOpeningTotal){const candidateTotal=openingCandidates.reduce((s,e)=>s+Number(e.amount||0),0);els.cashOpeningCandidateNotice.style.display="block";els.cashOpeningCandidateNotice.innerHTML=`현금 기초잔고 반영액 <strong>${formatWon(appliedOpeningTotal)}</strong>${openingCandidates.length?` · 미반영 후보 <strong>${openingCandidates.length}건 / ${formatWon(candidateTotal)}</strong>은 현금사용내역 탭의 연회색 행에서 선택 반영할 수 있습니다.`:""}`;}else{els.cashOpeningCandidateNotice.style.display="none";els.cashOpeningCandidateNotice.innerHTML="";}}const account=getComputed("account",month);const cash=getComputed("cash",month);const combined=getCombinedRows(month);const keyword=els.searchInput.value.trim().toLowerCase();els.summaryOpeningAccount.textContent=formatWon(account.opening);els.summaryOpeningCash.textContent=formatWon(cash.opening);els.summaryUsedAccount.textContent=formatWon(account.expenseTotal);els.summaryUsedCash.textContent=formatWon(cash.expenseTotal);els.summaryCurrentAccount.textContent=formatWon(account.closing);els.summaryCurrentCash.textContent=formatWon(cash.closing);document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.tab===activeTab));els.accountPanel.classList.toggle("hide",activeTab!=="account");els.cashPanel.classList.toggle("hide",activeTab!=="cash");els.combinedPanel.classList.toggle("hide",activeTab!=="combined");renderDraftRows("account");renderDraftRows("cash");renderAccountTable(account,keyword);renderCashTable(cash,keyword);renderCombinedTable(combined,keyword);}
+
+    function renderAccountOpeningRow(computed,keyword){const summary=openingSummary("account",computed.month);if(!summary)return "";const row={kind:"account",txType:"carryover",summary,memo:openingCarryoverMemo(computed.month),method:"월초잔고"};if(!keywordMatch(row,keyword))return "";return `<tr class="carryover-row"><td class="center"><strong>이월</strong></td><td class="center nowrap">${escapeHtml(openingDate(computed.month))}</td><td><span class="carryover-title">${escapeHtml(summary)}</span><br><span class="muted-cell">${openingLabel("account")}</span></td><td class="center"><span class="pill carryover-pill">이월</span></td><td class="num income">-</td><td class="num expense">-</td><td class="center nowrap">월초잔고</td><td class="num"><strong>${formatWon(computed.opening)}</strong></td><td class="center muted-cell">-</td><td class="center muted-cell">미대상</td><td>${escapeHtml(openingCarryoverMemo(computed.month))}</td><td class="center no-print muted-cell">-</td></tr>`;}
+    function renderAccountTable(computed,keyword){const openingHtml=renderAccountOpeningRow(computed,keyword);const rows=computed.rows.filter(row=>keywordMatch({...row,kind:"account"},keyword));els.accountBody.innerHTML=openingHtml+rows.map((row,idx)=>`<tr><td class="center">${row.no}</td><td class="center nowrap">${escapeHtml(row.date)}</td><td>${escapeHtml(row.summary)}</td><td class="center"><span class="pill ${row.txType==="income"?"income-pill":"expense-pill"}">${row.txType==="income"?"입금":"출금"}</span></td><td class="num income">${row.income?formatWon(row.income):"-"}</td><td class="num expense">${row.expense?formatWon(row.expense):"-"}</td><td class="center nowrap">${escapeHtml(row.method)}</td><td class="num"><strong>${formatWon(row.afterBalance)}</strong></td><td class="center">${renderCashReflectionCell(row)}</td><td class="center">${renderReceiptCell("account",row,true)}</td><td>${escapeHtml(row.memo)}</td><td class="center no-print nowrap"><div class="inline-actions">${renderMoveButtons("account",row.id,idx===0,idx===rows.length-1)}<button type="button" class="danger" onclick="deleteEntry('account','${row.id}')">삭제</button></div></td></tr>`).join("");els.accountFoot.innerHTML=`<tr><td colspan="4" class="num"><strong>월계</strong></td><td class="num income"><strong>${formatWon(computed.incomeTotal)}</strong></td><td class="num expense"><strong>${formatWon(computed.expenseTotal)}</strong></td><td class="center">-</td><td class="num"><strong>${formatWon(computed.closing)}</strong></td><td colspan="4" class="no-print"></td></tr>`;els.accountEmpty.style.display=(openingHtml||rows.length||accountDrafts.length)?"none":"block";}
+    function renderCashOpeningRow(computed,keyword){const summary=openingSummary("cash",computed.month);if(!summary)return "";const row={kind:"cash",txType:"carryover",summary,memo:openingCarryoverMemo(computed.month),method:"월초잔고"};if(!keywordMatch(row,keyword))return "";return `<tr class="carryover-row"><td class="center"><strong>이월</strong></td><td class="center nowrap">${escapeHtml(openingDate(computed.month))}</td><td><span class="carryover-title">${escapeHtml(summary)}</span><br><span class="muted-cell">${openingLabel("cash")}</span></td><td class="center"><span class="pill carryover-pill">이월</span></td><td class="num income">-</td><td class="num expense">-</td><td class="center nowrap">월초잔고</td><td class="num orange-text"><strong>${formatWon(computed.opening)}</strong></td><td class="center muted-cell">미대상</td><td>${escapeHtml(openingCarryoverMemo(computed.month))}</td><td class="center no-print muted-cell">-</td></tr>`;}
+    function renderCashTable(computed,keyword){const openingHtml=renderCashOpeningRow(computed,keyword);const candidates=getCashOpeningCandidates(computed.month).filter(row=>keywordMatch({kind:"cash",txType:"income",summary:`기초잔고 반영 후보 ${row.summary}`,memo:row.memo,method:"계좌 현금인출 기초잔고 후보"},keyword));const candidateHtml=candidates.map(row=>`<tr class="cash-opening-candidate-row"><td class="center"><strong>후보</strong></td><td class="center nowrap">${escapeHtml(row.date)}</td><td><span class="candidate-title">기초잔고 반영 후보</span><br><span class="muted-cell">${escapeHtml(row.summary)}</span></td><td class="center"><span class="pill income-pill">기초</span></td><td class="num income">${formatWon(row.amount)}</td><td class="num expense">-</td><td class="center nowrap">계좌 현금인출</td><td class="center muted-cell">반영 전</td><td class="center muted-cell">-</td><td>${escapeHtml(row.memo||"입출금장부 현금인출 건")}</td><td class="center no-print nowrap"><div class="inline-actions"><button type="button" class="secondary" onclick="applyCashOpeningFromAccount('${row.id}')">기초잔고 반영</button><button type="button" class="danger" onclick="ignoreCashOpeningCandidate('${row.id}')">제외</button></div></td></tr>`).join("");const rows=computed.rows.filter(row=>keywordMatch({...row,kind:"cash"},keyword));els.cashBody.innerHTML=openingHtml+candidateHtml+rows.map((row,idx)=>`<tr><td class="center">${row.no}</td><td class="center nowrap">${escapeHtml(row.date)}</td><td>${escapeHtml(row.summary)}</td><td class="center"><span class="pill ${row.txType==="income"?"income-pill":"expense-pill"}">${row.txType==="income"?"수입":"사용"}</span></td><td class="num income">${row.income?formatWon(row.income):"-"}</td><td class="num expense">${row.expense?formatWon(row.expense):"-"}</td><td class="center nowrap">${escapeHtml(row.method)}</td><td class="num orange-text"><strong>${formatWon(row.afterBalance)}</strong></td><td class="center">${renderReceiptCell("cash",row,true)}</td><td>${escapeHtml(row.memo)}</td><td class="center no-print nowrap"><div class="inline-actions">${renderMoveButtons("cash",row.id,idx===0,idx===rows.length-1)}<button type="button" class="danger" onclick="deleteEntry('cash','${row.id}')">삭제</button></div></td></tr>`).join("");els.cashFoot.innerHTML=`<tr><td colspan="4" class="num"><strong>월계</strong></td><td class="num income"><strong>${formatWon(computed.incomeTotal)}</strong></td><td class="num expense"><strong>${formatWon(computed.expenseTotal)}</strong></td><td class="center">-</td><td class="num orange-text"><strong>${formatWon(computed.closing)}</strong></td><td colspan="3" class="no-print"></td></tr>`;els.cashEmpty.style.display=(openingHtml||rows.length||candidates.length||cashDrafts.length)?"none":"block";}
+    function renderCombinedTable(combined,keyword){const rows=combined.rows.filter(row=>keywordMatch(row,keyword));els.combinedBody.innerHTML=rows.map(row=>`<tr class="${row.isCarryover?"carryover-row":""}"><td class="center">${row.isCarryover?"이월":row.no}</td><td class="center nowrap">${escapeHtml(row.date)}</td><td class="center"><span class="pill ${row.kind==="account"?"account-pill":"cash-pill"}">${row.kind==="account"?"입출금장부":"현금사용"}</span></td><td>${row.isCarryover?`<span class="carryover-title">${escapeHtml(row.summary)}</span><br><span class="muted-cell">${escapeHtml(openingLabel(row.kind))}</span>`:escapeHtml(row.summary)}</td><td class="center"><span class="pill ${flowPillClass(row.txType)}">${flowLabel(row)}</span></td><td class="num ${amountToneClass(row.txType)}">${formatWon(row.amount)}</td><td class="num">${formatWon(row.accountBalance)}</td><td class="num orange-text">${formatWon(row.cashBalance)}</td><td class="num"><strong>${formatWon(row.totalBalance)}</strong></td><td class="center">${escapeHtml(receiptStatusText(row))}</td><td>${escapeHtml(row.memo)}</td></tr>`).join("");els.combinedFoot.innerHTML=`<tr><td colspan="6" class="num"><strong>월말 잔고</strong></td><td class="num"><strong>${formatWon(combined.account.closing)}</strong></td><td class="num orange-text"><strong>${formatWon(combined.cash.closing)}</strong></td><td class="num"><strong>${formatWon(combined.totalClosing)}</strong></td><td></td><td></td></tr>`;els.combinedEmpty.style.display=rows.length?"none":"block";}
+
+    function deleteEntry(kind,id){const ledger=currentLedger();const arr=kind==="account"?ledger.accountEntries:ledger.cashEntries;const entry=arr.find(e=>e.id===id);if(!entry)return;if(!confirm(`삭제하시겠습니까?\n${entry.date} / ${entry.summary} / ${formatWon(entry.amount)}`))return;if(kind==="account"){const status=getCashOpeningStatus(entry,entry.date.slice(0,7));if(status==="applied"){const meta=monthMeta(entry.date.slice(0,7));meta.cashOpeningBalance=Math.max(0,Number(meta.cashOpeningBalance||0)-Number(entry.amount||0));meta.cashOpeningLinkedAccountIds=(meta.cashOpeningLinkedAccountIds||[]).filter(v=>String(v)!==String(id));}else if(status==="ignored"){const meta=monthMeta(entry.date.slice(0,7));meta.cashOpeningIgnoredAccountIds=(meta.cashOpeningIgnoredAccountIds||[]).filter(v=>String(v)!==String(id));}const linked=ledger.cashEntries.filter(e=>e.linkedAccountId===id);if(linked.length&&confirm("이 입출금장부 건과 연결된 현금장부 자동반영 내역도 함께 삭제하시겠습니까?")){ledger.cashEntries=ledger.cashEntries.filter(e=>e.linkedAccountId!==id);}ledger.accountEntries=ledger.accountEntries.filter(e=>e.id!==id);}else{ledger.cashEntries=ledger.cashEntries.filter(e=>e.id!==id);}saveState();render();}
+    window.deleteEntry=deleteEntry;
+    function getPreviousMonth(month){const [y,m]=month.split("-").map(Number);const d=new Date(y,m-2,1);return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`;}
+    function saveOpeningBalance(){const month=currentMonth();const ledger=currentLedger();const accountOpeningBalance=parseAmount(els.accountOpeningInput.value);const cashOpeningBalance=parseAmount(els.cashOpeningInput.value);if(accountOpeningBalance<0||cashOpeningBalance<0){alert("월초 잔고는 0원 이상으로 입력해야 합니다.");return;}const prev=monthMeta(month);ledger.monthly[month]={...prev,accountOpeningBalance,cashOpeningBalance};saveState();render();}
+    function copyPreviousClosing(){const month=currentMonth();const prev=getPreviousMonth(month);const prevAccount=getComputed("account",prev);const prevCash=getComputed("cash",prev);const previousMeta={...monthMeta(month)};currentLedger().monthly[month]={...previousMeta,accountOpeningBalance:prevAccount.closing,cashOpeningBalance:prevCash.closing,cashOpeningLinkedAccountIds:[],cashOpeningIgnoredAccountIds:[],accountOpeningSummary:"(이월)",cashOpeningSummary:"(이월)",openingCarryoverFromMonth:prev,openingCarryoverAt:new Date().toISOString()};saveState();render();alert(`${currentDirectory().name} / ${prev} 월말 계좌잔고 ${formatWon(prevAccount.closing)}, 현금잔고 ${formatWon(prevCash.closing)}을 ${month} 월초 잔고로 반영했습니다. 적요에는 '(이월)'이 자동 표시됩니다.`);}
+    function addSample(){const month=currentMonth();ensureMonth(month);const ledger=currentLedger();if(ledger.accountEntries.some(e=>e.date?.slice(0,7)===month)||ledger.cashEntries.some(e=>e.date?.slice(0,7)===month)){if(!confirm("현재 디렉토리의 선택 월에 이미 내역이 있습니다. 예시 3건을 추가하시겠습니까?"))return;}const d1=`${month}-01`,d2=`${month}-02`,d3=`${month}-03`;const accountIncomeId=newId(),withdrawId=newId();ledger.accountEntries.push({id:accountIncomeId,date:d1,txType:"income",amount:200000,method:"계좌이체",summary:`${currentDirectory().name} 입금`,memo:"예시 데이터",createdAt:new Date().toISOString()},{id:withdrawId,date:d2,txType:"expense",amount:100000,method:"현금인출",summary:"현금 사용분 인출",memo:"현금장부 자동반영 예시",createdAt:new Date(Date.now()+1).toISOString()});ensureMonth(month);ledger.monthly[month].cashOpeningBalance=Number(ledger.monthly[month].cashOpeningBalance||0)+100000;ledger.monthly[month].cashOpeningLinkedAccountIds=[...(ledger.monthly[month].cashOpeningLinkedAccountIds||[]),String(withdrawId)];ledger.cashEntries.push({id:newId(),date:d3,txType:"expense",amount:30000,method:"현금사용",summary:"회의 다과 구입",memo:"영수증 확인 필요",createdAt:new Date(Date.now()+3).toISOString()});saveState();activeTab="combined";render();}
+    function clearDrafts(){if(!accountDrafts.length&&!cashDrafts.length){alert("초기화할 미저장 행이 없습니다.");return;}if(!confirm("미저장 입력행을 모두 삭제하시겠습니까?"))return;accountDrafts=[];cashDrafts=[];render();}
+    function clearCurrentMonth(){const month=currentMonth();const dir=currentDirectory();if(!confirm(`${dir.name} / ${month} 월의 입출금장부와 현금사용내역을 모두 삭제합니다. 월초 잔고는 유지됩니다. 계속하시겠습니까?`))return;const ledger=currentLedger();ledger.accountEntries=ledger.accountEntries.filter(e=>e.date.slice(0,7)!==month);ledger.cashEntries=ledger.cashEntries.filter(e=>e.date.slice(0,7)!==month);saveState();render();}
+    function exportJson(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json;charset=utf-8"});downloadBlob(blob,`기관계좌_장부_전체백업_${currentMonth()}.json`);}
+    function importJson(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const normalized=normalizeState(JSON.parse(reader.result));if(!confirm("현재 브라우저에 저장된 전체 통장 디렉토리 장부를 백업 파일로 대체합니다. 계속하시겠습니까?"))return;state=normalized;accountDrafts=[];cashDrafts=[];saveState();render();alert("복원이 완료되었습니다.");}catch(e){alert("JSON 백업 파일을 읽지 못했습니다. 파일 형식을 확인해 주십시오.");}finally{els.importJsonInput.value="";}};reader.readAsText(file,"utf-8");}
+    function downloadBlob(blob,filename){const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+
+    function colName(index){let name="",n=index+1;while(n>0){const rem=(n-1)%26;name=String.fromCharCode(65+rem)+name;n=Math.floor((n-1)/26);}return name;}
+    function sheetXmlFromRows(rows){const sheetData=rows.map((row,rIdx)=>{const r=rIdx+1;const cells=row.map((cell,cIdx)=>{const ref=`${colName(cIdx)}${r}`;if(typeof cell==="number"&&Number.isFinite(cell))return `<c r="${ref}"><v>${cell}</v></c>`;return `<c r="${ref}" t="inlineStr"><is><t>${xmlEscape(cell)}</t></is></c>`;}).join("");return `<row r="${r}">${cells}</row>`;}).join("");return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="18"/><cols><col min="1" max="1" width="8" customWidth="1"/><col min="2" max="2" width="14" customWidth="1"/><col min="3" max="3" width="20" customWidth="1"/><col min="4" max="4" width="38" customWidth="1"/><col min="5" max="10" width="18" customWidth="1"/></cols><sheetData>${sheetData}</sheetData></worksheet>`;}
+    function openingReportRow(kind,month,opening){const summary=openingSummary(kind,month);if(!summary)return [];return [["이월",openingDate(month),summary,"이월","","","월초잔고",opening,"미대상",openingCarryoverMemo(month)]];}
+    function exportXlsx(){const month=currentMonth();const dir=currentDirectory();const account=getComputed("account",month),cash=getComputed("cash",month),combined=getCombinedRows(month);const created=new Date().toLocaleString("ko-KR");const accountRows=[[`${dir.name} 입출금장부`],["정산 월",month],["작성일시",created],[],["월초 계좌잔고",account.opening],["계좌 입금 합계",account.incomeTotal],["계좌 출금 합계",account.expenseTotal],["월말 계좌잔고",account.closing],[],["연번","일자","적요","입/출금","입금","출금","사용 유형","사용후잔액","영수증","비고"],...openingReportRow("account",month,account.opening),...account.rows.map(r=>[r.no,r.date,r.summary,r.txType==="income"?"입금":"출금",r.income||"",r.expense||"",r.method,r.afterBalance,receiptStatusText(r),r.memo||""]),["","","월계","",account.incomeTotal,account.expenseTotal,"",account.closing,"",""]];const cashRows=[[`${dir.name} 현금사용내역`],["정산 월",month],["작성일시",created],[],["월초 현금잔고",cash.opening],["현금인출 기초잔고 반영액",getAppliedCashOpeningTotal(month)],["현금 수입 합계",cash.incomeTotal],["현금 사용 합계",cash.expenseTotal],["월말 현금잔고",cash.closing],[],["연번","일자","적요","수입/사용","현금수입","현금사용","사용 유형","현금잔액","영수증","비고"],...openingReportRow("cash",month,cash.opening),...cash.rows.map(r=>[r.no,r.date,r.summary,r.txType==="income"?"수입":"사용",r.income||"",r.expense||"",r.method,r.afterBalance,receiptStatusText(r),r.memo||""]),["","","월계","",cash.incomeTotal,cash.expenseTotal,"",cash.closing,"",""]];const combinedRows=[[`${dir.name} 통합보기`],["정산 월",month],["작성일시",created],[],["월말 계좌잔고",account.closing],["월말 현금잔고",cash.closing],["총 가용잔액",combined.totalClosing],[],["연번","일자","장부구분","적요","입/출","금액","계좌잔액","현금잔액","총가용잔액","영수증","비고"],...combined.rows.map(r=>[r.isCarryover?"이월":r.no,r.date,r.kind==="account"?"입출금장부":"현금사용내역",r.summary,flowLabel(r),r.amount,r.accountBalance,r.cashBalance,r.totalBalance,receiptStatusText(r),r.memo||""]),["","","","월말 잔고","","",account.closing,cash.closing,combined.totalClosing,"",""]];const files=buildXlsxFiles([{name:"입출금장부",rows:accountRows},{name:"현금사용내역",rows:cashRows},{name:"통합보기",rows:combinedRows}]);const zip=createZip(files);downloadBlob(new Blob([zip],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),`${safeFileName(dir.name)}_장부보고서_${month}.xlsx`);}
+    function buildXlsxFiles(sheets){const contentOverrides=sheets.map((_,idx)=>`<Override PartName="/xl/worksheets/sheet${idx+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("\n  ");const sheetList=sheets.map((sheet,idx)=>`<sheet name="${xmlEscape(sheet.name)}" sheetId="${idx+1}" r:id="rId${idx+1}"/>`).join("");const relList=sheets.map((_,idx)=>`<Relationship Id="rId${idx+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${idx+1}.xml"/>`).join("\n  ");const files={"[Content_Types].xml":`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${contentOverrides}<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`,"_rels/.rels":`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`,"xl/workbook.xml":`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheetList}</sheets></workbook>`,"xl/_rels/workbook.xml.rels":`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${relList}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,"xl/styles.xml":`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="1"><font><sz val="11"/><name val="맑은 고딕"/></font></fonts><fills count="1"><fill><patternFill patternType="none"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`};sheets.forEach((sheet,idx)=>{files[`xl/worksheets/sheet${idx+1}.xml`]=sheetXmlFromRows(sheet.rows);});return files;}
+    function crc32(bytes){let crc=0xffffffff;for(let i=0;i<bytes.length;i++){crc^=bytes[i];for(let j=0;j<8;j++)crc=(crc>>>1)^(0xedb88320&-(crc&1));}return (crc^0xffffffff)>>>0;} function dateToDos(date){const year=date.getFullYear(),month=date.getMonth()+1,day=date.getDate(),hours=date.getHours(),minutes=date.getMinutes(),seconds=Math.floor(date.getSeconds()/2);return {time:(hours<<11)|(minutes<<5)|seconds,date:((year-1980)<<9)|(month<<5)|day};} function pushU16(arr,v){arr.push(v&0xff,(v>>>8)&0xff);} function pushU32(arr,v){arr.push(v&0xff,(v>>>8)&0xff,(v>>>16)&0xff,(v>>>24)&0xff);} function concatUint8(chunks){const total=chunks.reduce((s,c)=>s+c.length,0);const out=new Uint8Array(total);let offset=0;for(const c of chunks){out.set(c,offset);offset+=c.length;}return out;} function createZip(files){const encoder=new TextEncoder();const chunks=[],centralChunks=[];let offset=0;const now=dateToDos(new Date());const names=Object.keys(files);for(const name of names){const nameBytes=encoder.encode(name),data=encoder.encode(files[name]),crc=crc32(data),local=[];pushU32(local,0x04034b50);pushU16(local,20);pushU16(local,0);pushU16(local,0);pushU16(local,now.time);pushU16(local,now.date);pushU32(local,crc);pushU32(local,data.length);pushU32(local,data.length);pushU16(local,nameBytes.length);pushU16(local,0);const localBytes=new Uint8Array(local);chunks.push(localBytes,nameBytes,data);const central=[];pushU32(central,0x02014b50);pushU16(central,20);pushU16(central,20);pushU16(central,0);pushU16(central,0);pushU16(central,now.time);pushU16(central,now.date);pushU32(central,crc);pushU32(central,data.length);pushU32(central,data.length);pushU16(central,nameBytes.length);pushU16(central,0);pushU16(central,0);pushU16(central,0);pushU16(central,0);pushU32(central,0);pushU32(central,offset);centralChunks.push(new Uint8Array(central),nameBytes);offset+=localBytes.length+nameBytes.length+data.length;}const centralStart=offset,centralDir=concatUint8(centralChunks),end=[];pushU32(end,0x06054b50);pushU16(end,0);pushU16(end,0);pushU16(end,names.length);pushU16(end,names.length);pushU32(end,centralDir.length);pushU32(end,centralStart);pushU16(end,0);return concatUint8([...chunks,centralDir,new Uint8Array(end)]);}
+
+    document.querySelectorAll(".tab-btn").forEach(btn=>btn.addEventListener("click",()=>{activeTab=btn.dataset.tab;render();}));
+    els.tabPositionSelect.addEventListener("change",()=>setTabPosition(els.tabPositionSelect.value));
+    document.querySelectorAll("[data-add]").forEach(btn=>btn.addEventListener("click",()=>addDraft(btn.dataset.add)));
+    els.directorySelect.addEventListener("change",()=>switchDirectory(els.directorySelect.value)); els.addDirectoryBtn.addEventListener("click",addDirectory); els.renameDirectoryBtn.addEventListener("click",renameDirectory); els.deleteDirectoryBtn.addEventListener("click",deleteDirectory);
+    els.monthInput.addEventListener("change",()=>{accountDrafts=[];cashDrafts=[];render();}); els.saveOpeningBtn.addEventListener("click",saveOpeningBalance); els.copyPrevClosingBtn.addEventListener("click",copyPreviousClosing); els.sampleBtn.addEventListener("click",addSample); els.clearDraftsBtn.addEventListener("click",clearDrafts); els.searchInput.addEventListener("input",render); els.clearSearchBtn.addEventListener("click",()=>{els.searchInput.value="";render();}); els.saveAllDraftsBtn.addEventListener("click",saveAllDrafts); els.exportXlsxBtn.addEventListener("click",exportXlsx); els.printPdfBtn.addEventListener("click",()=>window.print()); els.exportJsonBtn.addEventListener("click",exportJson); els.importJsonInput.addEventListener("change",e=>importJson(e.target.files[0])); els.clearMonthBtn.addEventListener("click",clearCurrentMonth);
+    els.monthInput.value=todayMonth(); ensureMonth(currentMonth()); render();
+  </script>
+</body>
+</html>
