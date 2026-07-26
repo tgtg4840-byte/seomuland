@@ -237,220 +237,11 @@
       if(cells.length) rows.push(`<row r="${r+1}">${cells.join('')}</row>`);
     }
     const merges=(ws['!merges']||[]).map(m=>`<mergeCell ref="${encode_range(m)}"/>`).join('');
-    const mergeBlock=merges?`<mergeCells count="${ws['!merges'].length}">${merges}</mergeCells>`:'';
-    const cols=(ws['!cols']||[]).map((col,i)=> col && col.wch ? `<col min="${i+1}" max="${i+1}" width="${Number(col.wch)}" customWidth="1"/>` : '').join('');
-    const colsBlock=cols?`<cols>${cols}</cols>`:'';
-    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="${XMLNS_MAIN}" xmlns:r="${XMLNS_REL}"><dimension ref="${ws['!ref']||'A1'}"/><sheetViews><sheetView workbookViewId="0"/></sheetViews>${colsBlock}<sheetData>${rows.join('')}</sheetData>${mergeBlock}</worksheet>`;
-  }
-  function writeFile(wb, filename){
-    const files={};
-    const names=wb.SheetNames||[];
-    files['[Content_Types].xml']=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${names.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
-    files['_rels/.rels']=`<?xml version="1.0â€¦53882 tokens truncatedâ€¦u0027,'ê±´ê°•ë³´í—˜','ê³ ìš©ë³´í—˜','ì‚°ìž¬ë³´í—˜','ê³„']];
-    preview.rows.forEach(r=>aoa.push([r.budget,r.category,r.national,r.health,r.employment,r.industrial,r.total]));
-    aoa.push(['í•©ê³„',`${preview.totals.count}ëª…`,preview.totals.national,preview.totals.health,preview.totals.employment,preview.totals.industrial,preview.totals.total]);
-    const ws=XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols']=[{wch:34},{wch:16},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
-    Object.keys(ws).forEach(addr=>{ if(addr[0]==='!') return; if(/[C-G]\d+/.test(addr)){ ws[addr].z='#,##0'; } });
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'ê¸°ê´€ë¶€ë‹´ê¸ˆ ì‚°ì •');
-    const suffix=preview.mode === 'matched' ? '_ìš°ë¦¬ë¶€ì„œ' : '';
-    XLSX.writeFile(wb, safeFileName(`${currentMonth().replace('-','ë…„ ')}ì›” ê¸°ê´€ë¶€ë‹´ê¸ˆ ì‚°ì •${suffix}.xlsx`));
-    toast(`ê¸°ê´€ë¶€ë‹´ê¸ˆ ì‚°ì •íŒŒì¼ì„ ì¶œë ¥í–ˆìŠµë‹ˆë‹¤. ì§‘ê³„ ${preview.rows.length}ê±´ / ëŒ€ìƒ ${preview.totals.count}ëª…`);
-  }
-  function exportSocialInsuranceXlsx(){
-    const data=monthData();
-    const mode=insurancePreviewMode();
-    const records=getInsuranceDetailRows(mode);
-    if(!records.length){ toast(mode === 'matched' ? 'ë³´ìˆ˜ë‚´ì—­ ì„±ëª…ê³¼ ì¼ì¹˜í•˜ëŠ” ì‚¬íšŒë³´í—˜ ê³ ì§€ì„œ ì¸ì›ì´ ì—†ìŠµë‹ˆë‹¤.' : 'ì‚¬íšŒë³´í—˜ ë‚´ì—­ì„ ë§Œë“¤ ë³´í—˜ ê³ ì§€ì„œ ì›ìžë£Œê°€ ì—†ìŠµë‹ˆë‹¤. êµ­ë¯¼ì—°ê¸ˆÂ·ê±´ê°•ë³´í—˜Â·ê³ ìš©ë³´í—˜Â·ì‚°ìž¬ë³´í—˜ ì¤‘ í•˜ë‚˜ ì´ìƒì„ ì—…ë¡œë“œí•˜ì‹­ì‹œì˜¤.'); return; }
-    if(!window.XLSX){ toast('ì‚¬íšŒë³´í—˜ ë‚´ì—­ XLSXë¥¼ ë§Œë“¤ë ¤ë©´ ë‚´ìž¥ XLSX ëª¨ë“ˆì´ í•„ìš”í•©ë‹ˆë‹¤. ì´ íŒŒì¼ì´ ì†ìƒë˜ì§€ ì•Šì•˜ëŠ”ì§€ í™•ì¸í•˜ì‹­ì‹œì˜¤.'); return; }
-    const aoa=[
-      [null,'ì„±ëª…','êµ­ë¯¼ì—°ê¸ˆ',null,null,'ê±´ê°•ë³´í—˜',null,null,null,null,'ê³ ìš©ë³´í—˜',null,null,null,'ì‚°ìž¬ë³´í—˜  \n (ì‚¬ì—…ì£¼ë¶€ë‹´)','ê·¼ë¡œìž\në¶€ë‹´','ì‚¬ì—…ì£¼\në¶€ë‹´','ì´ê³„','ì†Œì†ë¶€ì„œ','ì§ì¢…','êµ¬ë¶„','ì˜ˆì‚°ê³¼ëª©'],
-      [null,null,'ê·¼ë¡œìžë¶€ë‹´','ì‚¬ì—…ì£¼ë¶€ë‹´','í•©ê³„','ê·¼ë¡œìžë¶€ë‹´',null,'ì‚¬ì—…ì£¼ë¶€ë‹´',null,'í•©ê³„','ê·¼ë¡œìžë¶€ë‹´','ì‚¬ì—…ì£¼ë¶€ë‹´',null,'í•©ê³„',null,null,null,null,null,null,null,null],
-      [null,null,null,null,null,'ê±´ê°•','ìž¥ê¸°ìš”ì–‘','ê±´ê°•','ìž¥ê¸°ìš”ì–‘',null,'ì‹¤ì—…ê¸‰ì—¬','ì‹¤ì—…ê¸‰ì—¬','ê³ ìš©ì•ˆì •',null,null,null,null,null,null,null,null,null]
-    ];
-    const sums=Array(22).fill(0);
-    let unmatchedCount=0;
-    records.forEach((r,i)=>{
-      const nW=toNumber(r.nationalPension);
-      const nE=hasOwn(r,'_nationalEmployer') ? toNumber(r._nationalEmployer) : nW;
-      const hW=toNumber(r.healthInsurance);
-      const cW=toNumber(r.longTermCare);
-      const hE=hasOwn(r,'_healthEmployer') ? toNumber(r._healthEmployer) : hW;
-      const cE=hasOwn(r,'_careEmployer') ? toNumber(r._careEmployer) : cW;
-      const empW=toNumber(r.employmentInsurance);
-      const empEU=hasOwn(r,'_employmentEmployerUnemployment') ? toNumber(r._employmentEmployerUnemployment) : empW;
-      const empES=hasOwn(r,'_employmentEmployerStabilization') ? toNumber(r._employmentEmployerStabilization) : Math.max(0, toNumber(r._employmentEmployer)-empEU);
-      const industrial=toNumber(r._industrial);
-      const pensionTotal=nW+nE;
-      const healthTotal=hW+cW+hE+cE;
-      const employmentTotal=empW+empEU+empES;
-      const workerTotal=nW+hW+cW+empW;
-      const employerTotal=nE+hE+cE+empEU+empES+industrial;
-      const allTotal=workerTotal+employerTotal;
-      const matched = r._payrollMatched !== false;
-      if(!matched) unmatchedCount++;
-      const identity=insuranceIdentityFields(r,data);
-      const line=[i+1,r.name||'',nW,nE,pensionTotal,hW,cW,hE,cE,healthTotal,empW,empEU,empES,employmentTotal,industrial,workerTotal,employerTotal,allTotal,identity.office,identity.jobType,identity.category,identity.budgetSubject];
-      aoa.push(line);
-      for(let c=2;c<=17;c++) sums[c]+=toNumber(line[c]);
-    });
-    const totalLine=Array(22).fill(null);
-    totalLine[1]='í•©ê³„';
-    for(let c=2;c<=17;c++) totalLine[c]=sums[c];
-    aoa.push(totalLine);
-    const ws=XLSX.utils.aoa_to_sheet(aoa);
-    ws['!merges']=[
-      {s:{r:0,c:2},e:{r:0,c:4}}, {s:{r:0,c:5},e:{r:0,c:9}}, {s:{r:0,c:10},e:{r:0,c:13}},
-      {s:{r:0,c:14},e:{r:2,c:14}}, {s:{r:0,c:15},e:{r:2,c:15}}, {s:{r:0,c:16},e:{r:2,c:16}}, {s:{r:0,c:17},e:{r:2,c:17}},
-      {s:{r:0,c:1},e:{r:2,c:1}}, {s:{r:0,c:18},e:{r:2,c:18}}, {s:{r:0,c:19},e:{r:2,c:19}}, {s:{r:0,c:20},e:{r:2,c:20}}, {s:{r:0,c:21},e:{r:2,c:21}},
-      {s:{r:1,c:2},e:{r:2,c:2}}, {s:{r:1,c:3},e:{r:2,c:3}}, {s:{r:1,c:4},e:{r:2,c:4}},
-      {s:{r:1,c:9},e:{r:2,c:9}}, {s:{r:1,c:13},e:{r:2,c:13}}
-    ];
-    ws['!cols']=[{wch:5},{wch:12},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:13},{wch:11},{wch:11},{wch:12},{wch:16},{wch:14},{wch:14},{wch:24}];
-    ws['!rows']=Array(aoa.length).fill(0).map((_,i)=> i<3?{hpt:30}:{hpt:20});
-    Object.keys(ws).forEach(addr=>{ if(addr[0]==='!') return; if(/[C-R]\d+/.test(addr)){ ws[addr].z='#,##0'; } });
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'ì‚°ì¶œ(ì´)ì„¸ë¶€ë‚´ì—­');
-    const suffix = mode === 'matched' ? '_ìš°ë¦¬ë¶€ì„œ' : '';
-    XLSX.writeFile(wb, safeFileName(`${currentMonth().replace('-','ë…„ ')}ì›” ì‚¬íšŒë³´í—˜ ë‚´ì—­${suffix}.xlsx`));
-    toast(`ì‚¬íšŒë³´í—˜ ë‚´ì—­ XLSX íŒŒì¼ì„ ì¶œë ¥í–ˆìŠµë‹ˆë‹¤. ëŒ€ìƒ ${records.length}ëª…${mode === 'matched' ? ' / ìš°ë¦¬ ë¶€ì„œ' : (unmatchedCount?` / ë³´ìˆ˜ë‚´ì—­ ë¯¸ë§¤ì¹­ ${unmatchedCount}ëª… í¬í•¨`:'')}`);
-  }
-  function exportXlsx(){
-    if(isAutoTax()) recalcTaxRows();
-    saveSettings(); saveState();
-    const data=monthData();
-    normalizePayrollData(data);
-    if(!data.rows.length){toast('ì¶œë ¥í•  ìžë£Œê°€ ì—†ìŠµë‹ˆë‹¤.');return;}
-    if(!window.XLSX){ exportCsv(); return; }
-
-    const rowCount=data.rows.length;
-    const dataFirstRow=3;
-    const dataLastRow=dataFirstRow + rowCount - 1;
-    const totalRow=dataLastRow + 1;
-    const excludeRow=totalRow + 1;
-    const noteRow=excludeRow + 1;
-
-    const aoa=[
-      ['ë¶€ì„œ-ë¶„ì•¼','ì„±  ëª…','âž€ì›”ë³´ìˆ˜\n(ê¸°ë³¸ê¸‰)','âžì‹œê°„ì™¸ìˆ˜ë‹¹\n(íœ´ì¼ìˆ˜ë‹¹ í¬í•¨)','âž‚ì‹ëŒ€','âžƒì§ë¬´ìˆ˜ë‹¹\n(ê°ì¢… ìˆ˜ë‹¹)','âž„ì—°ê°€\në³´ìƒë¹„/\nëª…ì ˆìˆ˜ë‹¹','âž…ê¸‰ì—¬ì´ì•¡\n(âž€+âž+âž‚+âžƒ+âž„)','ê³µì œí•©ê³„','âž†ì‹¤ìˆ˜ë ¹ì•¡','ì°¨ê°ì•¡',null,null,null,null,null,null,null,null,'íšŒë‹´ë³¸ë¶€ ë¶€ë‹´ ë³´í—˜í•©ê³„','ê³¼ì„¸ëŒ€ìƒê¸‰ì—¬\n(âž…-âž‚)\nì†Œê³„','â‘©ì§€ê¸‰ì´ê¸ˆì•¡\n(â‘¦+â‘§+â‘¨)'],
-      [null,null,null,null,null,null,null,null,null,null,'â‘§ê·¼ë¡œì†Œë“ì„¸','â‘¨ì§€ë°©ì†Œë“ì„¸','ê±´ê°•ë³´í—˜ë£Œ','ìž¥ê¸°ìš”ì–‘ë³´í—˜','êµ­ë¯¼ì—°ê¸ˆ','ê³ ìš©ë³´í—˜ë£Œ','êµ¬ë‚´ì‹ë‹¹ ì‹ë¹„','ìƒì¡°íšŒë¹„','í•™ìžê¸ˆ ê³µì œ',null,null,null]
-    ];
-
-    data.rows.forEach(r=>{
-      aoa.push([
-        r.deptField||'',
-        r.name||'',
-        toNumber(r.basePay),
-        toNumber(r.overtimePay),
-        toNumber(r.mealAllowance),
-        toNumber(r.dutyAllowance),
-        toNumber(r.annualHolidayPay),
-        null,
-        null,
-        null,
-        toNumber(r.incomeTax),
-        toNumber(r.localIncomeTax),
-        toNumber(r.healthInsurance),
-        toNumber(r.longTermCare),
-        toNumber(r.nationalPension),
-        toNumber(r.employmentInsurance),
-        toNumber(r.cafeteria),
-        toNumber(r.mutualAid),
-        toNumber(r.tuitionDeduction),
-        toNumber(r.employerInsuranceTotal),
-        null,
-        null
-      ]);
-    });
-
-    aoa.push(['í•©  ê³„',null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]);
-    aoa.push(['ê¸°ë³¸ê²½ë¹„ ì œì™¸',null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]);
-    aoa.push(['* ë¹„ê³¼ì„¸ ëŒ€ìƒ : â‘ ì‹ëŒ€20ë§Œì›ì´í•˜(ì†Œë“ì„¸ë²• ì‹œí–‰ë ¹ ì œ17ì¡°2)',null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]);
-
-    const ws=XLSX.utils.aoa_to_sheet(aoa);
-    ws['!merges']=[
-      {s:{r:0,c:0},e:{r:1,c:0}},
-      {s:{r:0,c:1},e:{r:1,c:1}},
-      {s:{r:0,c:2},e:{r:1,c:2}},
-      {s:{r:0,c:3},e:{r:1,c:3}},
-      {s:{r:0,c:4},e:{r:1,c:4}},
-      {s:{r:0,c:5},e:{r:1,c:5}},
-      {s:{r:0,c:6},e:{r:1,c:6}},
-      {s:{r:0,c:7},e:{r:1,c:7}},
-      {s:{r:0,c:8},e:{r:1,c:8}},
-      {s:{r:0,c:9},e:{r:1,c:9}},
-      {s:{r:0,c:10},e:{r:0,c:18}},
-      {s:{r:0,c:19},e:{r:1,c:19}},
-      {s:{r:0,c:20},e:{r:1,c:20}},
-      {s:{r:0,c:21},e:{r:1,c:21}}
-    ];
-    ws['!cols']=[
-      {wch:16},{wch:11},{wch:13},{wch:15},{wch:10},{wch:14},{wch:16},{wch:17},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12},{wch:13},{wch:11},{wch:12},{wch:14},{wch:11},{wch:12},{wch:17},{wch:15},{wch:15}
-    ];
-    ws['!rows']=Array(noteRow).fill(0).map((_,i)=> (i===0||i===1)?{hpt:46}:{hpt:20});
-
-    function setFormula(addr, f){ if(!ws[addr]) ws[addr]={t:'n'}; ws[addr].f=f; ws[addr].z='#,##0'; }
-    for(let r=dataFirstRow;r<=dataLastRow;r++){
-      // FÂ·GëŠ” ê³„ì‚°ì—´ì´ ì•„ë‹ˆë¼ ê·¼ë¡œìžë³„ ì§ì ‘ ìž…ë ¥ê°’ìž…ë‹ˆë‹¤.
-      const sourceRow=data.rows[r-dataFirstRow];
-      ws['F'+r]={t:'n',v:toNumber(sourceRow?.dutyAllowance),z:'#,##0'};
-      ws['G'+r]={t:'n',v:toNumber(sourceRow?.annualHolidayPay),z:'#,##0'};
-      setFormula('H'+r,`SUM(C${r}:G${r})`);
-      setFormula('I'+r,`SUM(K${r}:S${r})`);
-      setFormula('J'+r,`H${r}-I${r}`);
-      setFormula('U'+r,`H${r}-E${r}`);
-      setFormula('V'+r,`J${r}+K${r}+L${r}`);
-    }
-    const sumCols=['C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V'];
-    sumCols.forEach(col=>{
-      setFormula(`${col}${totalRow}`,`SUM(${col}${dataFirstRow}:${col}${dataLastRow})`);
-      const included=[];
-      data.rows.forEach((r,i)=>{ if(!String(r.deptField||'').includes('ê¸°ë³¸ê²½ë¹„')) included.push(`${col}${dataFirstRow+i}`); });
-      setFormula(`${col}${excludeRow}`,included.length?`SUM(${included.join(',')})`:'0');
-    });
-    Object.keys(ws).forEach(addr=>{ if(addr[0]==='!') return; if(/[C-V]\d+/.test(addr)){ ws[addr].z='#,##0'; }});
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'ë³´ìˆ˜ë‚´ì—­');
-    XLSX.utils.book_append_sheet(wb, buildOvertimeSheet(data), 'ì´ˆê³¼ê·¼ë¬´ê³„ì‚°');
-    XLSX.writeFile(wb, safeFileName(`${currentMonth().replace('-','ë…„ ')}ì›” ê³µë¬´ì§ ë° ê¸°ê°„ì œ ì§ì› ë³´ìˆ˜ ì§€ê¸‰ë‚´ì—­.xlsx`));
-    toast('ì—‘ì…€ íŒŒì¼ì„ ì¶œë ¥í–ˆìŠµë‹ˆë‹¤. ë³´ìˆ˜ë‚´ì—­ì€ ì—…ë¡œë“œ ê¸°ì¤€ì–‘ì‹ A~V ì—´ìˆœì„œë¡œ ì €ìž¥í•˜ê³ , ì´ˆê³¼ê·¼ë¬´ê³„ì‚° íƒ­ë„ í•¨ê»˜ ì €ìž¥í–ˆìŠµë‹ˆë‹¤.');
-  }
-
-  $('payMonth').addEventListener('change',()=>setMonth(currentMonth())); ['officeName','memo','titleSuffix'].forEach(id=>$(id).addEventListener('input',()=>{saveSettings(); debounceSave(); render();}));
-  $('fileInput').addEventListener('change',async e=>{ const f=e.target.files[0]; if(!f) return; try{ const parsed=await parseWorkbook(f); if(parsed.workbook){ const rows=parseBosunaeyok(parsed.workbook); if(rows.length){ importedRows=rows; importHeaders=['ë³´ìˆ˜ë‚´ì—­ ì–‘ì‹']; toast(`ë³´ìˆ˜ë‚´ì—­ íŒŒì¼ ì½ê¸° ì™„ë£Œ: ${rows.length}ëª…`); } else { const ws=parsed.workbook.Sheets[parsed.workbook.SheetNames[0]]; importedRows=XLSX.utils.sheet_to_json(ws,{defval:''}); importHeaders=Object.keys(importedRows[0]||{}); refreshColumnSelect(); toast(`ì¼ë°˜ ëª…ë‹¨ íŒŒì¼ ì½ê¸° ì™„ë£Œ: ${importedRows.length}í–‰`); } } else { importedRows=parsed.rows; importHeaders=Object.keys(importedRows[0]||{}); refreshColumnSelect(); toast(`CSV ì½ê¸° ì™„ë£Œ: ${importedRows.length}í–‰`); } }catch(err){ toast(err.message||'íŒŒì¼ì„ ì½ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.'); } });
-  $('importBtn').onclick=importRows;
-  const masterRosterInput=$('masterRosterInput'); if(masterRosterInput) masterRosterInput.addEventListener('change',()=>importMasterRoster());
-  const applyMasterRosterBtn=$('applyMasterRosterBtn'); if(applyMasterRosterBtn) applyMasterRosterBtn.onclick=applyMasterRosterNow;
-  const masterRosterTemplateBtn=$('masterRosterTemplateBtn'); if(masterRosterTemplateBtn) masterRosterTemplateBtn.onclick=downloadMasterRosterTemplate;
-  const clearMasterRosterBtn=$('clearMasterRosterBtn'); if(clearMasterRosterBtn) clearMasterRosterBtn.onclick=clearMasterRoster;
-  const rosterLockMode=$('rosterLockMode'); if(rosterLockMode) rosterLockMode.addEventListener('change',()=>{ state.settings=state.settings||{}; state.settings.rosterLockMode=rosterLockMode.value; if(isMasterRosterLocked()) applyMasterRosterToData(monthData(),true); saveState(); render(); toast(isMasterRosterLocked()?'ê¸°ì¤€ëª…ë‹¨ ìˆœì„œÂ·ì •ë³´ ê³ ì •ì„ ì ìš©í–ˆìŠµë‹ˆë‹¤.':'ê¸°ì¤€ëª…ë‹¨ ê³ ì •ì„ í•´ì œí–ˆìŠµë‹ˆë‹¤.'); });
-  const legacyInsuranceInput=$('insuranceInput'); if(legacyInsuranceInput) legacyInsuranceInput.addEventListener('change',()=>importInsurance());
-  const pensionInput=$('pensionInsuranceInput'); if(pensionInput) pensionInput.addEventListener('change',()=>importInsurancePart('national','pensionInsuranceInput','pensionInsuranceState'));
-  const healthInput=$('healthInsuranceInput'); if(healthInput) healthInput.addEventListener('change',()=>importInsurancePart('health','healthInsuranceInput','healthInsuranceState'));
-  const employmentInput=$('employmentInsuranceInput'); if(employmentInput) employmentInput.addEventListener('change',()=>importInsurancePart('employment','employmentInsuranceInput','employmentInsuranceState'));
-  const industrialInput=$('industrialInsuranceInput'); if(industrialInput) industrialInput.addEventListener('change',()=>importInsurancePart('industrial','industrialInsuranceInput','industrialInsuranceState'));
-  $('copyPrevBtn').onclick=copyPrev; $('addRowBtn').onclick=addRow; $('sortBtn').onclick=sortRows; $('restoreOrderBtn').onclick=restoreOriginalRows; $('sampleTemplateBtn').onclick=downloadSampleTemplate; $('exportXlsxBtn').onclick=exportXlsx; $('exportInsuranceDetailBtn').onclick=exportSocialInsuranceXlsx; $('exportEmployerBurdenBtn').onclick=exportEmployerBurdenXlsx; $('syncOvertimeBtn').onclick=syncOvertimeRowsFromPayroll; $('applyOvertimeBtn').onclick=applyOvertimeToPayroll; $('addOvertimeRowBtn').onclick=addOvertimeRow; $('clearOvertimeBtn').onclick=clearOvertimeRows;
-  const showAllInsurancePreviewBtn=$('showAllInsurancePreviewBtn'); if(showAllInsurancePreviewBtn) showAllInsurancePreviewBtn.onclick=()=>setInsurancePreviewMode('all');
-  const showMatchedInsurancePreviewBtn=$('showMatchedInsurancePreviewBtn'); if(showMatchedInsurancePreviewBtn) showMatchedInsurancePreviewBtn.onclick=()=>setInsurancePreviewMode('matched');
-  const refreshInsurancePreviewBtn=$('refreshInsurancePreviewBtn'); if(refreshInsurancePreviewBtn) refreshInsurancePreviewBtn.onclick=()=>{ renderInsurancePreview(); toast('ì‚¬íšŒë³´í—˜ ë‚´ì—­ ë¯¸ë¦¬ë³´ê¸°ë¥¼ ê°±ì‹ í–ˆìŠµë‹ˆë‹¤.'); }; const refreshEmployerBurdenBtn=$('refreshEmployerBurdenBtn'); if(refreshEmployerBurdenBtn) refreshEmployerBurdenBtn.onclick=()=>{ renderEmployerBurdenPreview(); toast('ê¸°ê´€ë¶€ë‹´ê¸ˆ ë¯¸ë¦¬ë³´ê¸°ë¥¼ ê°±ì‹ í–ˆìŠµë‹ˆë‹¤.'); }; $('exportCsvBtn').onclick=exportCsv; $('backupBtn').onclick=backup; $('restoreInput').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) restore(f); e.target.value=''; }); $('clearMonthBtn').onclick=clearMonth;
-  if($('familyCount')){ $('familyCount').innerHTML=Array.from({length:11},(_,i)=>`<option value="${i+1}">${i+1}ëª…</option>`).join(''); }
-  $('applyTaxBtn').onclick=()=>applyTaxAll(true); $('validateTaxBtn').onclick=()=>validateTax(true);
-  $('familyCount').addEventListener('change',()=>{ saveSettings(); if(isAutoTax()) applyTaxAll(false); else { saveState(); validateTax(false); } render(); toast(`ê³µì œëŒ€ìƒ ê°€ì¡± ìˆ˜ ${selectedFamilyCount()}ëª… ê¸°ì¤€ìœ¼ë¡œ ì„¤ì •í–ˆìŠµë‹ˆë‹¤.`); });
-  $('autoTaxMode').addEventListener('change',()=>{ saveSettings(); if(isAutoTax()) applyTaxAll(false); else { saveState(); validateTax(false); } toast(isAutoTax()?'ì†Œë“ì„¸ ìžë™ ë°˜ì˜ ëª¨ë“œìž…ë‹ˆë‹¤.':'ì†Œë“ì„¸ ìˆ˜ê¸° ìœ ì§€ ëª¨ë“œìž…ë‹ˆë‹¤.'); });
-  const repairedAllowanceCells=repairLegacyAllowanceParseError();
-  if($('rosterLockMode')) $('rosterLockMode').value=state.settings?.rosterLockMode || 'off';
-  const initial=defaultMonth(); $('payMonth').value=initial; setMonth(initial); validateTax(false); renderInsurancePreview(); renderEmployerBurdenPreview();
-  if(repairedAllowanceCells) toast(`ì§ë¬´ìˆ˜ë‹¹/ì—°ê°€ë³´ìƒë¹„ì˜ ê¸°ì¡´ ì˜¤ì¸ì‹ ê°’ ${repairedAllowanceCells}ê±´ì„ ë³µêµ¬í–ˆìŠµë‹ˆë‹¤. ê¸°ì¤€ íŒŒì¼ì„ ë‹¤ì‹œ ì—…ë¡œë“œí•˜ë©´ ì •í™•ížˆ ìž¬ë°˜ì˜ë©ë‹ˆë‹¤.`);
-
-  const insuranceViewModeEl=$('insuranceViewMode');
-  if(insuranceViewModeEl){
-    insuranceViewModeEl.value=insurancePreviewMode();
-    insuranceViewModeEl.addEventListener('change',e=>{
-      const target=e.target.value==='matched'?'showMatchedInsurancePreviewBtn':'showAllInsurancePreviewBtn';
-      const btn=$(target); if(btn) btn.click();
-    });
-  }
-})();
-</script>
-</body>
-</html>
+    const mergeBlock=merges?`<mergeCells ë7ÒÚ$z{-®éÜj×BrÂ~ÙZž«8BrÂ~«{ÎºÎÉé»h¸»BrÆçVÆÂÂ~È*ÎÉx^Ê;Î»h¸»BrÆçVÆÂÂ~ÙZž«8BrÂ~«{ÎºÎÉé»h¸»BrÂ~È*ÎÉx^Ê;Î»h¸»BrÆçVÆÂÂ~ÙZž«8BrÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÅÒÀÐ¢¶çVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÂ~«N«	RrÂ~Éê^«‹É©NÉirÂ~«N«	RrÂ~Éê^«‹É©NÉirÆçVÆÂÂ~ÈºNÉx^«ˆžÉzÂrÂ~ÈºNÉx^«ˆžÉzÂrÂ~«:ÉªžÉXŽÊ	RrÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÅÐÐ¢Ó°Ð¢6öç7B7V×3Ô'&’ƒ#"’æf–ÆÂƒ“°Ð¢ÆWBVæÖF6†VD6÷VçCÓ°Ð¢&V6÷&G2æf÷$V6‚‚‡"Æ’“Óç°Ð¢6öç7Bås×FôçVÖ&W"‡"ææF–öæÅVç6–öâ“°Ð¢6öç7BäSÖ†4÷vâ‡"ÂuöæF–öæÄV×Æ÷–W"r’òFôçVÖ&W"‡"åöæF–öæÄV×Æ÷–W"’¢ås°Ð¢6öç7B…s×FôçVÖ&W"‡"æ†VÇF„–ç7W&æ6R“°Ð¢6öç7B5s×FôçVÖ&W"‡"æÆöæuFW&Ô6&R“°Ð¢6öç7B„SÖ†4÷vâ‡"Âuö†VÇF„V×Æ÷–W"r’òFôçVÖ&W"‡"åö†VÇF„V×Æ÷–W"’¢…s°Ð¢6öç7B4SÖ†4÷vâ‡"Âuö6&TV×Æ÷–W"r’òFôçVÖ&W"‡"åö6&TV×Æ÷–W"’¢5s°Ð¢6öç7BV×s×FôçVÖ&W"‡"æV×Æ÷–ÖVçD–ç7W&æ6R“°Ð¢6öç7BV×USÖ†4÷vâ‡"ÂuöV×Æ÷–ÖVçDV×Æ÷–W%VæV×Æ÷–ÖVçBr’òFôçVÖ&W"‡"åöV×Æ÷–ÖVçDV×Æ÷–W%VæV×Æ÷–ÖVçB’¢V×s°Ð¢6öç7BV×U3Ö†4÷vâ‡"ÂuöV×Æ÷–ÖVçDV×Æ÷–W%7F&–Æ—¦F–öâr’òFôçVÖ&W"‡"åöV×Æ÷–ÖVçDV×Æ÷–W%7F&–Æ—¦F–öâ’¢ÖF‚æÖ‚ƒÂFôçVÖ&W"‡"åöV×Æ÷–ÖVçDV×Æ÷–W"’ÖV×UR“°Ð¢6öç7B–æGW7G&–Ã×FôçVÖ&W"‡"åö–æGW7G&–Â“°Ð¢6öç7BVç6–öåF÷FÃÖår¶äS°Ð¢6öç7B†VÇF…F÷FÃÖ…r¶5r¶„R¶4S°Ð¢6öç7BV×Æ÷–ÖVçEF÷FÃÖV×r¶V×UR¶V×U3°Ð¢6öç7Bv÷&¶W%F÷FÃÖår¶…r¶5r¶V×s°Ð¢6öç7BV×Æ÷–W%F÷FÃÖäR¶„R¶4R¶V×UR¶V×U2¶–æGW7G&–Ã°Ð¢6öç7BÆÅF÷FÃ×v÷&¶W%F÷FÂ¶V×Æ÷–W%F÷FÃ°Ð¢6öç7BÖF6†VBÒ"å÷—&öÆÄÖF6†VBÓÒfÇ6S°Ð¢–b‚ÖF6†VB’VæÖF6†VD6÷VçB²³°Ð¢6öç7B–FVçF—G“Ö–ç7W&æ6T–FVçF—G”f–VÆG2‡"ÆFF“°Ð¢6öç7BÆ–æSÕ¶’³Ç"ææÖWÇÂrrÆårÆäRÇVç6–öåF÷FÂÆ…rÆ5rÆ„RÆ4RÆ†VÇF…F÷FÂÆV×rÆV×URÆV×U2ÆV×Æ÷–ÖVçEF÷FÂÆ–æGW7G&–ÂÇv÷&¶W%F÷FÂÆV×Æ÷–W%F÷FÂÆÆÅF÷FÂÆ–FVçF—G’æöff–6RÆ–FVçF—G’æ¦ö%G—RÆ–FVçF—G’æ6FVv÷'’Æ–FVçF—G’æ'VFvWE7V&¦V7EÓ°Ð¢öçW6‚†Æ–æR“°Ð¢f÷"†ÆWB3Ó#¶3ÃÓs¶2²²’7V×5¶5Ò³×FôçVÖ&W"†Æ–æU¶5Ò“°Ð¢Ò“°Ð¢6öç7BF÷FÄÆ–æSÔ'&’ƒ#"’æf–ÆÂ†çVÆÂ“°Ð¢F÷FÄÆ–æU³ÓÒ~ÙZž«8Bs°Ð¢f÷"†ÆWB3Ó#¶3ÃÓs¶2²²’F÷FÄÆ–æU¶5Ó×7V×5¶5Ó°Ð¢öçW6‚‡F÷FÄÆ–æR“°Ð¢6öç7Bw3Õ„Å5‚çWF–Ç2æö÷Fõ÷6†VWB†ö“°Ð¢w5²rÖW&vW2uÓÕ°Ð¢·3§·#£Æ3£'ÒÆS§·#£Æ3£G×ÒÂ·3§·#£Æ3£WÒÆS§·#£Æ3£—×ÒÂ·3§·#£Æ3£ÒÆS§·#£Æ3£7×ÒÀÐ¢·3§·#£Æ3£GÒÆS§·#£"Æ3£G×ÒÂ·3§·#£Æ3£WÒÆS§·#£"Æ3£W×ÒÂ·3§·#£Æ3£gÒÆS§·#£"Æ3£g×ÒÂ·3§·#£Æ3£wÒÆS§·#£"Æ3£w×ÒÀÐ¢·3§·#£Æ3£ÒÆS§·#£"Æ3£×ÒÂ·3§·#£Æ3£‡ÒÆS§·#£"Æ3£‡×ÒÂ·3§·#£Æ3£—ÒÆS§·#£"Æ3£—×ÒÂ·3§·#£Æ3£#ÒÆS§·#£"Æ3£#×ÒÂ·3§·#£Æ3£#ÒÆS§·#£"Æ3£#×ÒÀÐ¢·3§·#£Æ3£'ÒÆS§·#£"Æ3£'×ÒÂ·3§·#£Æ3£7ÒÆS§·#£"Æ3£7×ÒÂ·3§·#£Æ3£GÒÆS§·#£"Æ3£G×ÒÀÐ¢·3§·#£Æ3£—ÒÆS§·#£"Æ3£—×ÒÂ·3§·#£Æ3£7ÒÆS§·#£"Æ3£7×ÐÐ¢Ó°Ð¢w5²r6öÇ2uÓÕ··v6ƒ£WÒÇ·v6ƒ£'ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£7ÒÇ·v6ƒ£ÒÇ·v6ƒ£ÒÇ·v6ƒ£'ÒÇ·v6ƒ£gÒÇ·v6ƒ£GÒÇ·v6ƒ£GÒÇ·v6ƒ£#GÕÓ°Ð¢w5²r&÷w2uÓÔ'&’†öæÆVæwF‚’æf–ÆÂƒ’æÖ‚…òÆ’“Óâ“Ã3÷¶‡C£3Ó§¶‡C£#Ò“°Ð¢ö&¦V7Bæ¶W—2‡w2’æf÷$V6‚†FG#Óç²–b†FG%³ÓÓÓÒrr’&WGW&ã²–b‚õ´2Õ%ÕÆB²òçFW7B†FG"’—²w5¶FG%Òç£Òr2Â23s²ÒÒ“°Ð¢6öç7Bv#Õ„Å5‚çWF–Ç2æ&ööµöæWr‚“°Ð¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v"Âw2Â~È+ËiÂŽËIÒžÈKŽ»h¸+NÉzÒr“°Ð¢6öç7B7Vff—‚ÒÖöFRÓÓÒvÖF6†VBròuþÉ«ºjÎ»hÈIÂr¢rs°Ð¢„Å5‚çw&—FTf–ÆR‡v"Â6fTf–ÆTæÖR†G¶7W'&VçDÖöçF‚‚’ç&WÆ6R‚rÒrÂ~¸XBr—ÞÉ¹BÈ*ÎÙ¨Î»;NÙy‚¸+NÉzÒG·7Vff—‡Òç†Ç7†’“°Ð¢Fö7B†È*ÎÙ¨Î»;NÙy‚¸+NÉzÒ„Å5‚ØÈÎÉÛÎÉØBËiÎº
+^ÙhŽÈ«^¸¸Ž¸ºBâ¸ÈÈ8G·&V6÷&G2æÆVæwF‡Þº¨RG¶ÖöFRÓÓÒvÖF6†VBròròÉ«ºjÂ»hÈIÂr¢‡VæÖF6†VD6÷VçCöò»;NÈ‰Ž¸+NÉzÒºûŽºzNËšÒG·VæÖF6†VD6÷VçGÞº¨RØúÎÙZ†¢rr—Ö“°Ð¢ÐÐ¢gVæ7F–öâW‡÷'E†Ç7‚‚—°Ð¢–b†—4WFõF‚‚’’&V6Æ5F…&÷w2‚“°Ð¢6fU6WGF–æw2‚“²6fU7FFR‚“°Ð¢6öç7BFFÖÖöçF„FF‚“°Ð¢æ÷&ÖÆ—¦U—&öÆÄFF†FF“°Ð¢–b‚FFç&÷w2æÆVæwF‚—·Fö7B‚~ËiÎº
+^ÙZÉéº8Î«ÉxnÈ«^¸¸Ž¸ºBâr“·&WGW&ã·ÐÐ¢–b‚v–æF÷rå„Å5‚—²W‡÷'D77b‚“²&WGW&ã²ÐÐ Ð¢6öç7B&÷t6÷VçCÖFFç&÷w2æÆVæwFƒ°Ð¢6öç7BFFf—'7E&÷sÓ3°Ð¢6öç7BFFÆ7E&÷sÖFFf—'7E&÷r²&÷t6÷VçBÒ°Ð¢6öç7BF÷FÅ&÷sÖFFÆ7E&÷r²°Ð¢6öç7BW†6ÇVFU&÷s×F÷FÅ&÷r²°Ð¢6öç7Bæ÷FU&÷sÖW†6ÇVFU&÷r²°Ð Ð¢6öç7BöÕ°Ð¢²~»hÈIÂÞ»hNÉ[ÂrÂ~ÈKº¨RrÂ~)èÉ¹N»;NÈ‰…ÆâŽ«‹»;Ž«ˆ’’rÂ~)èÈ¹Î«NÉ›ŽÈ‰Ž¸»•ÆâŽÙËNÉÛÎÈ‰Ž¸»’ØúÎÙZ‚’rÂ~)è.È¹Þ¸ÈrÂ~)è>ÊxºËNÈ‰Ž¸»•ÆâŽ«Ê(RÈ‰Ž¸»’’rÂ~)èNÉ{«Æî»;NÈ8»˜BõÆîº¨^ÊŽÈ‰Ž¸»’rÂ~)è^«ˆžÉzÎËIÞÉZÆâŽ)è¾)è¾)è"¾)è2¾)èB’rÂ~«;^Ê	ÎÙZž«8BrÂ~)ènÈºNÈ‰ŽºžÉZrÂ~Ë
+Ž«	ÉZrÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÂ~Ù¨Î¸»N»;Ž»h»h¸»B»;NÙyŽÙZž«8BrÂ~«;ÎÈKŽ¸ÈÈ8«ˆžÉzÅÆâŽ)èRÞ)è"•ÆîÈhÎ«8BrÂ~)žÊx«ˆžËIÞ«ˆŽÉZÆâŽ)b¾)r¾)‚’uÒÀÐ¢¶çVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÂ~)~«{ÎºÎÈhÎ¹9ÞÈK‚rÂ~)ŽÊx»
+žÈhÎ¹9ÞÈK‚rÂ~«N«	^»;NÙyŽº8ÂrÂ~Éê^«‹É©NÉi»;NÙy‚rÂ~«ZÞºûÎÉ{«ˆ‚rÂ~«:Éªž»;NÙyŽº8ÂrÂ~«ZÎ¸+NÈ¹Þ¸»’È¹Þ»˜BrÂ~È8ÊÙ¨Î»˜BrÂ~ÙYžÉé«ˆ‚«;^Ê	ÂrÆçVÆÂÆçVÆÂÆçVÆÅÐÐ¢Ó°Ð Ð¢FFç&÷w2æf÷$V6‚‡#Óç°Ð¢öçW6‚…°Ð¢"æFWDf–VÆGÇÂrrÀÐ¢"ææÖWÇÂrrÀÐ¢FôçVÖ&W"‡"æ&6U’’ÀÐ¢FôçVÖ&W"‡"æ÷fW'F–ÖU’’ÀÐ¢FôçVÖ&W"‡"æÖVÄÆÆ÷væ6R’ÀÐ¢FôçVÖ&W"‡"æGWG”ÆÆ÷væ6R’ÀÐ¢FôçVÖ&W"‡"ææçVÄ†öÆ–F•’’ÀÐ¢çVÆÂÀÐ¢çVÆÂÀÐ¢çVÆÂÀÐ¢FôçVÖ&W"‡"æ–æ6öÖUF‚’ÀÐ¢FôçVÖ&W"‡"æÆö6Ä–æ6öÖUF‚’ÀÐ¢FôçVÖ&W"‡"æ†VÇF„–ç7W&æ6R’ÀÐ¢FôçVÖ&W"‡"æÆöæuFW&Ô6&R’ÀÐ¢FôçVÖ&W"‡"ææF–öæÅVç6–öâ’ÀÐ¢FôçVÖ&W"‡"æV×Æ÷–ÖVçD–ç7W&æ6R’ÀÐ¢FôçVÖ&W"‡"æ6fWFW&–’ÀÐ¢FôçVÖ&W"‡"æ×WGVÄ–B’ÀÐ¢FôçVÖ&W"‡"çGV—F–öäFVGV7F–öâ’ÀÐ¢FôçVÖ&W"‡"æV×Æ÷–W$–ç7W&æ6UF÷FÂ’ÀÐ¢çVÆÂÀÐ¢çVÆÀÐ¢Ò“°Ð¢Ò“°Ð Ð¢öçW6‚…²~ÙZ’«8BrÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÅÒ“°Ð¢öçW6‚…²~«‹»;Ž«+Þ»˜BÊ	ÎÉ›‚rÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÅÒ“°Ð¢öçW6‚…²r¢»˜N«;ÎÈK‚¸ÈÈ8¢)È¹Þ¸È#ºxÎÉ¹ÉÛNÙY‚ŽÈhÎ¹9ÞÈKŽ»)RÈ¹ÎÙhžº’Ê	Ã~Ê"’rÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÂÆçVÆÅÒ“°Ð Ð¢6öç7Bw3Õ„Å5‚çWF–Ç2æö÷Fõ÷6†VWB†ö“°Ð¢w5²rÖW&vW2uÓÕ°Ð¢·3§·#£Æ3£ÒÆS§·#£Æ3£×ÒÀÐ¢·3§·#£Æ3£ÒÆS§·#£Æ3£×ÒÀÐ¢·3§·#£Æ3£'ÒÆS§·#£Æ3£'×ÒÀÐ¢·3§·#£Æ3£7ÒÆS§·#£Æ3£7×ÒÀÐ¢·3§·#£Æ3£GÒÆS§·#£Æ3£G×ÒÀÐ¢·3§·#£Æ3£WÒÆS§·#£Æ3£W×ÒÀÐ¢·3§·#£Æ3£gÒÆS§·#£Æ3£g×ÒÀÐ¢·3§·#£Æ3£wÒÆS§·#£Æ3£w×ÒÀÐ¢·3§·#£Æ3£‡ÒÆS§·#£Æ3£‡×ÒÀÐ¢·3§·#£Æ3£—ÒÆS§·#£Æ3£—×ÒÀÐ¢·3§·#£Æ3£ÒÆS§·#£Æ3£‡×ÒÀÐ¢·3§·#£Æ3£—ÒÆS§·#£Æ3£—×ÒÀÐ¢·3§·#£Æ3£#ÒÆS§·#£Æ3£#×ÒÀÐ¢·3§·#£Æ3£#ÒÆS§·#£Æ3£#×ÐÐ¢Ó°Ð¢w5²r6öÇ2uÓÕ°Ð¢·v6ƒ£gÒÇ·v6ƒ£ÒÇ·v6ƒ£7ÒÇ·v6ƒ£WÒÇ·v6ƒ£ÒÇ·v6ƒ£GÒÇ·v6ƒ£gÒÇ·v6ƒ£wÒÇ·v6ƒ£'ÒÇ·v6ƒ£'ÒÇ·v6ƒ£'ÒÇ·v6ƒ£'ÒÇ·v6ƒ£'ÒÇ·v6ƒ£7ÒÇ·v6ƒ£ÒÇ·v6ƒ£'ÒÇ·v6ƒ£GÒÇ·v6ƒ£ÒÇ·v6ƒ£'ÒÇ·v6ƒ£wÒÇ·v6ƒ£WÒÇ·v6ƒ£WÐÐ¢Ó°Ð¢w5²r&÷w2uÓÔ'&’†æ÷FU&÷r’æf–ÆÂƒ’æÖ‚…òÆ’“Óâ†“ÓÓÓÇÆ“ÓÓÓ“÷¶‡C£CgÓ§¶‡C£#Ò“°Ð Ð¢gVæ7F–öâ6WDf÷&×VÆ†FG"Âb—²–b‚w5¶FG%Ò’w5¶FG%Ó×·C¢vâwÓ²w5¶FG%ÒæcÖc²w5¶FG%Òç£Òr2Â23s²ÐÐ¢f÷"†ÆWB#ÖFFf—'7E&÷s·#ÃÖFFÆ7E&÷s·"²²—°Ð¢òòl+t~¸©B«8NÈ+É{NÉÛBÉXN¸¸Ž¹ÛÂ«{ÎºÎÉé»8BÊxÊ	Éè^º
+^«	.Éè^¸¸Ž¸ºBàÐ¢6öç7B6÷W&6U&÷sÖFFç&÷w5·"ÖFFf—'7E&÷uÓ°Ð¢w5²tbr·%Ó×·C¢vârÇc§FôçVÖ&W"‡6÷W&6U&÷sòæGWG”ÆÆ÷væ6R’Ç£¢r2Â23wÓ°Ð¢w5²trr·%Ó×·C¢vârÇc§FôçVÖ&W"‡6÷W&6U&÷sòææçVÄ†öÆ–F•’’Ç£¢r2Â23wÓ°Ð¢6WDf÷&×VÆ‚t‚r·"Æ5TÒ„2G·'Ó¤rG·'Ò–“°Ð¢6WDf÷&×VÆ‚t’r·"Æ5TÒ„²G·'Ó¥2G·'Ò–“°Ð¢6WDf÷&×VÆ‚t¢r·"Æ‚G·'ÒÔ’G·'Ö“°Ð¢6WDf÷&×VÆ‚uRr·"Æ‚G·'ÒÔRG·'Ö“°Ð¢6WDf÷&×VÆ‚ubr·"Æ¢G·'Ò´²G·'Ò´ÂG·'Ö“°Ð¢ÐÐ¢6öç7B7VÔ6öÇ3Õ²t2rÂtBrÂtRrÂtbrÂtrrÂt‚rÂt’rÂt¢rÂt²rÂtÂrÂtÒrÂtârÂtòrÂurÂurÂu"rÂu2rÂuBrÂuRrÂubuÓ°Ð¢7VÔ6öÇ2æf÷$V6‚†6öÃÓç°Ð¢6WDf÷&×VÆ†G¶6öÇÒG·F÷FÅ&÷wÖÆ5TÒ‚G¶6öÇÒG¶FFf—'7E&÷wÓ¢G¶6öÇÒG¶FFÆ7E&÷wÒ–“°Ð¢6öç7B–æ6ÇVFVCÕµÓ°Ð¢FFç&÷w2æf÷$V6‚‚‡"Æ’“Óç²–b‚7G&–ær‡"æFWDf–VÆGÇÂrr’æ–æ6ÇVFW2‚~«‹»;Ž«+Þ»˜Br’’–æ6ÇVFVBçW6‚†G¶6öÇÒG¶FFf—'7E&÷r¶—Ö“²Ò“°Ð¢6WDf÷&×VÆ†G¶6öÇÒG¶W†6ÇVFU&÷wÖÆ–æ6ÇVFVBæÆVæwFƒö5TÒ‚G¶–æ6ÇVFVBæ¦ö–â‚rÂr—Ò–¢sr“°Ð¢Ò“°Ð¢ö&¦V7Bæ¶W—2‡w2’æf÷$V6‚†FG#Óç²–b†FG%³ÓÓÓÒrr’&WGW&ã²–b‚õ´2ÕeÕÆB²òçFW7B†FG"’—²w5¶FG%Òç£Òr2Â23s²×Ò“°Ð¢6öç7Bv#Õ„Å5‚çWF–Ç2æ&ööµöæWr‚“°Ð¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v"Âw2Â~»;NÈ‰Ž¸+NÉzÒr“°Ð¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v"Â'V–ÆD÷fW'F–ÖU6†VWB†FF’Â~ËHŽ«;Î«{ÎºËN«8NÈ+r“°Ð¢„Å5‚çw&—FTf–ÆR‡v"Â6fTf–ÆTæÖR†G¶7W'&VçDÖöçF‚‚’ç&WÆ6R‚rÒrÂ~¸XBr—ÞÉ¹B«;^ºËNÊx»ò«‹«NÊ	ÂÊxÉ¹»;NÈ‰‚Êx«ˆž¸+NÉzÒç†Ç7†’“°Ð¢Fö7B‚~ÉyÈXØÈÎÉÛÎÉØBËiÎº
+^ÙhŽÈ«^¸¸Ž¸ºBâ»;NÈ‰Ž¸+NÉzÞÉØÉx^ºÎ¹9Â«‹ÊHÉiÈ¹ÒåbÉ{NÈ‰ÎÈIÎºÂÊÉê^ÙYŽ«:ÂËHŽ«;Î«{ÎºËN«8NÈ+Ø:Þ¸øBÙZŽ«¹‚ÊÉê^ÙhŽÈ«^¸¸Ž¸ºBâr“°Ð¢ÐÐ Ð¢B‚w”ÖöçF‚r’æFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óç6WDÖöçF‚†7W'&VçDÖöçF‚‚’’“²²vöff–6TæÖRrÂvÖVÖòrÂwF—FÆU7Vff—‚uÒæf÷$V6‚†–CÓâB†–B’æFDWfVçDÆ—7FVæW"‚v–çWBrÂ‚“Óç·6fU6WGF–æw2‚“²FV&÷Væ6U6fR‚“²&VæFW"‚“·Ò’“°Ð¢B‚vf–ÆT–çWBr’æFDWfVçDÆ—7FVæW"‚v6†ævRrÆ7–æ2SÓç²6öç7BcÖRçF&vWBæf–ÆW5³Ó²–b‚b’&WGW&ã²G'—²6öç7B'6VCÖv—B'6Uv÷&¶&öö²†b“²–b‡'6VBçv÷&¶&öö²—²6öç7B&÷w3×'6T&÷7VæW–ö²‡'6VBçv÷&¶&öö²“²–b‡&÷w2æÆVæwF‚—²–×÷'FVE&÷w3×&÷w3²–×÷'D†VFW'3Õ²~»;NÈ‰Ž¸+NÉzÒÉiÈ¹ÒuÓ²Fö7B†»;NÈ‰Ž¸+NÉzÒØÈÎÉÛÂÉÛÞ«‹É˜Nº8Ã¢G·&÷w2æÆVæwF‡Þº¨V“²ÒVÇ6R²6öç7Bw3×'6VBçv÷&¶&öö²å6†VWG5·'6VBçv÷&¶&öö²å6†VWDæÖW5³ÕÓ²–×÷'FVE&÷w3Õ„Å5‚çWF–Ç2ç6†VWE÷Fõö§6öâ‡w2Ç¶FVgfÃ¢rwÒ“²–×÷'D†VFW'3Ôö&¦V7Bæ¶W—2†–×÷'FVE&÷w5³×ÇÇ·Ò“²&Vg&W6„6öÇVÖå6VÆV7B‚“²Fö7B†ÉÛÎ»	‚º¨^¸º‚ØÈÎÉÛÂÉÛÞ«‹É˜Nº8Ã¢G¶–×÷'FVE&÷w2æÆVæwF‡ÞÙh–“²ÒÒVÇ6R²–×÷'FVE&÷w3×'6VBç&÷w3²–×÷'D†VFW'3Ôö&¦V7Bæ¶W—2†–×÷'FVE&÷w5³×ÇÇ·Ò“²&Vg&W6„6öÇVÖå6VÆV7B‚“²Fö7B†55bÉÛÞ«‹É˜Nº8Ã¢G¶–×÷'FVE&÷w2æÆVæwF‡ÞÙh–“²ÒÖ6F6‚†W'"—²Fö7B†W'"æÖW76vWÇÂ~ØÈÎÉÛÎÉØBÉÛÞÊxº«¾ÙhŽÈ«^¸¸Ž¸ºBâr“²ÒÒ“°Ð¢B‚v–×÷'D'Fâr’æöæ6Æ–6³Ö–×÷'E&÷w3°Ð¢6öç7BÖ7FW%&÷7FW$–çWCÒB‚vÖ7FW%&÷7FW$–çWBr“²–b†Ö7FW%&÷7FW$–çWB’Ö7FW%&÷7FW$–çWBæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óæ–×÷'DÖ7FW%&÷7FW"‚’“°Ð¢6öç7BÇ”Ö7FW%&÷7FW$'FãÒB‚vÇ”Ö7FW%&÷7FW$'Fâr“²–b†Ç”Ö7FW%&÷7FW$'Fâ’Ç”Ö7FW%&÷7FW$'Fâæöæ6Æ–6³ÖÇ”Ö7FW%&÷7FW$æ÷s°Ð¢6öç7BÖ7FW%&÷7FW%FV×ÆFT'FãÒB‚vÖ7FW%&÷7FW%FV×ÆFT'Fâr“²–b†Ö7FW%&÷7FW%FV×ÆFT'Fâ’Ö7FW%&÷7FW%FV×ÆFT'Fâæöæ6Æ–6³ÖF÷væÆöDÖ7FW%&÷7FW%FV×ÆFS°Ð¢6öç7B6ÆV$Ö7FW%&÷7FW$'FãÒB‚v6ÆV$Ö7FW%&÷7FW$'Fâr“²–b†6ÆV$Ö7FW%&÷7FW$'Fâ’6ÆV$Ö7FW%&÷7FW$'Fâæöæ6Æ–6³Ö6ÆV$Ö7FW%&÷7FW#°Ð¢6öç7B&÷7FW$Æö6´ÖöFSÒB‚w&÷7FW$Æö6´ÖöFRr“²–b‡&÷7FW$Æö6´ÖöFR’&÷7FW$Æö6´ÖöFRæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óç²7FFRç6WGF–æw3×7FFRç6WGF–æw7ÇÇ·Ó²7FFRç6WGF–æw2ç&÷7FW$Æö6´ÖöFS×&÷7FW$Æö6´ÖöFRçfÇVS²–b†—4Ö7FW%&÷7FW$Æö6¶VB‚’’Ç”Ö7FW%&÷7FW%FôFF†ÖöçF„FF‚’ÇG'VR“²6fU7FFR‚“²&VæFW"‚“²Fö7B†—4Ö7FW%&÷7FW$Æö6¶VB‚“ò~«‹ÊHº¨^¸º‚È‰ÎÈIÌ+~Ê	^»;B«:Ê	^ÉØBÊÉªžÙhŽÈ«^¸¸Ž¸ºBâs¢~«‹ÊHº¨^¸º‚«:Ê	^ÉØBÙ[NÊ	ÎÙhŽÈ«^¸¸Ž¸ºBâr“²Ò“°Ð¢6öç7BÆVv7”–ç7W&æ6T–çWCÒB‚v–ç7W&æ6T–çWBr“²–b†ÆVv7”–ç7W&æ6T–çWB’ÆVv7”–ç7W&æ6T–çWBæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óæ–×÷'D–ç7W&æ6R‚’“°Ð¢6öç7BVç6–öä–çWCÒB‚wVç6–öä–ç7W&æ6T–çWBr“²–b‡Vç6–öä–çWB’Vç6–öä–çWBæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óæ–×÷'D–ç7W&æ6U'B‚væF–öæÂrÂwVç6–öä–ç7W&æ6T–çWBrÂwVç6–öä–ç7W&æ6U7FFRr’“°Ð¢6öç7B†VÇF„–çWCÒB‚v†VÇF„–ç7W&æ6T–çWBr“²–b††VÇF„–çWB’†VÇF„–çWBæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óæ–×÷'D–ç7W&æ6U'B‚v†VÇF‚rÂv†VÇF„–ç7W&æ6T–çWBrÂv†VÇF„–ç7W&æ6U7FFRr’“°Ð¢6öç7BV×Æ÷–ÖVçD–çWCÒB‚vV×Æ÷–ÖVçD–ç7W&æ6T–çWBr“²–b†V×Æ÷–ÖVçD–çWB’V×Æ÷–ÖVçD–çWBæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óæ–×÷'D–ç7W&æ6U'B‚vV×Æ÷–ÖVçBrÂvV×Æ÷–ÖVçD–ç7W&æ6T–çWBrÂvV×Æ÷–ÖVçD–ç7W&æ6U7FFRr’“°Ð¢6öç7B–æGW7G&–Ä–çWCÒB‚v–æGW7G&–Ä–ç7W&æ6T–çWBr“²–b†–æGW7G&–Ä–çWB’–æGW7G&–Ä–çWBæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óæ–×÷'D–ç7W&æ6U'B‚v–æGW7G&–ÂrÂv–æGW7G&–Ä–ç7W&æ6T–çWBrÂv–æGW7G&–Ä–ç7W&æ6U7FFRr’“°Ð¢B‚v6÷•&Wd'Fâr’æöæ6Æ–6³Ö6÷•&Wc²B‚vFE&÷t'Fâr’æöæ6Æ–6³ÖFE&÷s²B‚w6÷'D'Fâr’æöæ6Æ–6³×6÷'E&÷w3²B‚w&W7F÷&T÷&FW$'Fâr’æöæ6Æ–6³×&W7F÷&T÷&–v–æÅ&÷w3²B‚w6×ÆUFV×ÆFT'Fâr’æöæ6Æ–6³ÖF÷væÆöE6×ÆUFV×ÆFS²B‚vW‡÷'E†Ç7„'Fâr’æöæ6Æ–6³ÖW‡÷'E†Ç7ƒ²B‚vW‡÷'D–ç7W&æ6TFWF–Ä'Fâr’æöæ6Æ–6³ÖW‡÷'E6ö6–Ä–ç7W&æ6U†Ç7ƒ²B‚vW‡÷'DV×Æ÷–W$'W&FVä'Fâr’æöæ6Æ–6³ÖW‡÷'DV×Æ÷–W$'W&FVå†Ç7ƒ²B‚w7–æ4÷fW'F–ÖT'Fâr’æöæ6Æ–6³×7–æ4÷fW'F–ÖU&÷w4g&öÕ—&öÆÃ²B‚vÇ”÷fW'F–ÖT'Fâr’æöæ6Æ–6³ÖÇ”÷fW'F–ÖUFõ—&öÆÃ²B‚vFD÷fW'F–ÖU&÷t'Fâr’æöæ6Æ–6³ÖFD÷fW'F–ÖU&÷s²B‚v6ÆV$÷fW'F–ÖT'Fâr’æöæ6Æ–6³Ö6ÆV$÷fW'F–ÖU&÷w3°Ð¢6öç7B6†÷tÆÄ–ç7W&æ6U&Wf–Wt'FãÒB‚w6†÷tÆÄ–ç7W&æ6U&Wf–Wt'Fâr“²–b‡6†÷tÆÄ–ç7W&æ6U&Wf–Wt'Fâ’6†÷tÆÄ–ç7W&æ6U&Wf–Wt'Fâæöæ6Æ–6³Ò‚“Óç6WD–ç7W&æ6U&Wf–WtÖöFR‚vÆÂr“°Ð¢6öç7B6†÷tÖF6†VD–ç7W&æ6U&Wf–Wt'FãÒB‚w6†÷tÖF6†VD–ç7W&æ6U&Wf–Wt'Fâr“²–b‡6†÷tÖF6†VD–ç7W&æ6U&Wf–Wt'Fâ’6†÷tÖF6†VD–ç7W&æ6U&Wf–Wt'Fâæöæ6Æ–6³Ò‚“Óç6WD–ç7W&æ6U&Wf–WtÖöFR‚vÖF6†VBr“°Ð¢6öç7B&Vg&W6„–ç7W&æ6U&Wf–Wt'FãÒB‚w&Vg&W6„–ç7W&æ6U&Wf–Wt'Fâr“²–b‡&Vg&W6„–ç7W&æ6U&Wf–Wt'Fâ’&Vg&W6„–ç7W&æ6U&Wf–Wt'Fâæöæ6Æ–6³Ò‚“Óç²&VæFW$–ç7W&æ6U&Wf–Wr‚“²Fö7B‚~È*ÎÙ¨Î»;NÙy‚¸+NÉzÒºûŽºjÎ»;N«‹º[Â«ÈºÙhŽÈ«^¸¸Ž¸ºBâr“²Ó²6öç7B&Vg&W6„V×Æ÷–W$'W&FVä'FãÒB‚w&Vg&W6„V×Æ÷–W$'W&FVä'Fâr“²–b‡&Vg&W6„V×Æ÷–W$'W&FVä'Fâ’&Vg&W6„V×Æ÷–W$'W&FVä'Fâæöæ6Æ–6³Ò‚“Óç²&VæFW$V×Æ÷–W$'W&FVå&Wf–Wr‚“²Fö7B‚~«‹«H»h¸»N«ˆ‚ºûŽºjÎ»;N«‹º[Â«ÈºÙhŽÈ«^¸¸Ž¸ºBâr“²Ó²B‚vW‡÷'D77d'Fâr’æöæ6Æ–6³ÖW‡÷'D77c²B‚v&6·W'Fâr’æöæ6Æ–6³Ö&6·W²B‚w&W7F÷&T–çWBr’æFDWfVçDÆ—7FVæW"‚v6†ævRrÆSÓç²6öç7BcÖRçF&vWBæf–ÆW5³Ó²–b†b’&W7F÷&R†b“²RçF&vWBçfÇVSÒrs²Ò“²B‚v6ÆV$ÖöçF„'Fâr’æöæ6Æ–6³Ö6ÆV$ÖöçFƒ°Ð¢–b‚B‚vfÖ–Ç”6÷VçBr’—²B‚vfÖ–Ç”6÷VçBr’æ–ææW$…DÔÃÔ'&’æg&öÒ‡¶ÆVæwFƒ£ÒÂ…òÆ’“ÓæÆ÷F–öâfÇVSÒ"G¶’³Ò#âG¶’³Þº¨SÂö÷F–öãæ’æ¦ö–â‚rr“²ÐÐ¢B‚vÇ•F„'Fâr’æöæ6Æ–6³Ò‚“ÓæÇ•F„ÆÂ‡G'VR“²B‚wfÆ–FFUF„'Fâr’æöæ6Æ–6³Ò‚“ÓçfÆ–FFUF‚‡G'VR“°Ð¢B‚vfÖ–Ç”6÷VçBr’æFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óç²6fU6WGF–æw2‚“²–b†—4WFõF‚‚’’Ç•F„ÆÂ†fÇ6R“²VÇ6R²6fU7FFR‚“²fÆ–FFUF‚†fÇ6R“²Ò&VæFW"‚“²Fö7B†«;^Ê	Î¸ÈÈ8«ÊÈ‰‚G·6VÆV7FVDfÖ–Ç”6÷VçB‚—Þº¨R«‹ÊHÉËÎºÂÈJNÊ	^ÙhŽÈ«^¸¸Ž¸ºBæ“²Ò“°Ð¢B‚vWFõF„ÖöFRr’æFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚“Óç²6fU6WGF–æw2‚“²–b†—4WFõF‚‚’’Ç•F„ÆÂ†fÇ6R“²VÇ6R²6fU7FFR‚“²fÆ–FFUF‚†fÇ6R“²ÒFö7B†—4WFõF‚‚“ò~ÈhÎ¹9ÞÈK‚Éé¸ù’»	ŽÉˆºªŽ¹9ÎÉè^¸¸Ž¸ºBâs¢~ÈhÎ¹9ÞÈK‚È‰Ž«‹ÉÊÊxºªŽ¹9ÎÉè^¸¸Ž¸ºBâr“²Ò“°Ð¢6öç7B&W—&VDÆÆ÷væ6T6VÆÇ3×&W—$ÆVv7”ÆÆ÷væ6U'6TW'&÷"‚“°Ð¢–b‚B‚w&÷7FW$Æö6´ÖöFRr’’B‚w&÷7FW$Æö6´ÖöFRr’çfÇVS×7FFRç6WGF–æw3òç&÷7FW$Æö6´ÖöFRÇÂvöfbs°Ð¢6öç7B–æ—F–ÃÖFVfVÇDÖöçF‚‚“²B‚w”ÖöçF‚r’çfÇVSÖ–æ—F–Ã²6WDÖöçF‚†–æ—F–Â“²fÆ–FFUF‚†fÇ6R“²&VæFW$–ç7W&æ6U&Wf–Wr‚“²&VæFW$V×Æ÷–W$'W&FVå&Wf–Wr‚“°Ð¢–b‡&W—&VDÆÆ÷væ6T6VÆÇ2’Fö7B†ÊxºËNÈ‰Ž¸»’þÉ{«»;NÈ8»˜NÉÙ‚«‹ÊBÉŠNÉÛŽÈ¹Ò«	"G·&W—&VDÆÆ÷væ6T6VÆÇ7Þ«NÉØB»;^«ZÎÙhŽÈ«^¸¸Ž¸ºBâ«‹ÊHØÈÎÉÛÎÉØB¸ºNÈ¹ÂÉx^ºÎ¹9ÎÙYŽº›BÊ	^Ù™^Ùè‚ÉêÎ»	ŽÉˆ¹
+ž¸¸Ž¸ºBæ“°Ð Ð¢6öç7B–ç7W&æ6Uf–WtÖöFTVÃÒB‚v–ç7W&æ6Uf–WtÖöFRr“°Ð¢–b†–ç7W&æ6Uf–WtÖöFTVÂ—°Ð¢–ç7W&æ6Uf–WtÖöFTVÂçfÇVSÖ–ç7W&æ6U&Wf–WtÖöFR‚“°Ð¢–ç7W&æ6Uf–WtÖöFTVÂæFDWfVçDÆ—7FVæW"‚v6†ævRrÆSÓç°Ð¢6öç7BF&vWCÖRçF&vWBçfÇVSÓÓÒvÖF6†VBsòw6†÷tÖF6†VD–ç7W&æ6U&Wf–Wt'Fâs¢w6†÷tÆÄ–ç7W&æ6U&Wf–Wt'Fâs°Ð¢6öç7B'FãÒB‡F&vWB“²–b†'Fâ’'Fâæ6Æ–6²‚“°Ð¢Ò“°Ð¢ÐÐ§Ò’‚“°Ð£Â÷67&—CàÐ£Âö&öG“àÐ£Âö‡FÖÃàÐ
