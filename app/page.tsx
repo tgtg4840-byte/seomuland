@@ -138,6 +138,23 @@ export default function Home(){
     const start=new Date(month.getFullYear(),month.getMonth(),1), first=start.getDay(), last=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
     const cells:(Date|null)[]=Array(first).fill(null); for(let d=1;d<=last;d++) cells.push(new Date(month.getFullYear(),month.getMonth(),d)); while(cells.length%7)cells.push(null); return cells;
   },[month]);
+  const calendarEntries=useMemo(()=>{
+    const result:(Task|null)[][]=calendarDays.map(()=>Array<Task|null>(3).fill(null));
+    for(let weekStart=0;weekStart<calendarDays.length;weekStart+=7){
+      const lanes:(string|null)[]=Array(3).fill(null);
+      for(let offset=0;offset<7;offset++){
+        const index=weekStart+offset,date=calendarDays[index];
+        if(!date){lanes.fill(null);continue;}
+        const active=notebook.tasks.filter(task=>taskOccurs(task,date));
+        const byId=new Map(active.map(task=>[task.id,task]));
+        lanes.forEach((id,lane)=>{if(id&&!byId.has(id))lanes[lane]=null;});
+        const placed=new Set(lanes.filter((id):id is string=>Boolean(id)));
+        active.forEach(task=>{if(placed.has(task.id))return;const lane=lanes.indexOf(null);if(lane<0)return;lanes[lane]=task.id;placed.add(task.id);});
+        result[index]=lanes.map(id=>id?byId.get(id)||null:null);
+      }
+    }
+    return result;
+  },[calendarDays,notebook.tasks]);
   const monthHolidays=useMemo(()=>koreanHolidays(month.getFullYear()),[month]);
   const selectedHoliday=monthHolidays.get(selectedDate);
 
@@ -200,7 +217,7 @@ export default function Home(){
 
         <section className="notebook-section calendar-section" id="calendar">
           <div className="section-heading"><div><span className="section-kicker">CALENDAR</span><h2>업무 달력</h2></div><div className="calendar-controls"><button onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()-1,1))}>←</button><b>{month.getFullYear()}년 {month.getMonth()+1}월</b><button onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()+1,1))}>→</button></div></div>
-          <div className="calendar-layout"><div className="calendar-card"><div className="weekday-row">{["일","월","화","수","목","금","토"].map(x=><span key={x}>{x}</span>)}</div><div className="calendar-grid">{calendarDays.map((d,i)=>{if(!d)return <span className="calendar-day blank" key={`b${i}`}/>;const iso=localISO(d),holiday=monthHolidays.get(iso),entries=notebook.tasks.filter(t=>taskOccurs(t,d)).slice(0,3);return <div key={iso} className={`calendar-day ${iso===selectedDate?"selected":""} ${iso===localISO()?"today":""} ${holiday?"holiday":""}`}><button className="day-number" onClick={()=>setSelectedDate(iso)} title={holiday?.name}><b>{d.getDate()}</b>{holiday&&<small>{holiday.name}</small>}</button><div className="calendar-events">{entries.map(t=>{const start=t.startDate||t.deadline,end=t.deadline||t.startDate,continuesFromPrevious=t.mode==="temporary"&&Boolean(start&&start<iso),continuesToNext=t.mode==="temporary"&&Boolean(end&&end>iso),left=continuesFromPrevious&&i%7!==0,right=continuesToNext&&i%7!==6,showTitle=!continuesFromPrevious||i%7===0;return <button key={t.id} title={t.title} className={`calendar-event event-${t.status} ${left?"continues-left":""} ${right?"continues-right":""}`} onClick={()=>editTask(t)}><span>{showTitle?t.title:""}</span></button>})}</div></div>})}</div></div>
+          <div className="calendar-layout"><div className="calendar-card"><div className="weekday-row">{["일","월","화","수","목","금","토"].map(x=><span key={x}>{x}</span>)}</div><div className="calendar-grid">{calendarDays.map((d,i)=>{if(!d)return <span className="calendar-day blank" key={`b${i}`}/>;const iso=localISO(d),holiday=monthHolidays.get(iso),entries=calendarEntries[i];return <div key={iso} className={`calendar-day ${iso===selectedDate?"selected":""} ${iso===localISO()?"today":""} ${holiday?"holiday":""}`}><button className="day-number" onClick={()=>setSelectedDate(iso)} title={holiday?.name}><b>{d.getDate()}</b>{holiday&&<small>{holiday.name}</small>}</button><div className="calendar-events">{entries.map((t,lane)=>{if(!t)return <span key={`lane-${lane}`} className="calendar-event calendar-event-placeholder"/>;const start=t.startDate||t.deadline,end=t.deadline||t.startDate,continuesFromPrevious=t.mode==="temporary"&&Boolean(start&&start<iso),continuesToNext=t.mode==="temporary"&&Boolean(end&&end>iso),left=continuesFromPrevious&&i%7!==0,right=continuesToNext&&i%7!==6,showTitle=!continuesFromPrevious||i%7===0;return <button key={t.id} title={t.title} className={`calendar-event event-${t.status} ${left?"continues-left":""} ${right?"continues-right":""}`} onClick={()=>editTask(t)}><span>{showTitle?t.title:""}</span></button>})}</div></div>})}</div></div>
             <aside className="day-agenda"><span>{new Intl.DateTimeFormat("ko-KR",{month:"long",day:"numeric",weekday:"short"}).format(new Date(`${selectedDate}T00:00:00`))}</span>{selectedHoliday&&<p className={`agenda-holiday ${selectedHoliday.substitute?"is-substitute":""}`}><i>●</i>{selectedHoliday.name}</p>}<h3>{selectedTasks.length}개의 업무</h3><div>{selectedTasks.length?selectedTasks.map(t=><button key={t.id} onClick={()=>editTask(t)}><i className={`dot-${t.status}`}/><span><b>{t.title}</b><small>{t.field}</small></span></button>):<p>등록된 업무가 없습니다.</p>}</div><button className="agenda-add" onClick={()=>openNewTask(selectedDate)}>＋ 이 날짜에 업무 추가</button></aside>
           </div>
         </section>
