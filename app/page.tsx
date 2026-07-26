@@ -13,7 +13,7 @@ type RoutineKind = "daily" | "weekly" | "monthly";
 type Task = {
   id: string; field: string; title: string; type: string; mode: WorkMode;
   routineKind?: RoutineKind; routineValue?: string; startDate: string; deadline: string;
-  status: TaskStatus; memo: string; createdAt: string;
+  status: TaskStatus; memo: string; createdAt: string; completedAt?: string;
 };
 type NotebookData = { fields: string[]; customTypes: string[]; tasks: Task[] };
 type HolidayInfo = { name:string; substitute?:boolean };
@@ -77,6 +77,7 @@ const emptyTask = (): Omit<Task,"id"|"createdAt"> => ({ field:"", title:"", type
 function readJson<T>(key:string, fallback:T):T { try { const v=window.localStorage.getItem(key); return v ? JSON.parse(v) as T : fallback; } catch { return fallback; } }
 function localISO(date=new Date()){ const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,"0"),d=String(date.getDate()).padStart(2,"0"); return `${y}-${m}-${d}`; }
 function uid(){ return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`; }
+function keepTaskForToday(task:Task,today=localISO()){ return task.status!=="done"||!task.completedAt||localISO(new Date(task.completedAt))>=today; }
 function taskOccurs(task:Task,date:Date){
   const iso=localISO(date);
   if(task.mode==="temporary") { const start=task.startDate||task.deadline,end=task.deadline||task.startDate; return Boolean(start&&end&&start<=iso&&iso<=end); }
@@ -116,13 +117,16 @@ export default function Home(){
 
   useEffect(()=>{
     const data=readJson<NotebookData>(notebookKey,{fields:["서무","공무직급여","보안"],customTypes:[],tasks:[]});
-    setNotebook({...data,fields:Array.isArray(data.fields)?data.fields:[],customTypes:Array.isArray(data.customTypes)?data.customTypes:[],tasks:Array.isArray(data.tasks)?data.tasks.map(t=>({...t,startDate:t.startDate||t.deadline||""})):[]});
+    const loadedAt=new Date().toISOString();
+    const tasks=Array.isArray(data.tasks)?data.tasks.map(t=>({...t,startDate:t.startDate||t.deadline||"",completedAt:t.status==="done"?(t.completedAt||loadedAt):undefined})).filter(task=>keepTaskForToday(task)):[];
+    setNotebook({...data,fields:Array.isArray(data.fields)?data.fields:[],customTypes:Array.isArray(data.customTypes)?data.customTypes:[],tasks});
     setFavorites(readJson<string[]>(favoriteKey,[])); setRecents(readJson<string[]>(recentKey,[]));
     setToday(new Intl.DateTimeFormat("ko-KR",{year:"numeric",month:"long",day:"numeric",weekday:"long"}).format(new Date()));
     setReady(true);
   },[]);
   useEffect(()=>{ const sync=()=>{const top=document.getElementById("notebook-home")?.offsetTop??window.innerHeight;setNotebookVisible(window.scrollY>=top-180);};sync();window.addEventListener("scroll",sync,{passive:true});window.addEventListener("resize",sync);return()=>{window.removeEventListener("scroll",sync);window.removeEventListener("resize",sync);}; },[]);
   useEffect(()=>{ if(ready) window.localStorage.setItem(notebookKey,JSON.stringify(notebook)); },[notebook,ready]);
+  useEffect(()=>{ if(!ready)return; const cleanup=()=>setNotebook(n=>{const tasks=n.tasks.filter(task=>keepTaskForToday(task));return tasks.length===n.tasks.length?n:{...n,tasks};});cleanup();const timer=window.setInterval(cleanup,60000);return()=>window.clearInterval(timer); },[ready]);
   useEffect(()=>{ if(!toast)return; const t=window.setTimeout(()=>setToast(""),2400); return()=>window.clearTimeout(t); },[toast]);
   useEffect(()=>{ if(!activeTool)return; document.body.classList.add("workspace-open"); return()=>document.body.classList.remove("workspace-open"); },[activeTool]);
 
@@ -142,8 +146,8 @@ export default function Home(){
   const openTool=(tool:Tool)=>{ const next=[tool.id,...recents.filter(id=>id!==tool.id)].slice(0,6); setRecents(next); localStorage.setItem(recentKey,JSON.stringify(next)); if(tool.download){ const a=document.createElement("a");a.href=tool.href;a.download="SalaryRPA_Extension.zip";a.click();setToast("급여 RPA 다운로드를 시작했습니다."); }else setActiveTool(tool); setMenuOpen(false); };
   const openNewTask=(date="")=>{ setEditingId(null);setNewType("");setDraft({...emptyTask(),field:notebook.fields[0]||"",startDate:date,deadline:date});setTaskModal(true); };
   const editTask=(task:Task)=>{ const {id,createdAt,...rest}=task;void id;void createdAt;setEditingId(task.id);setNewType("");setDraft(rest);setTaskModal(true); };
-  const saveTask=(e:FormEvent)=>{ e.preventDefault(); if(!draft.title.trim()){setToast("업무 제목을 입력해 주세요.");return;} if(!draft.field){setToast("업무 필드를 먼저 설정해 주세요.");return;} if(draft.mode==="temporary"&&draft.startDate&&draft.deadline&&draft.startDate>draft.deadline){setToast("종료일은 시작일보다 빠를 수 없습니다.");return;} const normalizedDraft=draft.mode==="temporary"?{...draft,startDate:draft.startDate||draft.deadline,deadline:draft.deadline||draft.startDate}:draft; const type=(draft.type==="__custom"?newType:draft.type).trim(); if(draft.type==="__custom"&&!type){setToast("새 업무 유형을 입력해 주세요.");return;} const nextTypes=type&&!defaultTypes.includes(type)&&!notebook.customTypes.includes(type)?[...notebook.customTypes,type]:notebook.customTypes; setNotebook(n=>({...n,customTypes:nextTypes,tasks:editingId?n.tasks.map(t=>t.id===editingId?{...t,...normalizedDraft,title:draft.title.trim(),type}:t):[...n.tasks,{...normalizedDraft,title:draft.title.trim(),type,id:uid(),createdAt:new Date().toISOString()}]})); setTaskModal(false);setToast(editingId?"업무를 수정했습니다.":"업무를 추가했습니다."); };
-  const updateStatus=(id:string,status:TaskStatus)=>setNotebook(n=>({...n,tasks:n.tasks.map(t=>t.id===id?{...t,status}:t)}));
+  const saveTask=(e:FormEvent)=>{ e.preventDefault(); if(!draft.title.trim()){setToast("업무 제목을 입력해 주세요.");return;} if(!draft.field){setToast("업무 필드를 먼저 설정해 주세요.");return;} if(draft.mode==="temporary"&&draft.startDate&&draft.deadline&&draft.startDate>draft.deadline){setToast("종료일은 시작일보다 빠를 수 없습니다.");return;} const normalizedDraft=draft.mode==="temporary"?{...draft,startDate:draft.startDate||draft.deadline,deadline:draft.deadline||draft.startDate}:draft; const type=(draft.type==="__custom"?newType:draft.type).trim(); if(draft.type==="__custom"&&!type){setToast("새 업무 유형을 입력해 주세요.");return;} const nextTypes=type&&!defaultTypes.includes(type)&&!notebook.customTypes.includes(type)?[...notebook.customTypes,type]:notebook.customTypes; const finalizedDraft={...normalizedDraft,completedAt:normalizedDraft.status==="done"?(normalizedDraft.completedAt||new Date().toISOString()):undefined}; setNotebook(n=>({...n,customTypes:nextTypes,tasks:editingId?n.tasks.map(t=>t.id===editingId?{...t,...finalizedDraft,title:draft.title.trim(),type}:t):[...n.tasks,{...finalizedDraft,title:draft.title.trim(),type,id:uid(),createdAt:new Date().toISOString()}]})); setTaskModal(false);setToast(editingId?"업무를 수정했습니다.":"업무를 추가했습니다."); };
+  const updateStatus=(id:string,status:TaskStatus)=>setNotebook(n=>({...n,tasks:n.tasks.map(t=>t.id===id?{...t,status,completedAt:status==="done"?(t.completedAt||new Date().toISOString()):undefined}:t)}));
   const deleteTask=(id:string)=>{ if(!window.confirm("이 업무를 삭제할까요?"))return;setNotebook(n=>({...n,tasks:n.tasks.filter(t=>t.id!==id)}));setTaskModal(false);setToast("업무를 삭제했습니다."); };
   const addField=()=>{ const name=newField.trim();if(!name)return;if(notebook.fields.includes(name)){setToast("이미 있는 업무 필드입니다.");return;}setNotebook(n=>({...n,fields:[...n.fields,name]}));setNewField(""); };
   const removeField=(field:string)=>{ if(notebook.tasks.some(t=>t.field===field)){setToast("연결된 업무가 있어 필드를 삭제할 수 없습니다.");return;}setNotebook(n=>({...n,fields:n.fields.filter(f=>f!==field)})); };
