@@ -460,8 +460,3084 @@
 
     function sheet_to_csv(sheet) {
       const aoa = sheet && sheet.__aoa ? sheet.__aoa : [];
-      return aoa.map((row) => (row || []).map(csvEscape).join(",")).join("\nßn8îÚ$z{-®éÜj×G#ãÇFB6öÇ7ãÒ"G¶6öÇ7çÒ"6Æ73Ò&V×G’#îÙÎÈ¹ÎÙZ¸ÛÉÛNØK«ÉxnÈ«^¸¸¸ºBãÂ÷FCãÂ÷G#æ°¢ÒVÇ6R°¢G&ç67F–öä&öG’æ–ææW$…DÔÂÒ6÷'FVEG&ç67F–öå&÷w2ç6Æ–6RƒÂ#’æÖ‚‡&÷r’Óâ°¢6öç7BF—7Æ•&÷rÒvWDÖVÄF—7Æ•&÷r‡&÷r“°¢&WGW&âÇG#âG¶ÖVÄF—7Æ”†VFW'2æÖ‚††VFW"’ÓâÇFCâG¶W66T‡FÖÂ†F—7Æ•&÷u¶†VFW%Òóò""—ÓÂ÷FCæ’æ¦ö–â‚""—ÓÂ÷G#æ°¢Ò’æ¦ö–â‚""“°¢Ğ ¢6öç7B66†VGVÆT&öG’ÒB‚'66†VGVÆT&öG’"“°¢–b‚6÷'FVE66†VGVÆU&÷w2æÆVæwF‚’°¢66†VGVÆT&öG’æ–ææW$…DÔÂÒÇG#ãÇFB6öÇ7ãÒ#‚"6Æ73Ò&V×G’#î«{ÎºËNÈ¹Î«NÙÎº[ÂÉx^ºÎ¹9ÎÙY«¸)‚ÙhÉØBËiN«ÙYº›BÙÎÈ¹Î¹
-¸¸¸ºBãÂ÷FCãÂ÷G#æ°¢ÒVÇ6R°¢66†VGVÆT&öG’æ–ææW$…DÔÂÒ6÷'FVE66†VGVÆU&÷w2ç6Æ–6RƒÂ3’æÖ‚‡&÷r’Óâ ¢ÇG#à¢ÇFB6Æ73Ò'66†VGVÆRÖVF—BÖ6VÆÂ#ãÆ–çWB6Æ73Ò'66†VGVÆRÖ–çWBæÖR"fÇVSÒ"G¶W66T‡FÖÂ‡&÷rîÉÛNºhB—Ò"öæ6†ævSÒ'WFFU66†VGVÆT6VÆÂ‚rG·&÷rå÷66†VGVÆT–GÒrÂ~ÉÛNºhBrÂF†—2çfÇVR’"óãÂ÷FCà¢ÇFB6Æ73Ò'66†VGVÆRÖVF—BÖ6VÆÂ#ãÆ–çWB6Æ73Ò'66†VGVÆRÖ–çWB÷6—F–öâ"fÇVSÒ"G¶W66T‡FÖÂ‡&÷rîÊx«ˆ’—Ò"öæ6†ævSÒ'WFFU66†VGVÆT6VÆÂ‚rG·&÷rå÷66†VGVÆT–GÒrÂ~Êx«ˆ’rÂF†—2çfÇVR’"óãÂ÷FCà¢ÇFB6Æ73Ò'66†VGVÆRÖVF—BÖ6VÆÂ#ãÆ–çWB6Æ73Ò'66†VGVÆRÖ–çWBFFR"fÇVSÒ"G¶W66T‡FÖÂ†f÷&ÖDFFTf÷$÷WGWB†vWE66†VGVÆTFFR‡&÷r’ÇÂ&÷rîÉÛÎÉé’—Ò"öæ6†ævSÒ'WFFU66†VGVÆT6VÆÂ‚rG·&÷rå÷66†VGVÆT–GÒrÂ~ÉÛÎÉérÂF†—2çfÇVR’"óãÂ÷FCà¢ÇFB6Æ73Ò'66†VGVÆRÖVF—BÖ6VÆÂ#ãÆ–çWB6Æ73Ò'66†VGVÆRÖ–çWBvVV¶F’"fÇVSÒ"G¶W66T‡FÖÂ‡&÷rîÉ©NÉÛÂ—Ò"öæ6†ævSÒ'WFFU66†VGVÆT6VÆÂ‚rG·&÷rå÷66†VGVÆT–GÒrÂ~É©NÉÛÂrÂF†—2çfÇVR’"óãÂ÷FCà¢ÇFB6Æ73Ò'66†VGVÆRÖVF—BÖ6VÆÂ#ãÆ–çWB6Æ73Ò'66†VGVÆRÖ–çWBF–ÖR"fÇVSÒ"G¶W66T‡FÖÂ‡&÷rîËiÎ«{ÎÊxÊ	^È¹Î«B—Ò"öæ6†ævSÒ'WFFU66†VGVÆT6VÆÂ‚rG·&÷rå÷66†VGVÆT–GÒrÂ~ËiÎ«{ÎÊxÊ	^È¹Î«BrÂF†—2çfÇVR’"óãÂ÷FCà¢ÇFB6Æ73Ò'66†VGVÆRÖVF—BÖ6VÆÂ#ãÆ–çWB6Æ73Ò'66†VGVÆRÖ–çWBF–ÖR"fÇVSÒ"G¶W66T‡FÖÂ‡&÷rîØ{N«{ÎÊxÊ	^È¹Î«B—Ò"öæ6†ævSÒ'WFFU66†VGVÆT6VÆÂ‚rG·&÷rå÷66†VGVÆT–GÒrÂ~Ø{N«{ÎÊxÊ	^È¹Î«BrÂF†—2çfÇVR’"óãÂ÷FCà¢ÇFB6Æ73Ò'66†VGVÆRÖVF—BÖ6VÆÂ#ãÆ–çWB6Æ73Ò'66†VGVÆRÖ–çWBæ÷FRÖ6VÆÂ"fÇVSÒ"G¶W66T‡FÖÂ‡&÷rî»˜N«:ÇÂrr—Ò"öæ6†ævSÒ'WFFU66†VGVÆT6VÆÂ‚rG·&÷rå÷66†VGVÆT–GÒrÂ~»˜N«:rÂF†—2çfÇVR’"óãÂ÷FCà¢ÇFB6Æ73Ò&7F–öâÖ6VÆÂ#ãÆ'WGFöâ6Æ73Ò&Ö–æ’Ö'WGFöâFævW""G—SÒ&'WGFöâ"öæ6Æ–6³Ò&FVÆWFU66†VGVÆU&÷r‚rG·&÷rå÷66†VGVÆT–GÒr’#îÈ*ŞÊ	ÃÂö'WGFöããÂ÷FCà¢Â÷G#à¢’æ¦ö–â‚""“°¢Ğ ¢6öç7BGFVæFæ6T&öG’ÒB‚&GFVæFæ6T&öG’"“°¢–b‚6÷'FVDGFVæFæ6U&÷w2æÆVæwF‚’°¢GFVæFæ6T&öG’æ–ææW$…DÔÂÒÇG#ãÇFB6öÇ7ãÒ#r"6Æ73Ò&V×G’#îºzNÈ¹Ş»˜NÉ˜«{ÎºËNÈ¹Î«NÙÎ««+Ë™¸©BÙhÉÛBÙÎÈ¹Î¹
-¸¸¸ºBãÂ÷FCãÂ÷G#æ°¢ÒVÇ6R°¢GFVæFæ6T&öG’æ–ææW$…DÔÂÒ6÷'FVDGFVæFæ6U&÷w2ç6Æ–6RƒÂ3’æÖ‚‡&÷r’Óâ ¢ÇG#à¢ÇFCâG¶W66T‡FÖÂ‡&÷rîÉÛNºhB—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîÊx«ˆ’—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ†f÷&ÖDFFTf÷$÷WGWB‡&÷rîÉÛÎÉé’—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîÈ¹ŞÈ*Î«ZÎ»hB—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîÉ©NÉÛÂ—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîËiÎ«{ÎÊxÊ	^È¹Î«B—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîØ{N«{ÎÊxÊ	^È¹Î«B—ÓÂ÷FCà¢Â÷G#à¢’æ¦ö–â‚""“°¢Ğ ¢6öç7BÆVFvW$&öG’ÒB‚&ÆVFvW$&öG’"“°¢–b‚6÷'FVDÆVFvW%&÷w2æÆVæwF‚’°¢ÆVFvW$&öG’æ–ææW$…DÔÂÒÇG#ãÇFB6öÇ7ãÒ#""6Æ73Ò&V×G’#î«{ÎºËNÈ¹Î«NÙÎÉ˜ºzNÈ¹Ş»˜BØÈÎÉÛÎÉØBÉx^ºÎ¹9ÎÙYº›B«(ÊiÒ«+«;Î«ÙÎÈ¹Î¹
-¸¸¸ºBãÂ÷FCãÂ÷G#æ°¢ÒVÇ6R°¢ÆVFvW$&öG’æ–ææW$…DÔÂÒ6÷'FVDÆVFvW%&÷w2ç6Æ–6RƒÂ3’æÖ‚‡&÷r’Óâ ¢ÇG#à¢ÇFCâG¶W66T‡FÖÂ†f÷&ÖDFFTf÷$÷WGWB‡&÷rîÉÛÎÉé’—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîÈKº¨R—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rî«ZÎ»hB—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"‡&÷rîÉÛÉ¹È‰‚—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"‡&÷rîËIŞÈ*ÎÉª«ˆÉZ—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"‡&÷rî»»hN«ˆÉZ—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîÉ©NÉÛÂ—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîËiÎ«{ÎÊxÊ	^È¹Î«B—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rîØ{N«{ÎÊxÊ	^È¹Î«B—ÓÂ÷FCà¢ÇFCâG¶W66T‡FÖÂ‡&÷rî«{ÎºËNÈ¹Î«B—ÓÂ÷FCà¢ÇFB6Æ73Ò"G·&÷rîÊyÙh¸ÈÈ8ØÉÊ	RÓÓÒ.¸ÈÈ8"ò""¢'v&â'Ò#âG¶W66T‡FÖÂ‡&÷rîÊyÙh¸ÈÈ8ØÉÊ	R—ÓÂ÷FCà¢ÇFB6Æ73Ò"G·&÷rîÊyÙh¸ÈÈ8ØÉÊ	RÓÓÒ.¸ÈÈ8"ò""¢'v&â'Ò#âG¶W66T‡FÖÂ‡&÷rîØÉÊ	^È*ÎÉÊ—ÓÂ÷FCà¢Â÷G#à¢’æ¦ö–â‚""“°¢Ğ ¢6öç7B7VÖÖ'”&öG’ÒB‚'7VÖÖ'”&öG’"“°¢–b‚6÷'FVE7VÖÖ'•&÷w2æÆVæwF‚’°¢7VÖÖ'”&öG’æ–ææW$…DÔÂÒÇG#ãÇFB6öÇ7ãÒ#‚"6Æ73Ò&V×G’#îÊy«8NÙZ¸ÛÉÛNØK«ÉxnÈ«^¸¸¸ºBãÂ÷FCãÂ÷G#æ°¢ÒVÇ6R°¢7VÖÖ'”&öG’æ–ææW$…DÔÂÒ6÷'FVE7VÖÖ'•&÷w2æÖ‚‡&÷r’Óâ ¢ÇG#à¢ÇFCâG¶W66T‡FÖÂ‡&÷rîÈKº¨R—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"‡&÷rîËÉzÎ«NÈ‰‚—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"‡&÷rîÊÈ¹Ò—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"‡&÷rîÊIÈ¹Ò—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"‡&÷rîÈIŞÈ¹Ò—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"„ÖF‚ç&÷VæB‡&÷rî»»hN«ˆÉZÙZ«8B’—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡B#âG¶f÷&ÖDçVÖ&W"‡&÷rî¸ÈÈ8«NÈ‰‚—ÓÂ÷FCà¢ÇFB6Æ73Ò'&–v‡BG·&÷rî«(ØjÙXNÉ©N«NÈ‰‚ò'v&â"¢"'Ò#âG¶f÷&ÖDçVÖ&W"‡&÷rî«(ØjÙXNÉ©N«NÈ‰‚—ÓÂ÷FCà¢Â÷G#à¢’æ¦ö–â‚""“°¢Ğ ¢&–æE6÷'D†VFW'2‚“° ¢B‚&æ÷FR"’çFW‡D6öçFVçBĞ¢6÷'FVEG&ç67F–öå&÷w2æÆVæwF‚â#ÇÂ6÷'FVE66†VGVÆU&÷w2æÆVæwF‚â3ÇÂ6÷'FVDGFVæFæ6U&÷w2æÆVæwF‚â3ÇÂ6÷'FVDÆVFvW%&÷w2æÆVæwF‚â3 ¢ò.Ù™Nº›NÉy¸©BÉÛÎ»hÙhºxÂÙÎÈ¹ÎÙZ¸¸¸ºBâÊÉêRØÈÎÉÛÎÉy¸©BÙˆNÉêÂ«(È8’«+«;ÂÊNË+N«ØúÎÙZ¹
-¸¸¸ºBâ ¢¢"#°¢Ó° ¢6öç7BW66T‡FÖÂÒ‡fÇVR’Óâ°¢&WGW&â7G&–ær‡fÇVRóò""¢ç&WÆ6R‚òbörÂ"f×²"¢ç&WÆ6R‚óÂörÂ"fÇC²"¢ç&WÆ6R‚óâörÂ"fwC²"¢ç&WÆ6R‚ò"örÂ"gV÷C²"¢ç&WÆ6R‚òrörÂ"b33“²"“°¢Ó° ¢6öç7BFE66†VGVÆU&÷t'WGFöâÒB‚&FE66†VGVÆU&÷t'WGFöâ"“°¢–b†FE66†VGVÆU&÷t'WGFöâ’°¢FE66†VGVÆU&÷t'WGFöâæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâFE66†VGVÆU&÷r‚’“°¢Ğ ¢6öç7BFEVçfW&–f–VE66†VGVÆU&÷w4'WGFöâÒB‚&FEVçfW&–f–VE66†VGVÆU&÷w4'WGFöâ"“°¢–b†FEVçfW&–f–VE66†VGVÆU&÷w4'WGFöâ’°¢FEVçfW&–f–VE66†VGVÆU&÷w4'WGFöâæFDWfVçDÆ—7FVæW"‚&6Æ–6²"ÂFEVçfW&–f–VE66†VGVÆU&÷w2“°¢Ğ ¢B‚&f–ÆT–çWB"’æFDWfVçDÆ—7FVæW"‚&6†ævR"Â7–æ2†WfVçB’Óâ°¢6öç7B6VÆV7FVBÒ'&’æg&öÒ†WfVçBçF&vWBæf–ÆW2ÇÂµÒ“°¢–b‚6VÆV7FVBæÆVæwF‚’&WGW&ã° ¢G'’°¢B‚&ÖW76vR"’çFW‡D6öçFVçBÒ.ºzNÈ¹Ş»˜BØÈÎÉÛÎÉØBÉÛŞ¸©BÊIÉè^¸¸¸ºBâ#°¢6öç7B'6VBÒv—B&öÖ—6RæÆÂ‡6VÆV7FVBæÖ‡&VDÖVÄf–ÆR’“°¢6öç7BÖW&vVBÒ'6VBæfÆB‚“° ¢&÷w2Ò²ââç&÷w2ÂââæÖW&vVEÓ°¢&÷w2æf÷$V6‚‚‡&÷rÂ–æFW‚’Óâ°¢&÷rævVæW&FVE6W&–ÂÒ–æFW‚²°¢Ò“°¢f–ÆW2Ò²ââæf–ÆW2Âââç6VÆV7FVBæÖ‚†f–ÆR’Óâf–ÆRææÖR•Ó° ¢–b‚G&ç67F–öå6÷'Bæ¶W’bb÷WGWD†VFW'2æÆVæwF‚’°¢G&ç67F–öå6÷'BÒ²¶W“¢.ÉÛÎÉé"ÂF—&V7F–öã¢&62"Ó°¢Ğ ¢B‚&ÖW76vR"’çFW‡D6öçFVçBÒG·6VÆV7FVBæÆVæwF‡Ş«	ÂºzNÈ¹Ş»˜BØÈÎÉÛÎÉyÈIÂG¶ÖW&vVBæÆVæwF‚çFôÆö6ÆU7G&–ær‚—Ş«NÉØBËiN«ÙhÈ«^¸¸¸ºBæ°¢WfVçBçF&vWBçfÇVRÒ"#°¢&V6Æ2‚“°¢Ò6F6‚†W'&÷"’°¢6öç6öÆRæW'&÷"†W'&÷"“°¢B‚&ÖW76vR"’çFW‡D6öçFVçBÒ.ØÈÎÉÛÂË)ºjÎÉyÈºNØÊÙhÈ«^¸¸¸ºBâÉÛÎÉéòÈKº¨R«ZÎ»hB’òÉÛÉ¹È‰‚òÈ*ÎÉª«ˆÉZËºÎ¹ûÎÉØBÙ™^ÉÛÙYÈKÉ©Bâ#°¢Ğ¢Ò“° ¢B‚'66†VGVÆT–çWB"’æFDWfVçDÆ—7FVæW"‚&6†ævR"Â7–æ2†WfVçB’Óâ°¢6öç7B6VÆV7FVBÒ'&’æg&öÒ†WfVçBçF&vWBæf–ÆW2ÇÂµÒ“°¢–b‚6VÆV7FVBæÆVæwF‚’&WGW&ã° ¢G'’°¢B‚&ÖW76vR"’çFW‡D6öçFVçBÒ.«{ÎºËNÈ¹Î«NÙÎº[ÂÉÛŞ¸©BÊIÉè^¸¸¸ºBâ#°¢6öç7B'6VBÒv—B&öÖ—6RæÆÂ‡6VÆV7FVBæÖ‡&VE66†VGVÆTf–ÆR’“°¢6öç7BÖW&vVBÒ'6VBæfÆB‚“° ¢66†VGVÆU&÷w2Ò²ââç66†VGVÆU&÷w2ÂââæÖW&vVBæÖ†Vç7W&U66†VGVÆU&÷tÖWF•Ó°¢66†VGVÆTf–ÆW2Ò²ââç66†VGVÆTf–ÆW2Âââç6VÆV7FVBæÖ‚†f–ÆR’Óâf–ÆRææÖR•Ó° ¢B‚&ÖW76vR"’çFW‡D6öçFVçBÒG·6VÆV7FVBæÆVæwF‡Ş«	Â«{ÎºËNÈ¹Î«NÙÎÉyÈIÂG¶ÖW&vVBæÆVæwF‚çFôÆö6ÆU7G&–ær‚—Ş«NÉØBËiN«ÙhÈ«^¸¸¸ºBæ°¢WfVçBçF&vWBçfÇVRÒ"#°¢&V6Æ2‚“°¢Ò6F6‚†W'&÷"’°¢6öç6öÆRæW'&÷"†W'&÷"“°¢B‚&ÖW76vR"’çFW‡D6öçFVçBÒ.«{ÎºËNÈ¹Î«NÙÂË)ºjÎÉyÈºNØÊÙhÈ«^¸¸¸ºBâÉÛNºhBòÊx«ˆ’òÉÛÎÉéòÉ©NÉÛÂòËiÎ«{ÎÊxÊ	^È¹Î«BòØ{N«{ÎÊxÊ	^È¹Î«BËºÎ¹ûÎÉØBÙ™^ÉÛÙYÈKÉ©Bâ#°¢Ğ¢Ò“° ¢B‚'6V&6„–çWB"’æFDWfVçDÆ—7FVæW"‚&–çWB"Â&V6Æ2“°¢B‚&Æ–Ö—D–çWB"’æFDWfVçDÆ—7FVæW"‚&–çWB"Â&V6Æ2“°¢B‚'F‡&W6†öÆD–çWB"’æFDWfVçDÆ—7FVæW"‚&–çWB"Â&V6Æ2“°  ¢6öç7BF÷væÆöE6–ævÆU6†VWBÒ‡&÷w2Â6†VWDæÖRÂf–ÆTæÖR’Óâ°¢–b‚&÷w2ÇÂ&÷w2æÆVæwF‚’&WGW&ã°¢6öç7Bv÷&¶&öö²Ò„Å5‚çWF–Ç2æ&ööµöæWr‚“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²Â„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB‡&÷w2’Â6†VWDæÖR“°¢„Å5‚çw&—FTf–ÆR‡v÷&¶&öö²Âf–ÆTæÖR“°¢Ó° ¢6öç7B66†VGVÆU&÷w4f÷$W‡÷'BÒ†—FV×2’Óà¢—FV×2æÖ‚‡&÷r’Óâ‡°¢ÉÛNºhC¢&÷rîÉÛNºhBÀ¢Êx«ˆ“¢&÷rîÊx«ˆ’À¢ÉÛÎÉé¢f÷&ÖDFFTf÷$÷WGWB†vWE66†VGVÆTFFR‡&÷r’ÇÂ&÷rîÉÛÎÉé’À¢É©NÉÛÃ¢&÷rîÉ©NÉÛÂÀ¢ËiÎ«{ÎÊxÊ	^È¹Î«C¢&÷rîËiÎ«{ÎÊxÊ	^È¹Î«BÀ¢Ø{N«{ÎÊxÊ	^È¹Î«C¢&÷rîØ{N«{ÎÊxÊ	^È¹Î«@¢Ò’“° ¢6öç7BÆVFvW%&÷w4f÷$W‡÷'BÒ†—FV×2’Óà¢—FV×2æÖ‚‡&÷r’Óâ‡°¢ââç&÷rÀ¢ÉÛÎÉé¢f÷&ÖDFFTf÷$÷WGWB‡&÷rîÉÛÎÉé¢Ò’“° ¢6öç7BGFVæFæ6U&÷w4f÷$W‡÷'BÒ†—FV×2’Óà¢—FV×2æÖ‚‡&÷r’Óâ‡°¢ÉÛNºhC¢&÷rîÉÛNºhBÀ¢Êx«ˆ“¢&÷rîÊx«ˆ’À¢ÉÛÎÉé¢f÷&ÖDFFTf÷$÷WGWB‡&÷rîÉÛÎÉé’À¢È¹ŞÈ*Î«ZÎ»hC¢&÷rîÈ¹ŞÈ*Î«ZÎ»hBÀ¢É©NÉÛÃ¢&÷rîÉ©NÉÛÂÀ¢ËiÎ«{ÎÊxÊ	^È¹Î«C¢&÷rîËiÎ«{ÎÊxÊ	^È¹Î«BÀ¢Ø{N«{ÎÊxÊ	^È¹Î«C¢&÷rîØ{N«{ÎÊxÊ	^È¹Î«@¢Ò’“° ¢B‚&F÷væÆöE†Ç7‚"’æFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’Óâ°¢–b‚6÷'FVEG&ç67F–öå&÷w2æÆVæwF‚’&WGW&ã° ¢6öç7Bv÷&¶&öö²Ò„Å5‚çWF–Ç2æ&ööµöæWr‚“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²Â„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB†÷&–v–æÅ&÷w4f÷$W‡÷'B‡6÷'FVEG&ç67F–öå&÷w2’’Â.Øk^ÙZºªºÒ"“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²Â„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB‡66†VGVÆU&÷w4f÷$W‡÷'B‡6÷'FVE66†VGVÆU&÷w2’’Â.«{ÎºËNÈ¹Î«NÙÎÊ	^ºjÂ"“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²Â„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB†GFVæFæ6U&÷w4f÷$W‡÷'B‡6÷'FVDGFVæFæ6U&÷w2’’Â.È*ÎÉªÉéËiÎØ{N«{ÎÙ™^ÉÛ‚"“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²Â„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB†ÆVFvW%&÷w4f÷$W‡÷'B‡6÷'FVDÆVFvW%&÷w2’’Â.ÊyÙh¸ÈÈ8«(ÊiÒ"“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²Â„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB‡6÷'FVE7VÖÖ'•&÷w2’Â.«	ÎÉÛ»8NÙZ«8B"“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²Â„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB‡&Wf–Wu&÷w4f÷$W‡÷'B‡&Wf–Wu&÷w2’’Â.«(ØjÙXNÉ©B"“°¢„Å5‚çw&—FTf–ÆR‡v÷&¶&öö²Â.Øk^ÉÛÎ»hşØ««{ÎºzNÈ¹Ş»˜EşÊ	^È+«+«;Âç†Ç7‚"“°¢Ò“° ¢B‚&F÷væÆöD77b"’æFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’Óâ°¢–b‚6÷'FVEG&ç67F–öå&÷w2æÆVæwF‚’&WGW&ã° ¢6öç7Bv÷&·6†VWBÒ„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB†÷&–v–æÅ&÷w4f÷$W‡÷'B‡6÷'FVEG&ç67F–öå&÷w2’“°¢6öç7B77bÒ„Å5‚çWF–Ç2ç6†VWE÷Fõö77b‡v÷&·6†VWB“°¢6öç7B&Æö"ÒæWr&Æö"…²%ÇVfVfb"²77eÒÂ²G—S¢'FW‡Bö77c¶6†'6WC×WFbÓ‚"Ò“°¢6öç7BW&ÂÒU$Âæ7&VFTö&¦V7EU$Â†&Æö"“°¢6öç7BÒFö7VÖVçBæ7&VFTVÆVÖVçB‚&"“°¢æ‡&VbÒW&Ã°¢æF÷væÆöBÒ.Øk^ÉÛÎ»hşØ««{ÎºzNÈ¹Ş»˜EşØk^ÙZºªºÒæ77b#°¢æ6Æ–6²‚“°¢U$Âç&Wfö¶Tö&¦V7EU$Â‡W&Â“°¢Ò“° ¢B‚&F÷væÆöEFV×ÆFR"’æFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’Óâ°¢6öç7BÖVÅ6†VWBÒ„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB…°¢²ÉÛÎÉé¢###bÓBÓ"Â.ÈKº¨R«ZÎ»hB’#¢.Ù˜Ş«‹¸ù’"ÂÉÛÉ¹È‰ƒ¢ÂÈ*ÎÉª«ˆÉZ¢“ÂÉ{»(ƒ¢ÒÀ¢²ÉÛÎÉé¢###bÓBÓR"Â.ÈKº¨R«ZÎ»hB’#¢.Ù˜Ş«‹¸ù’Â«˜Ë*È‰‚ÈIŞÈ¹Ò’"ÂÉÛÉ¹È‰ƒ¢"ÂÈ*ÎÉª«ˆÉZ¢ƒÂÉ{»(ƒ¢"Ğ¢Ò“° ¢6öç7B66†VGVÆU6†VWBÒ„Å5‚çWF–Ç2æ§6öå÷Fõ÷6†VWB…°¢²ÉÛNºhC¢.Ù˜Ş«‹¸ù’"ÂÊx«ˆ“¢.Ê;ÎºËN«H"ÂÉÛÎÉé¢###bÓBÓ"ÂÉ©NÉÛÃ¢.È‰‚"ÂËiÎ«{ÎÊxÊ	^È¹Î«C¢#“£"ÂØ{N«{ÎÊxÊ	^È¹Î«C¢##£"ÒÀ¢²ÉÛNºhC¢.Ù˜Ş«‹¸ù’"ÂÊx«ˆ“¢.Ê;ÎºËN«H"ÂÉÛÎÉé¢###bÓBÓR"ÂÉ©NÉÛÃ¢.ÉÛÂ"ÂËiÎ«{ÎÊxÊ	^È¹Î«C¢#£"ÂØ{N«{ÎÊxÊ	^È¹Î«C¢#3£"ÒÀ¢²ÉÛNºhC¢.«˜Ë*È‰‚"ÂÊx«ˆ“¢.Ê;ÎºËN«H"ÂÉÛÎÉé¢###bÓBÓR"ÂÉ©NÉÛÃ¢.ÉÛÂ"ÂËiÎ«{ÎÊxÊ	^È¹Î«C¢#£"ÂØ{N«{ÎÊxÊ	^È¹Î«C¢#3£"Ğ¢Ò“° ¢6öç7Bv÷&¶&öö²Ò„Å5‚çWF–Ç2æ&ööµöæWr‚“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²ÂÖVÅ6†VWBÂ.ºzNÈ¹Ş»˜NÊ	ÎËiÎÉiÈ¹Ò"“°¢„Å5‚çWF–Ç2æ&ööµöVæE÷6†VWB‡v÷&¶&öö²Â66†VGVÆU6†VWBÂ.«{ÎºËNÈ¹Î«NÙÎÉiÈ¹Ò"“°¢„Å5‚çw&—FTf–ÆR‡v÷&¶&öö²Â.Øk^ÉÛÎ»hşØ««{ÎºzNÈ¹Ş»˜EşÉiÈ¹Òç†Ç7‚"“°¢Ò“°  ¢6öç7B&–æD÷F–öæÄ6Æ–6²Ò†–BÂ†æFÆW"’Óâ°¢6öç7BVÆVÖVçBÒB†–B“°¢–b†VÆVÖVçB’VÆVÖVçBæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â†æFÆW"“°¢Ó° ¢&–æD÷F–öæÄ6Æ–6²‚&W‡÷'EG&ç67F–öç4'WGFöâ"Â‚’Óâ°¢F÷væÆöE6–ævÆU6†VWB†÷&–v–æÅ&÷w4f÷$W‡÷'B‡6÷'FVEG&ç67F–öå&÷w2’Â.Øk^ÙZºªºÒ"Â.Øk^ÉÛÎ»hşØ««{ÎºzNÈ¹Ş»˜EşØk^ÙZºªºÒç†Ç7‚"“°¢Ò“° ¢&–æD÷F–öæÄ6Æ–6²‚&W‡÷'E66†VGVÆT'WGFöâ"Â‚’Óâ°¢F÷væÆöE6–ævÆU6†VWB‡66†VGVÆU&÷w4f÷$W‡÷'B‡6÷'FVE66†VGVÆU&÷w2’Â.«{ÎºËNÈ¹Î«NÙÎÊ	^ºjÂ"Â.Øk^ÉÛÎ»hşØ««{ÎºzNÈ¹Ş»˜Eş«{ÎºËNÈ¹Î«NÙÎÊ	^ºjÂç†Ç7‚"“°¢Ò“° ¢&–æD÷F–öæÄ6Æ–6²‚&W‡÷'DGFVæFæ6T'WGFöâ"Â‚’Óâ°¢F÷væÆöE6–ævÆU6†VWB†GFVæFæ6U&÷w4f÷$W‡÷'B‡6÷'FVDGFVæFæ6U&÷w2’Â.È*ÎÉªÉéËiÎØ{N«{ÎÙ™^ÉÛ‚"Â.Øk^ÉÛÎ»hşØ««{ÎºzNÈ¹Ş»˜EşÈ*ÎÉªÉéËiÎØ{N«{ÎÙ™^ÉÛ‚ç†Ç7‚"“°¢Ò“° ¢&–æD÷F–öæÄ6Æ–6²‚&W‡÷'DÆVFvW$'WGFöâ"Â‚’Óâ°¢F÷væÆöE6–ævÆU6†VWB†ÆVFvW%&÷w4f÷$W‡÷'B‡6÷'FVDÆVFvW%&÷w2’Â.ÊyÙh¸ÈÈ8«(ÊiÒ"Â.Øk^ÉÛÎ»hşØ««{ÎºzNÈ¹Ş»˜EşÊyÙh¸ÈÈ8«(ÊiÒç†Ç7‚"“°¢Ò“° ¢&–æD÷F–öæÄ6Æ–6²‚&W‡÷'E7VÖÖ'”'WGFöâ"Â‚’Óâ°¢F÷væÆöE6–ævÆU6†VWB‡6÷'FVE7VÖÖ'•&÷w2Â.«	ÎÉÛ»8NÙZ«8B"Â.Øk^ÉÛÎ»hşØ««{ÎºzNÈ¹Ş»˜Eş«	ÎÉÛ»8NÙZ«8Bç†Ç7‚"“°¢Ò“° ¢B‚'&W6WD'WGFöâ"’æFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’Óâ°¢&÷w2ÒµÓ°¢f–ÆW2ÒµÓ°¢66†VGVÆU&÷w2ÒµÓ°¢66†VGVÆU&÷u6WÒ°¢66†VGVÆTf–ÆW2ÒµÓ°¢66†VGVÆT'”FFTæÖRÒæWrÖ‚“°¢66†VGVÆT'”æÖRÒæWrÖ‚“° ¢÷WGWD†VFW'2ÒµÓ°¢f–ÇFW&VE&÷w2ÒµÓ°¢6÷'FVEG&ç67F–öå&÷w2ÒµÓ°¢ÆVFvW%&÷w2ÒµÓ°¢6÷'FVDÆVFvW%&÷w2ÒµÓ°¢GFVæFæ6U&÷w2ÒµÓ°¢6÷'FVDGFVæFæ6U&÷w2ÒµÓ°¢6÷'FVE66†VGVÆU&÷w2ÒµÓ°¢7VÖÖ'•&÷w2ÒµÓ°¢6÷'FVE7VÖÖ'•&÷w2ÒµÓ°¢&Wf–Wu&÷w2ÒµÓ° ¢G&ç67F–öå6÷'BÒ²¶W“¢çVÆÂÂF—&V7F–öã¢&62"Ó°¢66†VGVÆU6÷'BÒ²¶W“¢.ÉÛÎÉé"ÂF—&V7F–öã¢&62"Ó°¢GFVæFæ6U6÷'BÒ²¶W“¢.ÉÛÎÉé"ÂF—&V7F–öã¢&62"Ó°¢ÆVFvW%6÷'BÒ²¶W“¢.ÉÛÎÉé"ÂF—&V7F–öã¢&62"Ó°¢7VÖÖ'•6÷'BÒ²¶W“¢.ÈKº¨R"ÂF—&V7F–öã¢&62"Ó°¢7F—fUF"Ò'G&ç67F–öç2#° ¢B‚'6V&6„–çWB"’çfÇVRÒ"#°¢B‚&ÖVÄ†VFW%&÷t–çWB"’çfÇVRÒ"#°¢B‚'66†VGVÆT†VFW%&÷t–çWB"’çfÇVRÒ"#°¢B‚&Æ–Ö—D–çWB"’çfÇVRÒ#“#°¢B‚'F‡&W6†öÆD–çWB"’çfÇVRÒ#c#°¢B‚&ÖW76vR"’çFW‡D6öçFVçBÒ.ËH«‹Ù™NÙhÈ«^¸¸¸ºBâ#°¢&VæFW"‚“°¢Ò“° ¢&VæFW"‚“°¢Â÷67&—Cà¢Æfö÷FW"6Æ73Ò&fö÷FW"#ì*’Øk^ÉÛÎ»h¸*»hÙ¨Î¸»N»;»hÙ¨Î¸»NÊxÉ¹«;ÂÙšÊxNÉ«Ê;ÎºËN«HÊ	ÎÉéÂöfö÷FW#à£Âö&öG“à£Âö‡FÖÃà
+      return aoa.map((row) => (row || []).map(csvEscape).join(",")).join("\n");
+    }
+
+    function book_new() {
+      return { SheetNames: [], Sheets: {} };
+    }
+
+    function safeSheetName(name, existing) {
+      let s = String(name || "Sheet").replace(/[\\/?*\[\]:]/g, " ").trim() || "Sheet";
+      s = s.slice(0, 31);
+      let base = s;
+      let i = 2;
+      while (existing.includes(s)) {
+        const suffix = `_${i++}`;
+        s = base.slice(0, 31 - suffix.length) + suffix;
+      }
+      return s;
+    }
+
+    function book_append_sheet(workbook, sheet, name) {
+      const safeName = safeSheetName(name, workbook.SheetNames);
+      workbook.SheetNames.push(safeName);
+      workbook.Sheets[safeName] = sheet;
+    }
+
+    function sheetXml(sheet) {
+      const aoa = sheet && sheet.__aoa ? sheet.__aoa : [];
+      const rows = aoa.map((row, r) => {
+        const cells = (row || []).map((value, c) => {
+          if (value === undefined || value === null || value === "") return "";
+          const ref = encodeCellRef(r, c);
+          if (typeof value === "number" && Number.isFinite(value)) {
+            return `<c r="${ref}"><v>${value}</v></c>`;
+          }
+          const text = value instanceof Date ? value.toISOString().slice(0, 10) : String(value);
+          return `<c r="${ref}" t="inlineStr"><is><t>${xmlEscape(text)}</t></is></c>`;
+        }).join("");
+        return `<row r="${r + 1}">${cells}</row>`;
+      }).join("");
+
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">` +
+        `<sheetData>${rows}</sheetData></worksheet>`;
+    }
+
+    function buildXlsxFiles(workbook) {
+      const files = {};
+      const sheetNames = workbook.SheetNames || [];
+
+      files["[Content_Types].xml"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">` +
+        `<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>` +
+        `<Default Extension="xml" ContentType="application/xml"/>` +
+        `<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>` +
+        sheetNames.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("") +
+        `<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>` +
+        `</Types>`;
+
+      files["_rels/.rels"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">` +
+        `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>` +
+        `</Relationships>`;
+
+      files["xl/workbook.xml"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">` +
+        `<sheets>` +
+        sheetNames.map((name, i) => `<sheet name="${attrEscape(name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("") +
+        `</sheets></workbook>`;
+
+      files["xl/_rels/workbook.xml.rels"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">` +
+        sheetNames.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("") +
+        `</Relationships>`;
+
+      files["xl/styles.xml"] =
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">` +
+        `<fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>` +
+        `<fills count="1"><fill><patternFill patternType="none"/></fill></fills>` +
+        `<borders count="1"><border/></borders>` +
+        `<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>` +
+        `<cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>` +
+        `</styleSheet>`;
+
+      sheetNames.forEach((name, i) => {
+        files[`xl/worksheets/sheet${i + 1}.xml`] = sheetXml(workbook.Sheets[name]);
+      });
+
+      return files;
+    }
+
+    function makeZip(files) {
+      const chunks = [];
+      const central = [];
+      let offset = 0;
+      const entries = Object.keys(files);
+
+      entries.forEach((name) => {
+        const nameBytes = enc.encode(name);
+        const data = u8(files[name]);
+        const crc = crc32(data);
+        const local = new Uint8Array(30 + nameBytes.length);
+
+        writeU32LE(local, 0, 0x04034b50);
+        writeU16LE(local, 4, 20);
+        writeU16LE(local, 6, 0);
+        writeU16LE(local, 8, 0);
+        writeU16LE(local, 10, 0);
+        writeU16LE(local, 12, 0);
+        writeU32LE(local, 14, crc);
+        writeU32LE(local, 18, data.length);
+        writeU32LE(local, 22, data.length);
+        writeU16LE(local, 26, nameBytes.length);
+        writeU16LE(local, 28, 0);
+        local.set(nameBytes, 30);
+
+        chunks.push(local, data);
+
+        const cen = new Uint8Array(46 + nameBytes.length);
+        writeU32LE(cen, 0, 0x02014b50);
+        writeU16LE(cen, 4, 20);
+        writeU16LE(cen, 6, 20);
+        writeU16LE(cen, 8, 0);
+        writeU16LE(cen, 10, 0);
+        writeU16LE(cen, 12, 0);
+        writeU16LE(cen, 14, 0);
+        writeU32LE(cen, 16, crc);
+        writeU32LE(cen, 20, data.length);
+        writeU32LE(cen, 24, data.length);
+        writeU16LE(cen, 28, nameBytes.length);
+        writeU16LE(cen, 30, 0);
+        writeU16LE(cen, 32, 0);
+        writeU16LE(cen, 34, 0);
+        writeU16LE(cen, 36, 0);
+        writeU32LE(cen, 38, 0);
+        writeU32LE(cen, 42, offset);
+        cen.set(nameBytes, 46);
+        central.push(cen);
+
+        offset += local.length + data.length;
+      });
+
+      const centralOffset = offset;
+      let centralSize = 0;
+      central.forEach((c) => {
+        chunks.push(c);
+        centralSize += c.length;
+      });
+
+      const eocd = new Uint8Array(22);
+      writeU32LE(eocd, 0, 0x06054b50);
+      writeU16LE(eocd, 4, 0);
+      writeU16LE(eocd, 6, 0);
+      writeU16LE(eocd, 8, entries.length);
+      writeU16LE(eocd, 10, entries.length);
+      writeU32LE(eocd, 12, centralSize);
+      writeU32LE(eocd, 16, centralOffset);
+      writeU16LE(eocd, 20, 0);
+      chunks.push(eocd);
+
+      return new Blob(chunks, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    }
+
+    function writeFile(workbook, filename) {
+      const blob = makeZip(buildXlsxFiles(workbook));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename || "workbook.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    window.XLSX = {
+      readAsync,
+      utils: {
+        sheet_to_json,
+        json_to_sheet,
+        sheet_to_csv,
+        book_new,
+        book_append_sheet
+      },
+      writeFile
+    };
+  })();
+  </script>
+
+  <style>
+    :root {
+      --bg: #eef5ff;
+      --panel: #ffffff;
+      --border: #c9d8ee;
+      --text: #102033;
+      --muted: #5f7188;
+      --soft: #f3f8ff;
+      --warn: #b42318;
+      --blue: #003764;
+      --blue-dark: #002847;
+      --blue-soft: #e8f1f8;
+      --blue-line: #9bb8d0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: linear-gradient(180deg, #e8f1f8 0%, #f8fbff 220px, #ffffff 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 1320px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: 5px solid var(--blue);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 91, 172, 0.08);
+    }
+    h1 { margin: 0; font-size: 26px; line-height: 1.25; color: var(--blue-dark); }
+    h2 { margin: 20px 0 8px; font-size: 17px; }
+    p { margin: 8px 0 18px; color: var(--muted); }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    button, label.button, input[type="text"] {
+      height: 38px;
+      border-radius: 7px;
+      font-size: 14px;
+    }
+    button, label.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 13px;
+      border: 1px solid #c9c9c9;
+      background: #fff;
+      color: #111;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    label.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
+    input[type="file"] { display: none; }
+    input[type="text"] {
+      width: 180px;
+      border: 1px solid #c9c9c9;
+      padding: 0 10px;
+    }
+    input.narrow { width: 130px; }
+    input.tiny { width: 74px; }
+    .status {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--blue-soft);
+      border: 1px solid var(--blue-line);
+      border-radius: 7px;
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .files {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .file-chip {
+      border: 1px solid var(--border);
+      background: var(--blue-soft);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 12px;
+      color: #444;
+    }
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      overflow: auto;
+      max-height: 440px;
+      background: #fff;
+    }
+    .table-wrap.small { max-height: 280px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--blue-soft);
+      border-bottom: 1px solid var(--blue-line);
+      padding: 8px 10px;
+      text-align: left;
+      white-space: nowrap;
+      z-index: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+    td {
+      border-bottom: 1px solid #eeeeee;
+      padding: 7px 10px;
+      white-space: nowrap;
+      max-width: 360px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    td.right { text-align: right; }
+    td.warn { color: var(--warn); font-weight: 700; }
+    .empty { padding: 48px; text-align: center; color: #777; cursor: default; }
+    .note { margin-top: 10px; font-size: 13px; color: #666; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .tab-button {
+      border-radius: 999px;
+      height: 34px;
+      padding: 0 14px;
+      background: #fff;
+    }
+    .tab-button.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-card {
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+      padding: 14px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    .stat-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .dashboard-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dashboard-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0 12px;
+    }
+    .step-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(0, 91, 172, 0.05);
+    }
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .step-description {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .step-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .inline-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 38px;
+    }
+    .inline-control .control-label {
+      white-space: nowrap;
+    }
+    .dashboard {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    @media (max-width: 900px) {
+      .step-grid { grid-template-columns: 1fr; }
+    }
+  
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 20px 0 8px;
+    }
+    .section-header h2 {
+      margin: 0;
+    }
+    .section-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .mini-button {
+      height: 30px;
+      padding: 0 10px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+    .mini-button.danger {
+      color: #b42318;
+      border-color: #f3b5af;
+      background: #fff5f4;
+    }
+    .schedule-input {
+      width: 100%;
+      min-width: 96px;
+      height: 30px;
+      border: 1px solid #c9c9c9;
+      border-radius: 5px;
+      padding: 0 7px;
+      font-size: 12px;
+      background: #fff;
+    }
+    .schedule-input.name { min-width: 80px; }
+    .schedule-input.position { min-width: 70px; }
+    .schedule-input.date { min-width: 105px; }
+    .schedule-input.weekday { min-width: 55px; }
+    .schedule-input.time { min-width: 72px; }
+    .schedule-input.note-cell { min-width: 180px; }
+    td.schedule-edit-cell {
+      padding: 4px 6px;
+      max-width: none;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .action-cell {
+      text-align: center;
+      white-space: nowrap;
+    }
+
+  
+    .control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+      margin-bottom: 12px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .control-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .save-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .button-hint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+  
+    button:hover,
+    label.button:hover {
+      border-color: var(--blue);
+      color: var(--blue-dark);
+      background: var(--blue-soft);
+    }
+    label.primary:hover {
+      background: var(--blue-dark);
+      border-color: var(--blue-dark);
+      color: #fff;
+    }
+    button:disabled:hover {
+      background: #fff;
+      border-color: #c9c9c9;
+      color: #111;
+    }
+
+  
+    input[type="text"]:focus {
+      outline: 2px solid rgba(0, 91, 172, 0.18);
+      border-color: var(--blue);
+    }
+
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --border: #d9e0ea;
+      --text: #172033;
+      --muted: #667085;
+      --soft: #f7f9fc;
+      --warn: #b42318;
+      --blue: #003764;
+      --blue-dark: #001f3a;
+      --blue-soft: #eef5fb;
+      --blue-line: #c8d8e8;
+      --red: #e61e2b;
+      --surface: #f8fafc;
+      --line: #e4e9f1;
+      --shadow: 0 18px 46px rgba(16, 24, 40, 0.08);
+    }
+
+    body {
+      padding: 20px;
+      background: #f5f7fb;
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    main {
+      max-width: 1440px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .app-header {
+      padding: 18px 24px 22px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .gov-line,
+    .app-brand,
+    .hero-row,
+    .hero-chips {
+      display: flex;
+      align-items: center;
+    }
+
+    .gov-line {
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .app-brand {
+      min-width: 0;
+      gap: 10px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .app-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-soft));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .app-wordmark {
+      font-size: 17px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .agency-name {
+      padding-left: 11px;
+      border-left: 1px solid var(--line);
+      color: var(--blue-dark);
+      white-space: nowrap;
+    }
+
+    .system-badge,
+    .hero-chips span,
+    .file-chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+    }
+
+    .system-badge {
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .hero-row {
+      justify-content: space-between;
+      gap: 18px;
+      padding-top: 18px;
+    }
+
+    .hero-copy {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: #111827;
+      font-size: 30px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .app-summary {
+      max-width: 760px;
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .hero-chips {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .hero-chips span {
+      padding: 8px 11px;
+      color: #344054;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    main > .step-grid,
+    main > .control-bar,
+    main > .status,
+    main > .files,
+    main > .tabs,
+    main > .tab-panel,
+    main > .dashboard,
+    main > #note {
+      margin-left: 24px;
+      margin-right: 24px;
+    }
+
+    .step-grid {
+      gap: 14px;
+      margin-top: 20px;
+      margin-bottom: 14px;
+    }
+
+    .step-card {
+      border-color: var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: none;
+      padding: 16px;
+    }
+
+    .step-title {
+      color: #182230;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .step-number {
+      background: #111827;
+    }
+
+    .step-description,
+    .button-hint,
+    .note {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .control-bar {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    button,
+    label.button,
+    input[type="text"] {
+      height: 40px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    button,
+    label.button {
+      border-color: #ccd5e2;
+      background: #fff;
+      color: #182230;
+      font-weight: 700;
+    }
+
+    label.primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    button:hover,
+    label.button:hover {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+    }
+
+    label.primary:hover {
+      background: var(--blue-dark);
+      color: #fff;
+    }
+
+    input[type="text"] {
+      border-color: #ccd5e2;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input[type="text"]:focus {
+      outline: 3px solid rgba(0, 55, 100, 0.12);
+      border-color: var(--blue);
+    }
+
+    .status {
+      align-items: center;
+      padding: 12px 14px;
+      border-color: var(--line);
+      border-left: 4px solid var(--blue);
+      border-radius: 12px;
+      background: #fff;
+      color: #344054;
+    }
+
+    .files {
+      gap: 8px;
+    }
+
+    .file-chip {
+      padding: 6px 10px;
+      color: #344054;
+    }
+
+    .tabs {
+      gap: 6px;
+      margin-top: 18px;
+      border-bottom-color: var(--line);
+      padding-bottom: 0;
+    }
+
+    .tab-button {
+      height: 40px;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .tab-button.active {
+      border-bottom-color: var(--blue);
+      background: transparent;
+      color: var(--blue-dark);
+    }
+
+    .section-header {
+      margin-top: 22px;
+    }
+
+    h2 {
+      color: #182230;
+      letter-spacing: 0;
+    }
+
+    .mini-button {
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    .table-wrap {
+      border-color: var(--line);
+      border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    table {
+      font-size: 13px;
+    }
+
+    th {
+      background: #f1f5f9;
+      border-bottom-color: var(--line);
+      color: #344054;
+      font-weight: 800;
+    }
+
+    td {
+      border-bottom-color: #edf1f6;
+    }
+
+    tbody tr:hover td {
+      background: #fafcff;
+    }
+
+    .dashboard {
+      margin-top: 24px;
+      padding-top: 22px;
+      padding-bottom: 24px;
+      border-top-color: var(--line);
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      min-height: 104px;
+      border-color: var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: none;
+      padding: 13px;
+    }
+
+    .stat-card:first-child {
+      border-top: 3px solid var(--blue);
+    }
+
+    .stat-card:nth-child(2) {
+      border-top: 3px solid #0b7a75;
+    }
+
+    .stat-card:nth-child(3) {
+      border-top: 3px solid var(--red);
+    }
+
+    .stat-label,
+    .stat-sub {
+      color: var(--muted);
+    }
+
+    .stat-value {
+      color: #111827;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .dashboard-row {
+      gap: 14px;
+    }
+
+    @media (max-width: 1180px) {
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 12px;
+      }
+
+      main {
+        border-radius: 14px;
+      }
+
+      .hero-row,
+      .gov-line {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero-chips {
+        justify-content: flex-start;
+      }
+
+      main > .step-grid,
+      main > .control-bar,
+      main > .status,
+      main > .files,
+      main > .tabs,
+      main > .tab-panel,
+      main > .dashboard,
+      main > #note {
+        margin-left: 16px;
+        margin-right: 16px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app-brand {
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  
+    .footer {
+      max-width: 1320px;
+      margin: 14px auto 0;
+      padding: 12px 8px 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+  <main>
+    <header class="app-header">
+      <div class="gov-line">
+        <div class="app-brand" aria-label="íŠ¹ê·¼ë§¤ì‹ë¹„ ì •ì‚° í”„ë¡œê·¸ë¨">
+          <span class="app-mark" aria-hidden="true">AX</span>
+          <span class="app-wordmark">íŠ¹ê·¼ë§¤ì‹ë¹„ ì •ì‚°</span>
+          <span class="agency-name">í†µì¼ë¶€</span>
+        </div>
+        <span class="system-badge">ì„œë¬´ì—…ë¬´ AX</span>
+      </div>
+
+      <div class="hero-row">
+        <div class="hero-copy">
+          <div class="eyebrow">Monthly Settlement Automation</div>
+          <h1>íŠ¹ê·¼ë§¤ì‹ë¹„ ì •ì‚° í”„ë¡œê·¸ë¨</h1>
+          <p class="app-summary">ë§¤ì‹ë¹„ ì œì¶œë‚´ì—­ê³¼ ê·¼ë¬´ì‹œê°„í‘œë¥¼ ëŒ€ì¡°í•´ ì§‘í–‰ëŒ€ìƒ ê²€ì¦, ê°œì¸ë³„ í•©ê³„, ê²€í† í•„ìš” ë‚´ì—­ì„ í•œ ë²ˆì— ì •ë¦¬í•©ë‹ˆë‹¤.</p>
+        </div>
+        <div class="hero-chips" aria-label="ì£¼ìš” ì²˜ë¦¬ ìƒíƒœ">
+          <span>ì˜¤í”„ë¼ì¸ XLSX</span>
+          <span>ìë™ í—¤ë” ê°ì§€</span>
+          <span>ì •ì‚°ì—°ë²ˆ ìƒì„±</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="step-grid">
+      <section class="step-card">
+        <h2 class="step-title"><span class="step-number">1</span>ë§¤ì‹ë¹„ ì œì¶œ</h2>
+        <p class="step-description">ë¶€ì„œì›ì´ ì œì¶œí•œ ë§¤ì‹ë¹„ ìŠ¤í”„ë ˆë“œì‹œíŠ¸ë¥¼ ë¨¼ì € ì—…ë¡œë“œí•©ë‹ˆë‹¤. ì²« ì¤„ì´ ì œëª©ì¸ íŒŒì¼ì€ ì»¬ëŸ¼ í–‰ì„ ìë™ìœ¼ë¡œ ì°¾ê³ , ì œì¶œ ì—°ë²ˆì€ ì¤‘ë³µë˜ì–´ë„ ì›ë³¸ ì°¸ê³ ê°’ìœ¼ë¡œ ë³´ì¡´í•©ë‹ˆë‹¤.</p>
+        <div class="step-actions">
+          <label class="button primary">
+            ë§¤ì‹ë¹„ íŒŒì¼ ì„ íƒ
+            <input id="fileInput" type="file" multiple accept=".xlsx,.csv" />
+          </label>
+          <button id="downloadTemplate">ì–‘ì‹ ì €ì¥</button>
+          <div class="inline-control">
+            <label class="control-label" for="mealHeaderRowInput">í—¤ë” í–‰</label>
+            <input id="mealHeaderRowInput" class="tiny" type="text" inputmode="numeric" placeholder="ìë™" title="ë¹„ì›Œë‘ë©´ ì¼ìÂ·ì„±ëª…(êµ¬ë¶„)Â·ì¸ì›ìˆ˜Â·ì‚¬ìš©ê¸ˆì•¡ ì»¬ëŸ¼ì´ ìˆëŠ” í–‰ì„ ìë™ìœ¼ë¡œ ì°¾ìŠµë‹ˆë‹¤." />
+          </div>
+        </div>
+      </section>
+
+      <section class="step-card">
+        <h2 class="step-title"><span class="step-number">2</span>ê·¼ë¬´ì‹œê°„í‘œ ì œì¶œ</h2>
+        <p class="step-description">ì´ë¦„Â·ì§ê¸‰Â·ì¼ìÂ·ìš”ì¼Â·ì¶œê·¼ì§€ì •ì‹œê°„Â·í‡´ê·¼ì§€ì •ì‹œê°„ì´ ìˆëŠ” ê·¼ë¬´ì‹œê°„í‘œë¥¼ ì—…ë¡œë“œí•©ë‹ˆë‹¤. ì¶œê·¼ì§€ì •ì‹œê°„ì´ ë¹„ì–´ ìˆìœ¼ë©´ 09:00, í‡´ê·¼ì§€ì •ì‹œê°„ì´ ë¹„ì–´ ìˆìœ¼ë©´ 18:00 ì •ê°ìœ¼ë¡œ ê°„ì£¼í•˜ë©°, ì œëª© ì¤„ê³¼ ì™„ì „íˆ ë¹ˆ í–‰ì€ ìë™ ì œì™¸ë©ë‹ˆë‹¤.</p>
+        <div class="step-actions">
+          <label class="button">
+            ê·¼ë¬´ì‹œê°„í‘œ ì„ íƒ
+            <input id="scheduleInput" type="file" multiple accept=".xlsx,.csv" />
+          </label>
+          <div class="inline-control">
+            <label class="control-label" for="scheduleHeaderRowInput">í—¤ë” í–‰</label>
+            <input id="scheduleHeaderRowInput" class="tiny" type="text" inputmode="numeric" placeholder="ìë™" title="ë¹„ì›Œë‘ë©´ ì´ë¦„Â·ì¼ìÂ·ì¶œê·¼ì§€ì •ì‹œê°„Â·í‡´ê·¼ì§€ì •ì‹œê°„ ì»¬ëŸ¼ì´ ìˆëŠ” í–‰ì„ ìë™ìœ¼ë¡œ ì°¾ìŠµë‹ˆë‹¤." />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="control-bar">
+      <div class="control-group">
+        <label class="control-label" for="searchInput">ê²€ìƒ‰ì–´</label>
+        <input id="searchInput" type="text" placeholder="ì´ë¦„Â·ì¼ìÂ·íŒŒì¼ëª… ê²€ìƒ‰" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="limitInput">1ì¸ 1ì‹ ë‹¨ê°€</label>
+        <input id="limitInput" class="narrow" type="text" inputmode="numeric" value="9000" placeholder="9000" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="thresholdInput">ì´ˆê³¼ê·¼ë¬´ ì¸ì •ê¸°ì¤€</label>
+        <input id="thresholdInput" class="narrow" type="text" inputmode="numeric" value="60" placeholder="60ë¶„" />
+      </div>
+
+      <div class="control-group">
+        <span class="control-label">ì €ì¥</span>
+        <div class="save-actions">
+          <button id="downloadXlsx" disabled>ì „ì²´ XLSX ì €ì¥</button>
+          <button id="downloadCsv" disabled>í†µí•©ëª©ë¡ CSV ì €ì¥</button>
+          <button id="resetButton">ì´ˆê¸°í™”</button>
+        </div>
+      </div>
+
+      <div class="button-hint">
+        íŒŒì¼ ì—…ë¡œë“œ ì „ì—ëŠ” ì €ì¥ ë²„íŠ¼ì´ ë¹„í™œì„±í™”ë©ë‹ˆë‹¤.<br />
+        ì „ì²´ XLSXì—ëŠ” í†µí•©ëª©ë¡Â·ê·¼ë¬´ì‹œê°„í‘œì •ë¦¬Â·ì‚¬ìš©ìì¶œí‡´ê·¼í™•ì¸Â·ì§‘í–‰ëŒ€ìƒê²€ì¦Â·ê°œì¸ë³„í•©ê³„ê°€ í¬í•¨ë©ë‹ˆë‹¤.
+      </div>
+    </div>
+
+    <div class="status">
+      <span id="message">1ë‹¨ê³„ ë§¤ì‹ë¹„ íŒŒì¼ê³¼ 2ë‹¨ê³„ ê·¼ë¬´ì‹œê°„í‘œë¥¼ ì—…ë¡œë“œí•˜ë©´ ì•„ë˜ ê²°ê³¼í‘œì™€ ëŒ€ì‹œë³´ë“œê°€ ìë™ ìƒì„±ë©ë‹ˆë‹¤.</span>
+      <span id="stats">ë§¤ì‹ë¹„íŒŒì¼ 0ê°œ Â· ê·¼ë¬´ì‹œê°„í‘œ 0ê±´ Â· ê±°ë˜ 0ê±´ Â· ëŒ€ìƒ 0ëª… Â· ê²€í† í•„ìš” 0ê±´</span>
+    </div>
+
+    <div id="fileList" class="files"></div>
+
+
+    <div class="tabs">
+      <button class="tab-button active" data-tab="transactions">í†µí•©ëª©ë¡</button>
+      <button class="tab-button" data-tab="schedule">ê·¼ë¬´ì‹œê°„í‘œ</button>
+      <button class="tab-button" data-tab="attendance">ì‚¬ìš©ì ì¶œí‡´ê·¼í™•ì¸</button>
+      <button class="tab-button" data-tab="ledger">ì§‘í–‰ëŒ€ìƒê²€ì¦</button>
+      <button class="tab-button" data-tab="summary">ê°œì¸ë³„í•©ê³„</button>
+    </div>
+
+    <section id="tab-transactions" class="tab-panel active">
+      <div class="section-header">
+        <h2>í†µí•© ëª©ë¡</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="exportTransactionsButton" disabled>ì´ ëª©ë¡ ì €ì¥</button>
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top: 8px;">
+        <button id="attendanceMealSortButton" type="button">ì‹ì‚¬ìˆœ ì •ë ¬(ì¡°ì‹â†’ì¤‘ì‹â†’ì„ì‹)</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead id="transactionHead">
+            <tr><th>ì—…ë¡œë“œ í›„ ì›ë³¸ ì»¬ëŸ¼ì´ í‘œì‹œë©ë‹ˆë‹¤.</th></tr>
+          </thead>
+          <tbody id="transactionBody">
+            <tr><td class="empty">í‘œì‹œí•  ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section id="tab-schedule" class="tab-panel">
+      <div class="section-header">
+        <h2>ê·¼ë¬´ì‹œê°„í‘œ ì •ë¦¬</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="addScheduleRowButton" type="button">í–‰ ì¶”ê°€</button>
+          <button class="mini-button" id="addUnverifiedScheduleRowsButton" type="button">ë¯¸ê²€ì¦í–‰ ì¶”ê°€</button>
+          <button class="mini-button" id="exportScheduleButton" disabled>ì´ ëª©ë¡ ì €ì¥</button>
+        </div>
+      </div>
+      <p class="note">ì—…ë¡œë“œí•œ ê·¼ë¬´ì‹œê°„í‘œì—ì„œ í•„ìš”í•œ ì»¬ëŸ¼ì„ í‘œì‹œí•©ë‹ˆë‹¤. ì´ íƒ­ì—ì„œ í–‰ ì¶”ê°€Â·ì‚­ì œ, ê°œë³„ ì…€ ìˆ˜ì •, ë¹„ê³  ì…ë ¥ì´ ê°€ëŠ¥í•˜ë©° ìˆ˜ì • ì¦‰ì‹œ ì§‘í–‰ëŒ€ìƒ ê²€ì¦ê³¼ ì‚¬ìš©ì ì¶œí‡´ê·¼í™•ì¸ì— ë‹¤ì‹œ ë°˜ì˜ë©ë‹ˆë‹¤.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-schedule-sort="ì´ë¦„">ì´ë¦„</th>
+              <th data-schedule-sort="ì§ê¸‰">ì§ê¸‰</th>
+              <th data-schedule-sort="ì¼ì">ì¼ì</th>
+              <th data-schedule-sort="ìš”ì¼">ìš”ì¼</th>
+              <th data-schedule-sort="ì¶œê·¼ì§€ì •ì‹œê°„">ì¶œê·¼ì§€ì •ì‹œê°„</th>
+              <th data-schedule-sort="í‡´ê·¼ì§€ì •ì‹œê°„">í‡´ê·¼ì§€ì •ì‹œê°„</th>
+              <th data-schedule-sort="ë¹„ê³ ">ë¹„ê³ </th>
+              <th>ê´€ë¦¬</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody">
+            <tr><td colspan="8" class="empty">ê·¼ë¬´ì‹œê°„í‘œë¥¼ ì—…ë¡œë“œí•˜ê±°ë‚˜ í–‰ì„ ì¶”ê°€í•˜ë©´ í‘œì‹œë©ë‹ˆë‹¤.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section id="tab-attendance" class="tab-panel">
+      <div class="section-header">
+        <h2>ì‚¬ìš©ì ì¶œí‡´ê·¼í™•ì¸</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="exportAttendanceButton" disabled>ì´ ëª©ë¡ ì €ì¥</button>
+        </div>
+      </div>
+      <p class="note">ë§¤ì‹ë¹„ í‘œì˜ ì¼ìÂ·ì„±ëª…ì„ ê¸°ì¤€ìœ¼ë¡œ ê·¼ë¬´ì‹œê°„í‘œì˜ ì¼ìÂ·ì´ë¦„ì´ ë™ì‹œì— ì¼ì¹˜í•˜ëŠ” í–‰ë§Œ ê²€ì¦í•©ë‹ˆë‹¤. ê°™ì€ ì‚¬ëŒÂ·ê°™ì€ ì¼ìì— ì¡°ì‹ê³¼ ì„ì‹ ë“± ì—¬ëŸ¬ ì‹ì‚¬ê±´ì´ ìˆìœ¼ë©´ ê·¼ë¬´ê¸°ë¡ì€ 1ì¹¸ìœ¼ë¡œ í†µí•©í•˜ê³ , ì‹ì‚¬êµ¬ë¶„ë§Œ í•¨ê»˜ í‘œì‹œí•©ë‹ˆë‹¤. ê¸°ë³¸ ì •ë ¬ì€ ì¼ììˆœ, ì‹ì‚¬ìˆœ(ì¡°ì‹â†’ì¤‘ì‹â†’ì„ì‹)ì…ë‹ˆë‹¤.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-attendance-sort="ì´ë¦„">ì´ë¦„</th>
+              <th data-attendance-sort="ì§ê¸‰">ì§ê¸‰</th>
+              <th data-attendance-sort="ì¼ì">ì¼ì</th>
+              <th data-attendance-sort="ì‹ì‚¬êµ¬ë¶„">ì‹ì‚¬êµ¬ë¶„</th>
+              <th data-attendance-sort="ìš”ì¼">ìš”ì¼</th>
+              <th data-attendance-sort="ì¶œê·¼ì§€ì •ì‹œê°„">ì¶œê·¼ì§€ì •ì‹œê°„</th>
+              <th data-attendance-sort="í‡´ê·¼ì§€ì •ì‹œê°„">í‡´ê·¼ì§€ì •ì‹œê°„</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceBody">
+            <tr><td colspan="7" class="empty">ë§¤ì‹ë¹„ì™€ ê·¼ë¬´ì‹œê°„í‘œê°€ ê²¹ì¹˜ëŠ” í–‰ì´ í‘œì‹œë©ë‹ˆë‹¤.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-ledger" class="tab-panel">
+      <div class="section-header">
+        <h2>ì§‘í–‰ëŒ€ìƒ ê²€ì¦</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="exportLedgerButton" disabled>ì´ ëª©ë¡ ì €ì¥</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-ledger-sort="ì¼ì">ì¼ì</th>
+              <th data-ledger-sort="ì„±ëª…">ì„±ëª…</th>
+              <th data-ledger-sort="êµ¬ë¶„">êµ¬ë¶„</th>
+              <th data-ledger-sort="ì¸ì›ìˆ˜">ì¸ì›ìˆ˜</th>
+              <th data-ledger-sort="ì´ì‚¬ìš©ê¸ˆì•¡">ì´ì‚¬ìš©ê¸ˆì•¡</th>
+              <th data-ledger-sort="ë°°ë¶„ê¸ˆì•¡">ë°°ë¶„ê¸ˆì•¡</th>
+              <th data-ledger-sort="ìš”ì¼">ìš”ì¼</th>
+              <th data-ledger-sort="ì¶œê·¼ì§€ì •ì‹œê°„">ì¶œê·¼ì§€ì •ì‹œê°„</th>
+              <th data-ledger-sort="í‡´ê·¼ì§€ì •ì‹œê°„">í‡´ê·¼ì§€ì •ì‹œê°„</th>
+              <th data-ledger-sort="ê·¼ë¬´ì‹œê°„">ê·¼ë¬´ì‹œê°„</th>
+              <th data-ledger-sort="ì§‘í–‰ëŒ€ìƒíŒì •">ì§‘í–‰ëŒ€ìƒíŒì •</th>
+              <th data-ledger-sort="íŒì •ì‚¬ìœ ">íŒì •ì‚¬ìœ </th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody">
+            <tr><td colspan="12" class="empty">ê·¼ë¬´ì‹œê°„í‘œì™€ ë§¤ì‹ë¹„ íŒŒì¼ì„ ì—…ë¡œë“œí•˜ë©´ ê²€ì¦ ê²°ê³¼ê°€ í‘œì‹œë©ë‹ˆë‹¤.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-summary" class="tab-panel">
+      <div class="section-header">
+        <h2>ê°œì¸ë³„ í•©ê³„</h2>
+        <div class="section-actions">
+          <button class="mini-button" id="exportSummaryButton" disabled>ì´ ëª©ë¡ ì €ì¥</button>
+        </div>
+      </div>
+      <div class="table-wrap small">
+        <table>
+          <thead>
+            <tr>
+              <th data-summary-sort="ì„±ëª…">ì„±ëª…</th>
+              <th data-summary-sort="ì°¸ì—¬ê±´ìˆ˜">ì°¸ì—¬ê±´ìˆ˜</th>
+              <th data-summary-sort="ì¡°ì‹">ì¡°ì‹</th>
+              <th data-summary-sort="ì¤‘ì‹">ì¤‘ì‹</th>
+              <th data-summary-sort="ì„ì‹">ì„ì‹</th>
+              <th data-summary-sort="ë°°ë¶„ê¸ˆì•¡í•©ê³„">ë°°ë¶„ê¸ˆì•¡í•©ê³„</th>
+              <th data-summary-sort="ëŒ€ìƒê±´ìˆ˜">ëŒ€ìƒê±´ìˆ˜</th>
+              <th data-summary-sort="ê²€í† í•„ìš”ê±´ìˆ˜">ê²€í† í•„ìš”ê±´ìˆ˜</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody">
+            <tr><td colspan="8" class="empty">ì§‘ê³„í•  ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section class="dashboard">
+      <h2>ëŒ€ì‹œë³´ë“œ</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">ì´ ì‚¬ìš©ê¸ˆì•¡</div>
+          <div id="statTotalAmount" class="stat-value">0ì›</div>
+          <div class="stat-sub">ê±°ë˜ ê¸°ì¤€ ì´ì•¡</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">ê±°ë˜ ê±´ìˆ˜</div>
+          <div id="statTransactionCount" class="stat-value">0ê±´</div>
+          <div class="stat-sub">ê²€ìƒ‰í•„í„° ë°˜ì˜</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">ì¤‘ë³µ ì œì™¸ ì‚¬ìš©ì¸ì›</div>
+          <div id="statUniqueUsers" class="stat-value">0ëª…</div>
+          <div class="stat-sub">ì„±ëª… ê¸°ì¤€ ê³ ìœ  ì¸ì›</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">ì§€ê¸‰ê°€ëŠ¥ ê¸ˆì•¡</div>
+          <div id="statEligibleAmount" class="stat-value">0ì›</div>
+          <div class="stat-sub">ëŒ€ìƒ íŒì •ì ë°°ë¶„ê¸ˆì•¡ í•©ê³„</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">ì¤‘ë³µ ì œì™¸ ì§€ê¸‰ê°€ëŠ¥ ì¸ì›</div>
+          <div id="statEligibleUniqueUsers" class="stat-value">0ëª…</div>
+          <div class="stat-sub">ëŒ€ìƒ íŒì •ì ê³ ìœ  ì¸ì›</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">ê²€í† í•„ìš” ê±°ë˜</div>
+          <div id="statReviewCount" class="stat-value">0ê±´</div>
+          <div class="stat-sub">ë¹„ëŒ€ìƒÂ·ë¯¸í™•ì¸Â·ì˜¤ë¥˜ í¬í•¨</div>
+        </div>
+      </div>
+
+      <div class="dashboard-row">
+        <div>
+          <h2>ì‹ì‚¬êµ¬ë¶„ë³„ í†µê³„</h2>
+          <div class="table-wrap small">
+            <table>
+              <thead>
+                <tr>
+                  <th>êµ¬ë¶„</th>
+                  <th>ê±°ë˜ê±´ìˆ˜</th>
+                  <th>ì‚¬ìš©ê¸ˆì•¡</th>
+                  <th>ì§€ê¸‰ê°€ëŠ¥ê¸ˆì•¡</th>
+                </tr>
+              </thead>
+              <tbody id="mealStatsBody">
+                <tr><td colspan="4" class="empty">ì§‘ê³„í•  ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <h2>íŒì •ë³„ í†µê³„</h2>
+          <div class="table-wrap small">
+            <table>
+              <thead>
+                <tr>
+                  <th>íŒì •</th>
+                  <th>ì¤‘ë³µ ì œì™¸ ì¸ì›</th>
+                  <th>ë°°ë¶„ê¸ˆì•¡</th>
+                  <th>ì¡°ì¹˜</th>
+                </tr>
+              </thead>
+              <tbody id="decisionStatsBody">
+                <tr><td colspan="4" class="empty">ì§‘ê³„í•  ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="note" class="note"></div>
+  </main>
+
+  <script>
+    const DATE_HEADERS = ["ì¼ì", "ë‚ ì§œ", "ì‚¬ìš©ì¼ì", "ì‚¬ìš©ì¼", "ê±°ë˜ì¼ì", "ìŠ¹ì¸ì¼ì", "ê²°ì œì¼ì", "ê²°ì œì¼", "ì§‘í–‰ì¼ì", "ì§‘í–‰ì¼", "ì¹´ë“œì‚¬ìš©ì¼ì"];
+    const NAME_MEAL_HEADERS = [
+      "ì„±ëª…(êµ¬ë¶„)", "ì„±ëª…êµ¬ë¶„", "ì„±ëª…", "ì´ë¦„", "ì°¸ì„ì", "ì‚¬ìš©ì", "ì´ìš©ì",
+      "ì„±ëª…(ì‹ì‚¬)", "ì„±ëª…+ì‹ì‚¬", "ì„±ëª…+(ì¡°ì‹/ì¤‘ì‹/ì„ì‹)", "ì„±ëª…(ì¡°ì‹/ì¤‘ì‹/ì„ì‹)",
+      "ì„±ëª…ë°êµ¬ë¶„", "ì„±ëª… ë° êµ¬ë¶„", "ì‚¬ìš©ìêµ¬ë¶„", "ì‚¬ìš©ì êµ¬ë¶„", "ì„±ëª…ì‹ì‚¬êµ¬ë¶„", "ì„±ëª… ì‹ì‚¬ êµ¬ë¶„"
+    ];
+    const PEOPLE_COUNT_HEADERS = ["ì¸ì›ìˆ˜", "ì¸ì›", "ì‚¬ìš©ì¸ì›", "ì°¸ì„ì¸ì›", "ì‹ìˆ˜", "ëª…ìˆ˜", "ì‚¬ìš©ì¸ì›ìˆ˜", "ì°¸ì„ì¸ì›ìˆ˜"];
+    const AMOUNT_HEADERS = ["ì‚¬ìš©ê¸ˆì•¡", "ê¸ˆì•¡", "ê²°ì œê¸ˆì•¡", "ìŠ¹ì¸ê¸ˆì•¡", "ë§¤ì‹ë¹„", "íŠ¹ê·¼ë§¤ì‹ë¹„", "ì‚¬ìš©ì•¡", "ê²°ì œì•¡", "ìŠ¹ì¸ì•¡", "ì§‘í–‰ì•¡", "ê¸ˆì•¡ì›"];
+    const SERIAL_HEADERS = ["ì—°ë²ˆ", "ì œì¶œì—°ë²ˆ", "ì›ë³¸ì—°ë²ˆ", "ì •ì‚°ì—°ë²ˆ", "ì—°ë²ˆê¸°í˜¸", "ì—°ë²ˆ ê¸°í˜¸", "ê¸°í˜¸", "ì¼ë ¨ë²ˆí˜¸", "ìˆœë²ˆ", "ë²ˆí˜¸", "No", "NO", "no", "No."];
+    const MEAL_STANDARD_OUTPUT_HEADERS = ["ì •ì‚°ì—°ë²ˆ", "ì œì¶œì—°ë²ˆ", "ì¼ì", "ì„±ëª…(êµ¬ë¶„)", "ì¸ì›ìˆ˜", "ì‚¬ìš©ê¸ˆì•¡"];
+    const SCHEDULE_STANDARD_OUTPUT_HEADERS = ["ì´ë¦„", "ì§ê¸‰", "ì¼ì", "ìš”ì¼", "ì¶œê·¼ì§€ì •ì‹œê°„", "í‡´ê·¼ì§€ì •ì‹œê°„", "ë¹„ê³ "];
+
+    const SCHEDULE_DATE_HEADERS = ["ì¼ì", "ë‚ ì§œ", "ê·¼ë¬´ì¼ì", "ê·¼ë¬´ì¼", "ì‚¬ìš©ì¼ì"];
+    const SCHEDULE_NAME_HEADERS = ["ì´ë¦„", "ì„±ëª…", "ì§ì›ëª…", "ë¶€ì„œì›", "ì‚¬ìš©ì"];
+    const SCHEDULE_POSITION_HEADERS = ["ì§ê¸‰", "ì§ìœ„", "ì§ì±…", "ê¸‰ìˆ˜", "ì§ê¸‰ëª…"];
+    const SCHEDULE_WEEKDAY_HEADERS = ["ìš”ì¼", "ê·¼ë¬´ìš”ì¼", "ìš”ì¼êµ¬ë¶„"];
+    const SCHEDULE_START_HEADERS = ["ì¶œê·¼ì§€ì •ì‹œê°„", "ì¶œê·¼ì‹œê°„", "ê·¼ë¬´ì‹œì‘", "ê·¼ë¬´ì‹œì‘ì‹œê°„", "ì‹œì‘ì‹œê°„"];
+    const SCHEDULE_END_HEADERS = ["í‡´ê·¼ì§€ì •ì‹œê°„", "í‡´ê·¼ì‹œê°„", "ê·¼ë¬´ì¢…ë£Œ", "ê·¼ë¬´ì¢…ë£Œì‹œê°„", "ì¢…ë£Œì‹œê°„"];
+    const SCHEDULE_NOTE_HEADERS = ["ë¹„ê³ ", "ë©”ëª¨", "ì°¸ê³ ", "íŠ¹ì´ì‚¬í•­", "ìˆ˜ì •ì‚¬í•­", "í™•ì¸ì‚¬í•­"];
+    const MEAL_HEADER_GROUPS = [DATE_HEADERS, NAME_MEAL_HEADERS, PEOPLE_COUNT_HEADERS, AMOUNT_HEADERS, SERIAL_HEADERS];
+    const SCHEDULE_HEADER_GROUPS = [
+      SCHEDULE_NAME_HEADERS,
+      SCHEDULE_POSITION_HEADERS,
+      SCHEDULE_DATE_HEADERS,
+      SCHEDULE_WEEKDAY_HEADERS,
+      SCHEDULE_START_HEADERS,
+      SCHEDULE_END_HEADERS,
+      SCHEDULE_NOTE_HEADERS
+    ];
+
+    const STANDARD_START = 9 * 60;
+    const STANDARD_END = 18 * 60;
+    const STANDARD_WORK_MINUTES = 8 * 60;
+
+    let rows = [];
+    let files = [];
+    let scheduleRows = [];
+    let scheduleRowSeq = 0;
+    let scheduleFiles = [];
+    let scheduleByDateName = new Map();
+    let scheduleByName = new Map();
+
+    let outputHeaders = [];
+    let filteredRows = [];
+    let sortedTransactionRows = [];
+    let ledgerRows = [];
+    let sortedLedgerRows = [];
+    let attendanceRows = [];
+    let sortedAttendanceRows = [];
+    let sortedScheduleRows = [];
+    let summaryRows = [];
+    let sortedSummaryRows = [];
+    let reviewRows = [];
+
+    let transactionSort = { key: null, direction: "asc" };
+    let scheduleSort = { key: "ì¼ì", direction: "asc" };
+    let attendanceSort = { key: "ì¼ì", direction: "asc" };
+    let ledgerSort = { key: "ì¼ì", direction: "asc" };
+    let summarySort = { key: "ì„±ëª…", direction: "asc" };
+    let activeTab = "transactions";
+
+    const $ = (id) => document.getElementById(id);
+
+    const normalizeHeader = (value) =>
+      String(value || "").trim().replace(/\s+/g, "").replace(/[<>]/g, "");
+
+    const normalizeHeaderKey = (value) =>
+      normalizeHeader(value)
+        .toLowerCase()
+        .replace(/[^0-9a-zê°€-í£]/g, "");
+
+    const isHeaderMatch = (header, candidate) => {
+      const headerKey = normalizeHeaderKey(header);
+      const candidateKey = normalizeHeaderKey(candidate);
+      if (!headerKey || !candidateKey) return false;
+      if (headerKey === candidateKey) return true;
+      return candidateKey.length >= 2 && headerKey.includes(candidateKey);
+    };
+
+    const normalizeNameKey = (value) =>
+      String(value || "").replace(/\s+/g, "").trim();
+
+    const makeScheduleKey = (date, name) => {
+      const normalized = normalizeDate(date);
+      const dateKey = normalized || String(date || "").trim();
+      return `${dateKey}|${normalizeNameKey(name)}`;
+    };
+
+    const findHeader = (headers, candidates) => {
+      return headers.find((header) => candidates.some((candidate) => isHeaderMatch(header, candidate)));
+    };
+
+    const HEADER_SCAN_LIMIT = 25;
+
+    const parseManualHeaderRow = (inputId) => {
+      const input = $(inputId);
+      const value = input ? String(input.value || "").trim() : "";
+      if (!value) return null;
+
+      const rowNumber = Number(value.replace(/[^0-9]/g, ""));
+      return Number.isInteger(rowNumber) && rowNumber > 0 ? rowNumber : null;
+    };
+
+    const buildUniqueHeaders = (row, width) => {
+      const headers = [];
+      for (let i = 0; i < width; i += 1) {
+        const header = String((row || [])[i] ?? "").trim();
+        headers.push(header || `__EMPTY_${i + 1}`);
+      }
+
+      const seen = {};
+      return headers.map((header) => {
+        if (!seen[header]) {
+          seen[header] = 1;
+          return header;
+        }
+        seen[header] += 1;
+        return `${header}_${seen[header]}`;
+      });
+    };
+
+    const countHeaderMatches = (row, candidateGroups) => {
+      const cells = (row || []).map((cell) => String(cell ?? "").trim()).filter(Boolean);
+      if (!cells.length) return 0;
+      return candidateGroups.reduce((count, candidates) => (
+        findHeader(cells, candidates) ? count + 1 : count
+      ), 0);
+    };
+
+    const countNonEmptyCells = (row) =>
+      (row || []).filter((cell) => String(cell ?? "").trim() !== "").length;
+
+    const detectHeaderRowIndex = (aoa, candidateGroups) => {
+      let bestIndex = 0;
+      let bestScore = 0;
+      const scanLimit = Math.min(aoa.length, HEADER_SCAN_LIMIT);
+
+      for (let i = 0; i < scanLimit; i += 1) {
+        const score = countHeaderMatches(aoa[i], candidateGroups);
+        if (score > bestScore) {
+          bestScore = score;
+          bestIndex = i;
+        }
+      }
+
+      if (bestScore >= 2) return bestIndex;
+      if (bestScore >= 1 && countNonEmptyCells(aoa[bestIndex]) >= 3) return bestIndex;
+      return 0;
+    };
+
+    const rowsFromSheet = (sheet, candidateGroups, manualHeaderRowNumber) => {
+      const aoa = sheet && sheet.__aoa ? sheet.__aoa : [];
+      if (!aoa.length) return { rows: [], headers: [], headerRowNumber: 0 };
+
+      const autoHeaderIndex = detectHeaderRowIndex(aoa, candidateGroups);
+      const manualHeaderIndex =
+        manualHeaderRowNumber && manualHeaderRowNumber <= aoa.length
+          ? manualHeaderRowNumber - 1
+          : null;
+      const headerRowIndex = manualHeaderIndex ?? autoHeaderIndex;
+      const width = aoa.reduce((max, row) => Math.max(max, (row || []).length), 0);
+      const headers = buildUniqueHeaders(aoa[headerRowIndex], width);
+      const rows = [];
+
+      for (let r = headerRowIndex + 1; r < aoa.length; r += 1) {
+        const arr = aoa[r] || [];
+        const obj = {};
+        let hasValue = false;
+
+        headers.forEach((header, c) => {
+          const value = arr[c] === undefined || arr[c] === null ? "" : arr[c];
+          if (String(value ?? "").trim() !== "") hasValue = true;
+          obj[header] = value;
+        });
+
+        if (hasValue) {
+          Object.defineProperty(obj, "__sourceRowNumber", {
+            value: r + 1,
+            enumerable: false
+          });
+          rows.push(obj);
+        }
+      }
+
+      return { rows, headers, headerRowNumber: headerRowIndex + 1 };
+    };
+
+    const normalizeDate = (value) => {
+      if (value instanceof Date && !Number.isNaN(value.getTime())) {
+        return value.toISOString().slice(0, 10);
+      }
+
+      const text = String(value || "").trim();
+      if (!text) return "";
+
+      const compactDateMatch = text.match(/^(\d{4})(\d{2})(\d{2})$/);
+      if (compactDateMatch) {
+        const y = compactDateMatch[1];
+        const month = Number(compactDateMatch[2]);
+        const day = Number(compactDateMatch[3]);
+        if (Number.isInteger(month) && Number.isInteger(day) && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          const m = String(month).padStart(2, "0");
+          const d = String(day).padStart(2, "0");
+          return `${y}-${m}-${d}`;
+        }
+      }
+
+      const cleaned = text
+        .replace(/[ë…„ì›”]/g, "-")
+        .replace(/[ì¼.\/]/g, "-")
+        .replace(/\s+/g, "")
+        .replace(/-+/g, "-")
+        .replace(/-$/g, "");
+
+      const parts = cleaned.split("-").filter(Boolean);
+      if (parts.length >= 3) {
+        const y = parts[0].length === 2 ? `20${parts[0]}` : parts[0];
+        const month = Number(parts[1]);
+        const day = Number(parts[2]);
+        if (Number.isInteger(month) && Number.isInteger(day) && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          const m = String(month).padStart(2, "0");
+          const d = String(day).padStart(2, "0");
+          return `${y}-${m}-${d}`;
+        }
+      }
+
+      if (parts.length === 2) {
+        const month = Number(parts[0]);
+        const day = Number(parts[1]);
+        if (Number.isInteger(month) && Number.isInteger(day) && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          const y = String(new Date().getFullYear());
+          const m = String(month).padStart(2, "0");
+          const d = String(day).padStart(2, "0");
+          return `${y}-${m}-${d}`;
+        }
+      }
+
+      return text;
+    };
+
+    const formatDateForOutput = (value) => {
+      const normalized = normalizeDate(value);
+      return /^\d{4}-\d{2}-\d{2}$/.test(String(normalized || ""))
+        ? normalized
+        : String(value || "").trim();
+    };
+
+    const getScheduleDate = (row) =>
+      normalizeDate(row && (row.normalizedDate || row.ì¼ì || row.rawDate || ""));
+
+    const makeScheduleRowId = () => {
+      scheduleRowSeq += 1;
+      return `schedule-${Date.now().toString(36)}-${scheduleRowSeq}`;
+    };
+
+    const weekdayFromDate = (value) => {
+      const normalized = normalizeDate(value);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return "";
+      const [year, month, day] = normalized.split("-").map(Number);
+      const date = new Date(year, month - 1, day);
+      if (Number.isNaN(date.getTime())) return "";
+      return ["ì¼", "ì›”", "í™”", "ìˆ˜", "ëª©", "ê¸ˆ", "í† "][date.getDay()] || "";
+    };
+
+    const ensureScheduleRowMeta = (row = {}) => {
+      const normalized = normalizeDate(row.normalizedDate || row.ì¼ì || row.rawDate || "");
+      const rawStart = String(row.ì¶œê·¼ì§€ì •ì‹œê°„ || "").trim();
+      const rawEnd = String(row.í‡´ê·¼ì§€ì •ì‹œê°„ || "").trim();
+      const weekday = String(row.ìš”ì¼ || "").trim() || weekdayFromDate(normalized || row.ì¼ì || row.rawDate || "");
+
+      row._scheduleId = row._scheduleId || makeScheduleRowId();
+      row.ì´ë¦„ = String(row.ì´ë¦„ || "").trim();
+      row.ì§ê¸‰ = String(row.ì§ê¸‰ || "").trim();
+      row.ì¼ì = normalized || String(row.ì¼ì || row.rawDate || "").trim();
+      row.rawDate = row.rawDate || row.ì¼ì;
+      row.normalizedDate = normalized || normalizeDate(row.ì¼ì);
+      row.ìš”ì¼ = weekday;
+      row.ìš”ì¼Parsed = parseWeekday(weekday);
+      row.ì¶œê·¼ì§€ì •ì‹œê°„ = rawStart || "09:00";
+      row.í‡´ê·¼ì§€ì •ì‹œê°„ = rawEnd || "18:00";
+      row.ë¹„ê³  = String(row.ë¹„ê³  || "").trim();
+      return row;
+    };
+
+    const createScheduleRow = (overrides = {}) => ensureScheduleRowMeta({
+      ì´ë¦„: "",
+      ì§ê¸‰: "",
+      ì¼ì: "",
+      rawDate: "",
+      normalizedDate: "",
+      ìš”ì¼: "",
+      ì¶œê·¼ì§€ì •ì‹œê°„: "09:00",
+      í‡´ê·¼ì§€ì •ì‹œê°„: "18:00",
+      ë¹„ê³ : "ìˆ˜ê¸° ì¶”ê°€",
+      ì›ë³¸íŒŒì¼: "ìˆ˜ê¸°ì…ë ¥",
+      ì›ë³¸ì‹œíŠ¸: "ê·¼ë¬´ì‹œê°„í‘œ ì •ë¦¬",
+      ì›ë³¸í–‰: "ìˆ˜ê¸°",
+      ...overrides
+    });
+
+    const sortableDateNumber = (value) => {
+      const text = String(value ?? "").trim();
+      if (!text || !/[0-9]/.test(text)) return null;
+      const normalized = normalizeDate(value);
+      return /^\d{4}-\d{2}-\d{2}$/.test(normalized) ? Number(normalized.replace(/-/g, "")) : null;
+    };
+
+    const parseAmount = (value) => {
+      const number = Number(String(value || "").replace(/[^0-9.-]/g, ""));
+      return Number.isFinite(number) ? number : 0;
+    };
+
+    const parsePeopleCount = (value) => {
+      const number = Number(String(value || "").replace(/[^0-9]/g, ""));
+      return Number.isFinite(number) && number > 0 ? number : 0;
+    };
+
+    const MEAL_MARKER_REGEX = /(ì¡°ì‹|ì¤‘ì‹|ì„ì‹|ì•„ì¹¨|ì ì‹¬|ì €ë…|\(\s*(ì¡°ì‹|ì¤‘ì‹|ì„ì‹|ì¡°|ì¤‘|ì„|ì•„ì¹¨|ì ì‹¬|ì €ë…)\s*\)|\[\s*(ì¡°ì‹|ì¤‘ì‹|ì„ì‹|ì¡°|ì¤‘|ì„|ì•„ì¹¨|ì ì‹¬|ì €ë…)\s*\])/g;
+
+    const mealFromMarker = (marker) => {
+      const text = String(marker || "");
+      if (/ì¡°ì‹|ì•„ì¹¨|ì¡°/.test(text)) return "ì¡°ì‹";
+      if (/ì¤‘ì‹|ì ì‹¬|ì¤‘/.test(text)) return "ì¤‘ì‹";
+      if (/ì„ì‹|ì €ë…|ì„/.test(text)) return "ì„ì‹";
+      return "";
+    };
+
+    const detectLastMeal = (value) => {
+      const text = String(value || "");
+      let meal = "";
+      for (const match of text.matchAll(MEAL_MARKER_REGEX)) {
+        const found = mealFromMarker(match[0]);
+        if (found) meal = found;
+      }
+      return meal;
+    };
+
+    const parseMeal = (value) => {
+      const text = String(value || "").trim();
+      if (!text) return "";
+      return detectLastMeal(text) || "ì„ì‹";
+    };
+
+    const appendDinnerToLastName = (segment) => {
+      const text = String(segment || "");
+      if (!text.trim()) return text;
+
+      const extraPeopleMatch = text.match(/^(.*?\S)(\s*ì™¸\s*\d+\s*ëª….*)$/);
+      if (extraPeopleMatch) return `${extraPeopleMatch[1]}(ì„ì‹)${extraPeopleMatch[2]}`;
+
+      return text.replace(/(\S+)(\s*)$/, "$1(ì„ì‹)$2");
+    };
+
+    const getLastParticipantSegment = (value) => {
+      const text = String(value || "");
+      const match = text.match(/^(.*(?:[,ï¼Œã€\/]|\s+ë°\s+|\s*&\s*))(.*)$/);
+      if (match) return { prefix: match[1], tail: match[2] };
+      return { prefix: "", tail: text };
+    };
+
+    const lastParticipantHasMeal = (segment) => {
+      const text = String(segment || "").trim();
+      if (!text) return false;
+
+      const withoutExtraPeople = text.replace(/\s*ì™¸\s*\d+\s*ëª….*$/, "").trim();
+      const tokens = withoutExtraPeople.split(/\s+/).filter(Boolean);
+      const lastToken = tokens.length ? tokens[tokens.length - 1] : withoutExtraPeople;
+      return Boolean(detectLastMeal(lastToken));
+    };
+
+    const normalizeNameMealText = (value) => {
+      const text = String(value || "").trim().replace(/\s+/g, " ");
+      if (!text) return "";
+
+      const { prefix, tail } = getLastParticipantSegment(text);
+      if (lastParticipantHasMeal(tail)) return text;
+      return `${prefix}${appendDinnerToLastName(tail)}`;
+    };
+
+    const removeMealMarkers = (value) =>
+      String(value || "")
+        .replace(MEAL_MARKER_REGEX, "")
+        .replace(/ì™¸\s*\d+\s*ëª…/g, "");
+
+    const parseNameMealEntries = (value) => {
+      const text = normalizeNameMealText(value);
+      const fallbackMeal = parseMeal(text) || "ì„ì‹";
+
+      return text
+        .split(/[,ï¼Œã€\/]|\s+ë°\s+|\s+ì™¸\s+|\s*&\s*/g)
+        .map((part) => {
+          const meal = detectLastMeal(part) || fallbackMeal;
+          const name = removeMealMarkers(part)
+            .replace(/[+_]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+          return { name, meal };
+        })
+        .filter((entry) => entry.name && !/^\d+\s*ëª…$/.test(entry.name));
+    };
+
+    const parseNames = (value) => parseNameMealEntries(value).map((entry) => entry.name);
+
+    const parseWeekday = (value) => {
+      const text = String(value ?? "").trim();
+      if (!text) return { value: "ë¯¸í™•ì¸", isHoliday: null };
+
+      if (/í† |í† ìš”ì¼|sat|saturday/i.test(text)) return { value: "í† ", isHoliday: true };
+      if (/ì¼|ì¼ìš”ì¼|sun|sunday/i.test(text)) return { value: "ì¼", isHoliday: true };
+
+      if (/ì›”|í™”|ìˆ˜|ëª©|ê¸ˆ|mon|tue|wed|thu|fri/i.test(text)) {
+        return { value: text, isHoliday: false };
+      }
+
+      return { value: text, isHoliday: null };
+    };
+
+    const parseTimeToMinutes = (value) => {
+      if (value instanceof Date && !Number.isNaN(value.getTime())) {
+        return value.getHours() * 60 + value.getMinutes();
+      }
+
+      if (typeof value === "number" && value >= 0 && value < 1) {
+        return Math.round(value * 24 * 60);
+      }
+
+      const text = String(value || "").trim();
+      if (!text) return null;
+
+      const decimal = Number(text);
+      if (Number.isFinite(decimal) && decimal >= 0 && decimal < 1) {
+        return Math.round(decimal * 24 * 60);
+      }
+
+      const match = text.match(/(\d{1,2})\s*[:ì‹œ]\s*(\d{1,2})?/);
+      if (match) {
+        const hour = Number(match[1]);
+        const minute = Number(match[2] || 0);
+        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) return hour * 60 + minute;
+      }
+
+      const digits = text.replace(/[^0-9]/g, "");
+      if (digits.length === 3 || digits.length === 4) {
+        const hour = Number(digits.slice(0, -2));
+        const minute = Number(digits.slice(-2));
+        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) return hour * 60 + minute;
+      }
+
+      if (digits.length <= 2 && digits.length > 0) {
+        const hour = Number(digits);
+        if (hour >= 0 && hour <= 23) return hour * 60;
+      }
+
+      return null;
+    };
+
+    const formatMinutesAsTime = (minutes) => {
+      if (!Number.isFinite(minutes)) return "";
+      const normalized = ((minutes % 1440) + 1440) % 1440;
+      const h = String(Math.floor(normalized / 60)).padStart(2, "0");
+      const m = String(normalized % 60).padStart(2, "0");
+      return `${h}:${m}`;
+    };
+
+    const calculateWorkMinutes = (start, end) => {
+      if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+      let elapsed = end - start;
+      if (elapsed < 0) elapsed += 24 * 60;
+      const lunchDeduction = elapsed >= 6 * 60 ? 60 : 0;
+      return Math.max(0, elapsed - lunchDeduction);
+    };
+
+    const minutesToHourText = (minutes) => {
+      if (!Number.isFinite(minutes)) return "";
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      return m ? `${h}ì‹œê°„ ${m}ë¶„` : `${h}ì‹œê°„`;
+    };
+
+    const addHeaders = (headers) => {
+      headers.forEach((header) => {
+        if (/^__EMPTY_\d+$/.test(String(header))) return;
+        if (!outputHeaders.includes(header)) outputHeaders.push(header);
+      });
+    };
+
+    const makeBasicStatus = (row) => {
+      const problems = [];
+      const max = Number(String($("limitInput").value).replace(/[^0-9]/g, ""));
+      const nameCount = Array.isArray(row.parsedNames) ? row.parsedNames.length : 0;
+
+      if (!row.normalizedDate) problems.push("ì¼ì ëˆ„ë½");
+      if (!row.nameMealText) problems.push("ì„±ëª…(êµ¬ë¶„) ëˆ„ë½");
+      if (!row.meal) problems.push("êµ¬ë¶„ ëˆ„ë½");
+      if (!row.peopleCount) problems.push("ì¸ì›ìˆ˜ ëˆ„ë½");
+      if (!row.amount) problems.push("ì‚¬ìš©ê¸ˆì•¡ ëˆ„ë½");
+      if (nameCount > 0 && row.peopleCount > 0 && nameCount !== row.peopleCount) problems.push("ì„±ëª… ìˆ˜ì™€ ì¸ì›ìˆ˜ ë¶ˆì¼ì¹˜");
+      if (max > 0 && row.peopleCount > 0 && row.amount > max * row.peopleCount) problems.push("1ì¸ ë‹¨ê°€ ì´ˆê³¼");
+
+      return problems.length ? problems.join(", ") : "ì •ìƒ";
+    };
+
+    const updateScheduleCell = (id, field, value) => {
+      const row = scheduleRows.find((item) => item._scheduleId === id);
+      if (!row) return;
+
+      if (field === "ì¼ì") {
+        const normalized = normalizeDate(value);
+        row.rawDate = value;
+        row.ì¼ì = normalized || String(value || "").trim();
+        row.normalizedDate = normalized;
+        if (!String(row.ìš”ì¼ || "").trim()) {
+          row.ìš”ì¼ = weekdayFromDate(normalized);
+          row.ìš”ì¼Parsed = parseWeekday(row.ìš”ì¼);
+        }
+      } else if (field === "ìš”ì¼") {
+        row.ìš”ì¼ = String(value || "").trim();
+        row.ìš”ì¼Parsed = parseWeekday(row.ìš”ì¼);
+      } else if (field === "ì¶œê·¼ì§€ì •ì‹œê°„") {
+        row.ì¶œê·¼ì§€ì •ì‹œê°„ = String(value || "").trim() || "09:00";
+      } else if (field === "í‡´ê·¼ì§€ì •ì‹œê°„") {
+        row.í‡´ê·¼ì§€ì •ì‹œê°„ = String(value || "").trim() || "18:00";
+      } else if (field === "ë¹„ê³ ") {
+        row.ë¹„ê³  = String(value || "").trim();
+      } else {
+        row[field] = String(value || "").trim();
+      }
+
+      ensureScheduleRowMeta(row);
+      recalc();
+    };
+
+    const addScheduleRow = (overrides = {}) => {
+      scheduleRows.push(createScheduleRow(overrides));
+      scheduleFiles = Array.from(new Set([...scheduleFiles, "ìˆ˜ê¸°ì…ë ¥"]));
+      activeTab = "schedule";
+      recalc();
+      $("message").textContent = "ê·¼ë¬´ì‹œê°„í‘œ ì •ë¦¬ì— ìˆ˜ê¸° í–‰ì„ ì¶”ê°€í–ˆìŠµë‹ˆë‹¤. í•„ìš”í•œ ì…€ì„ ìˆ˜ì •í•˜ì‹­ì‹œì˜¤.";
+    };
+
+    const deleteScheduleRow = (id) => {
+      const target = scheduleRows.find((row) => row._scheduleId === id);
+      const label = target ? `${target.ì¼ì || "ì¼ì ë¯¸ì…ë ¥"} / ${target.ì´ë¦„ || "ì´ë¦„ ë¯¸ì…ë ¥"}` : "ì„ íƒí•œ í–‰";
+      if (!confirm(`${label} ê·¼ë¬´ì‹œê°„í‘œ í–‰ì„ ì‚­ì œí•˜ì‹œê² ìŠµë‹ˆê¹Œ?`)) return;
+      scheduleRows = scheduleRows.filter((row) => row._scheduleId !== id);
+      recalc();
+      $("message").textContent = "ê·¼ë¬´ì‹œê°„í‘œ í–‰ì„ ì‚­ì œí–ˆìŠµë‹ˆë‹¤.";
+    };
+
+    const addScheduleRowsFromDecision = (decision = "ë¯¸ê²€ì¦") => {
+      const targets = ledgerRows.filter((row) => row.ì§‘í–‰ëŒ€ìƒíŒì • === decision);
+      if (!targets.length) {
+        $("message").textContent = `${decision} íŒì • ê±´ì´ ì—†ìŠµë‹ˆë‹¤.`;
+        return;
+      }
+
+      const existingKeys = new Set(scheduleRows.map((row) => makeScheduleKey(getScheduleDate(row) || row.ì¼ì, row.ì´ë¦„)));
+      const pending = new Map();
+
+      targets.forEach((row) => {
+        const date = normalizeDate(row.ì¼ì) || row.ì¼ì || "";
+        const name = row.ì„±ëª… || "";
+        const key = makeScheduleKey(date, name);
+        if (!date || !name || existingKeys.has(key) || pending.has(key)) return;
+        pending.set(key, createScheduleRow({
+          ì´ë¦„: name,
+          ì§ê¸‰: row.ì§ê¸‰ || "",
+          ì¼ì: date,
+          rawDate: row.ì¼ì,
+          normalizedDate: normalizeDate(row.ì¼ì),
+          ìš”ì¼: row.ìš”ì¼ || weekdayFromDate(row.ì¼ì),
+          ì¶œê·¼ì§€ì •ì‹œê°„: "09:00",
+          í‡´ê·¼ì§€ì •ì‹œê°„: "18:00",
+          ë¹„ê³ : `${decision} ë³´ì™„í–‰`,
+          ì›ë³¸íŒŒì¼: "íŒì •ë³„ í†µê³„ ë³´ì™„",
+          ì›ë³¸ì‹œíŠ¸: decision,
+          ì›ë³¸í–‰: "ìë™ì¶”ê°€"
+        }));
+      });
+
+      const additions = Array.from(pending.values());
+      if (!additions.length) {
+        $("message").textContent = `${decision} íŒì • ê±´ ì¤‘ ì¶”ê°€í•  ì‹ ê·œ ê·¼ë¬´ì‹œê°„í‘œ í–‰ì´ ì—†ìŠµë‹ˆë‹¤.`;
+        return;
+      }
+
+      scheduleRows = [...scheduleRows, ...additions.map(ensureScheduleRowMeta)];
+      scheduleFiles = Array.from(new Set([...scheduleFiles, `${decision} ë³´ì™„í–‰`]));
+      activeTab = "schedule";
+      recalc();
+      $("message").textContent = `${decision} íŒì • ê±´ ê¸°ì¤€ìœ¼ë¡œ ê·¼ë¬´ì‹œê°„í‘œ ë³´ì™„í–‰ ${additions.length.toLocaleString()}ê±´ì„ ì¶”ê°€í–ˆìŠµë‹ˆë‹¤. ê·¼ë¬´ì‹œê°„í‘œ ì •ë¦¬ íƒ­ì—ì„œ ìˆ˜ì •í•˜ì‹­ì‹œì˜¤.`;
+    };
+
+    const addUnverifiedScheduleRows = () => addScheduleRowsFromDecision("ë¯¸ê²€ì¦");
+
+    const buildScheduleMaps = () => {
+      scheduleByDateName = new Map();
+      scheduleByName = new Map();
+
+      scheduleRows.forEach((row) => {
+        ensureScheduleRowMeta(row);
+        const nameKey = normalizeNameKey(row.ì´ë¦„);
+        if (!nameKey) return;
+
+        const dateKey = getScheduleDate(row);
+        if (dateKey) {
+          scheduleByDateName.set(makeScheduleKey(dateKey, row.ì´ë¦„), row);
+        }
+
+        if (!scheduleByName.has(nameKey)) scheduleByName.set(nameKey, []);
+        scheduleByName.get(nameKey).push(row);
+      });
+    };
+
+    const findSchedule = (date, name) => {
+      const targetDate = normalizeDate(date);
+      const nameKey = normalizeNameKey(name);
+      if (!targetDate || !nameKey) return null;
+
+      // ê·¼ë¬´ì‹œê°„í‘œ ê²€ì¦ì˜ ê¸°ì¤€ì€ ë§¤ì‹ë¹„ í‘œì˜ ì¼ì + ì„±ëª…ì´ë‹¤.
+      // ì´ë¦„ë§Œ ë‹¨ë…ìœ¼ë¡œ ì¼ì¹˜í•˜ëŠ” í–‰ì€ ë‚ ì§œ ì˜¤ê²€ì¦ì„ ë§Œë“¤ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ì¸ì •í•˜ì§€ ì•ŠëŠ”ë‹¤.
+      return scheduleByDateName.get(makeScheduleKey(targetDate, name)) || null;
+    };
+
+    const evaluatePersonEligibility = (date, name) => {
+      if (!scheduleRows.length) {
+        return {
+          íŒì •: "ë¯¸ê²€ì¦",
+          ì‚¬ìœ : "ê·¼ë¬´ì‹œê°„í‘œ ë¯¸ì—…ë¡œë“œ",
+          ì¼ì: date,
+          ì§ê¸‰: "",
+          ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜: "ë¯¸ê²€ì¦",
+          ìš”ì¼: "",
+          ì¶œê·¼ì§€ì •ì‹œê°„: "",
+          í‡´ê·¼ì§€ì •ì‹œê°„: "",
+          ê·¼ë¬´ì‹œê°„: ""
+        };
+      }
+
+      const schedule = findSchedule(date, name);
+      if (!schedule) {
+        return {
+          íŒì •: "ë¯¸í™•ì¸",
+          ì‚¬ìœ : "ê·¼ë¬´ì‹œê°„í‘œì— í•´ë‹¹ ì¼ìÂ·ì„±ëª… ì—†ìŒ",
+          ì¼ì: date,
+          ì§ê¸‰: "",
+          ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜: "ë¶ˆì¼ì¹˜",
+          ìš”ì¼: "",
+          ì¶œê·¼ì§€ì •ì‹œê°„: "",
+          í‡´ê·¼ì§€ì •ì‹œê°„: "",
+          ê·¼ë¬´ì‹œê°„: ""
+        };
+      }
+
+      const scheduleDate = getScheduleDate(schedule) || normalizeDate(date) || date;
+      const start = parseTimeToMinutes(schedule.ì¶œê·¼ì§€ì •ì‹œê°„);
+      const end = parseTimeToMinutes(schedule.í‡´ê·¼ì§€ì •ì‹œê°„);
+      const workMinutes = calculateWorkMinutes(start, end);
+      const threshold = Number(String($("thresholdInput").value).replace(/[^0-9]/g, "")) || 60;
+      const weekday = schedule.ìš”ì¼Parsed;
+
+      if (weekday.isHoliday === true) {
+        return {
+          íŒì •: "ëŒ€ìƒ",
+          ì‚¬ìœ : `ê·¼ë¬´ì‹œê°„í‘œìƒ ${weekday.value}ìš”ì¼ íœ´ì¼ê·¼ë¬´`,
+          ì¼ì: scheduleDate,
+          ì§ê¸‰: schedule.ì§ê¸‰,
+          ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜: "ì¼ì¹˜",
+          ìš”ì¼: weekday.value,
+          ì¶œê·¼ì§€ì •ì‹œê°„: Number.isFinite(start) ? formatMinutesAsTime(start) : schedule.ì¶œê·¼ì§€ì •ì‹œê°„,
+          í‡´ê·¼ì§€ì •ì‹œê°„: Number.isFinite(end) ? formatMinutesAsTime(end) : schedule.í‡´ê·¼ì§€ì •ì‹œê°„,
+          ê·¼ë¬´ì‹œê°„: Number.isFinite(workMinutes) ? minutesToHourText(workMinutes) : ""
+        };
+      }
+
+      if (weekday.isHoliday === null) {
+        return {
+          íŒì •: "ê²€í† í•„ìš”",
+          ì‚¬ìœ : "ê·¼ë¬´ì‹œê°„í‘œ ìš”ì¼ ëˆ„ë½ ë˜ëŠ” í•´ì„ ë¶ˆê°€",
+          ì¼ì: scheduleDate,
+          ì§ê¸‰: schedule.ì§ê¸‰,
+          ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜: "ì¼ì¹˜",
+          ìš”ì¼: weekday.value,
+          ì¶œê·¼ì§€ì •ì‹œê°„: Number.isFinite(start) ? formatMinutesAsTime(start) : schedule.ì¶œê·¼ì§€ì •ì‹œê°„,
+          í‡´ê·¼ì§€ì •ì‹œê°„: Number.isFinite(end) ? formatMinutesAsTime(end) : schedule.í‡´ê·¼ì§€ì •ì‹œê°„,
+          ê·¼ë¬´ì‹œê°„: Number.isFinite(workMinutes) ? minutesToHourText(workMinutes) : ""
+        };
+      }
+
+      if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(workMinutes)) {
+        return {
+          íŒì •: "ë¯¸í™•ì¸",
+          ì‚¬ìœ : "ì¶œí‡´ê·¼ ì§€ì •ì‹œê°„ í•´ì„ ë¶ˆê°€",
+          ì¼ì: scheduleDate,
+          ì§ê¸‰: schedule.ì§ê¸‰,
+          ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜: "ì¼ì¹˜",
+          ìš”ì¼: weekday.value,
+          ì¶œê·¼ì§€ì •ì‹œê°„: schedule.ì¶œê·¼ì§€ì •ì‹œê°„,
+          í‡´ê·¼ì§€ì •ì‹œê°„: schedule.í‡´ê·¼ì§€ì •ì‹œê°„,
+          ê·¼ë¬´ì‹œê°„: ""
+        };
+      }
+
+      const earlyMinutes = Math.max(0, STANDARD_START - start);
+      const lateMinutes = Math.max(0, end - STANDARD_END);
+
+      if (workMinutes <= STANDARD_WORK_MINUTES) {
+        return {
+          íŒì •: "ë¹„ëŒ€ìƒ",
+          ì‚¬ìœ : "í‰ì¼ ì •ê·œ/ìœ ì—°ê·¼ë¬´ 8ì‹œê°„ ì´ë‚´",
+          ì¼ì: scheduleDate,
+          ì§ê¸‰: schedule.ì§ê¸‰,
+          ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜: "ì¼ì¹˜",
+          ìš”ì¼: weekday.value,
+          ì¶œê·¼ì§€ì •ì‹œê°„: formatMinutesAsTime(start),
+          í‡´ê·¼ì§€ì •ì‹œê°„: formatMinutesAsTime(end),
+          ê·¼ë¬´ì‹œê°„: minutesToHourText(workMinutes)
+        };
+      }
+
+      if (earlyMinutes >= threshold || lateMinutes >= threshold) {
+        return {
+          íŒì •: "ëŒ€ìƒ",
+          ì‚¬ìœ : earlyMinutes >= threshold && lateMinutes >= threshold
+            ? "í‰ì¼ ì •ê·œ ê·¼ë¬´ì‹œê°„ ì „Â·í›„ ì´ˆê³¼ê·¼ë¬´"
+            : earlyMinutes >= threshold
+              ? "í‰ì¼ ì •ê·œ ê·¼ë¬´ì‹œê°„ ì „ ì´ˆê³¼ê·¼ë¬´"
+              : "í‰ì¼ ì •ê·œ ê·¼ë¬´ì‹œê°„ í›„ ì´ˆê³¼ê·¼ë¬´",
+          ì¼ì: scheduleDate,
+          ì§ê¸‰: schedule.ì§ê¸‰,
+          ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜: "ì¼ì¹˜",
+          ìš”ì¼: weekday.value,
+          ì¶œê·¼ì§€ì •ì‹œê°„: formatMinutesAsTime(start),
+          í‡´ê·¼ì§€ì •ì‹œê°„: formatMinutesAsTime(end),
+          ê·¼ë¬´ì‹œê°„: minutesToHourText(workMinutes)
+        };
+      }
+
+      return {
+        íŒì •: "ê²€í† í•„ìš”",
+        ì‚¬ìœ : "í‰ì¼ 8ì‹œê°„ ì´ˆê³¼ì´ë‚˜ ì •ê·œì‹œê°„ ì „í›„ ì¸ì •ê¸°ì¤€ ë¯¸ì¶©ì¡±",
+        ì¼ì: scheduleDate,
+        ìš”ì¼: weekday.value,
+        ì¶œê·¼ì§€ì •ì‹œê°„: formatMinutesAsTime(start),
+        í‡´ê·¼ì§€ì •ì‹œê°„: formatMinutesAsTime(end),
+        ê·¼ë¬´ì‹œê°„: minutesToHourText(workMinutes)
+      };
+    };
+
+    const evaluateTransactionEligibility = (row) => {
+      const names = Array.isArray(row.parsedNames) ? row.parsedNames : [];
+      if (!names.length) return "ë¯¸í™•ì¸";
+      if (!scheduleRows.length) return "ë¯¸ê²€ì¦";
+
+      const results = names.map((name) => evaluatePersonEligibility(row.normalizedDate, name).íŒì •);
+      if (results.every((v) => v === "ëŒ€ìƒ")) return "ëŒ€ìƒ";
+      if (results.every((v) => v === "ë¹„ëŒ€ìƒ")) return "ë¹„ëŒ€ìƒ";
+      if (results.some((v) => v === "ëŒ€ìƒ")) return "ì¼ë¶€ëŒ€ìƒ";
+      return "ê²€í† í•„ìš”";
+    };
+
+    const readMealFile = async (file) => {
+      const buffer = await file.arrayBuffer();
+      const workbook = await XLSX.readAsync(buffer, { type: "array", cellDates: true });
+      const result = [];
+      const manualHeaderRowNumber = parseManualHeaderRow("mealHeaderRowInput");
+
+      workbook.SheetNames.forEach((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
+        const { rows: data, headers } = rowsFromSheet(sheet, MEAL_HEADER_GROUPS, manualHeaderRowNumber);
+        if (!data.length) return;
+
+        addHeaders(headers);
+
+        const dateHeader = findHeader(headers, DATE_HEADERS);
+        const nameMealHeader = findHeader(headers, NAME_MEAL_HEADERS);
+        const peopleCountHeader = findHeader(headers, PEOPLE_COUNT_HEADERS);
+        const amountHeader = findHeader(headers, AMOUNT_HEADERS);
+        const serialHeader = findHeader(headers, SERIAL_HEADERS);
+
+        data.forEach((row, index) => {
+          const rawDate = dateHeader ? row[dateHeader] : "";
+          const rawNameMeal = nameMealHeader ? row[nameMealHeader] : "";
+          const rawPeopleCount = peopleCountHeader ? row[peopleCountHeader] : "";
+          const rawAmount = amountHeader ? row[amountHeader] : "";
+          const rawSerial = serialHeader ? row[serialHeader] : "";
+
+          const hasAnyData = Object.values(row).some((v) => String(v).trim() !== "");
+          if (!hasAnyData) return;
+
+          const normalizedNameMealText = normalizeNameMealText(rawNameMeal);
+          const parsedNameMeals = parseNameMealEntries(normalizedNameMealText);
+
+          const item = {
+            original: { ...row },
+            rawDate,
+            rawNameMeal,
+            rawPeopleCount,
+            rawAmount,
+            rawSerial,
+            normalizedDate: normalizeDate(rawDate),
+            nameMealText: normalizedNameMealText,
+            peopleCount: parsePeopleCount(rawPeopleCount),
+            amount: parseAmount(rawAmount),
+            meal: parseMeal(normalizedNameMealText),
+            parsedNames: parsedNameMeals.map((entry) => entry.name),
+            parsedNameMeals,
+            sourceFile: file.name,
+            sourceSheet: sheetName,
+            sourceRow: row.__sourceRowNumber || index + 2
+          };
+
+          item.basicStatus = makeBasicStatus(item);
+          item.eligibility = evaluateTransactionEligibility(item);
+          result.push(item);
+        });
+      });
+
+      return result;
+    };
+
+    const readScheduleFile = async (file) => {
+      const buffer = await file.arrayBuffer();
+      const workbook = await XLSX.readAsync(buffer, { type: "array", cellDates: true });
+      const result = [];
+      const manualHeaderRowNumber = parseManualHeaderRow("scheduleHeaderRowInput");
+
+      workbook.SheetNames.forEach((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
+        const { rows: data, headers } = rowsFromSheet(sheet, SCHEDULE_HEADER_GROUPS, manualHeaderRowNumber);
+        if (!data.length) return;
+
+        const dateHeader = findHeader(headers, SCHEDULE_DATE_HEADERS);
+        const nameHeader = findHeader(headers, SCHEDULE_NAME_HEADERS);
+        const positionHeader = findHeader(headers, SCHEDULE_POSITION_HEADERS);
+        const weekdayHeader = findHeader(headers, SCHEDULE_WEEKDAY_HEADERS);
+        const startHeader = findHeader(headers, SCHEDULE_START_HEADERS);
+        const endHeader = findHeader(headers, SCHEDULE_END_HEADERS);
+        const noteHeader = findHeader(headers, SCHEDULE_NOTE_HEADERS);
+
+        data.forEach((row, index) => {
+          const rawDate = dateHeader ? row[dateHeader] : "";
+          const date = normalizeDate(rawDate);
+          const name = nameHeader ? String(row[nameHeader] || "").trim() : "";
+          const position = positionHeader ? String(row[positionHeader] || "").trim() : "";
+          const weekdayRaw = weekdayHeader ? String(row[weekdayHeader] || "").trim() : "";
+          const rawStart = startHeader ? String(row[startHeader] || "").trim() : "";
+          const rawEnd = endHeader ? String(row[endHeader] || "").trim() : "";
+          const note = noteHeader ? String(row[noteHeader] || "").trim() : "";
+
+          // ì¶œê·¼Â·í‡´ê·¼ì§€ì •ì‹œê°„ ê¸°ë³¸ê°’ ì²˜ë¦¬:
+          // ê·¼ë¬´ì‹œê°„í‘œì—ì„œ ì¶œê·¼ì§€ì •ì‹œê°„ì´ ë¹„ì–´ ìˆìœ¼ë©´ 09:00,
+          // í‡´ê·¼ì§€ì •ì‹œê°„ì´ ë¹„ì–´ ìˆìœ¼ë©´ 18:00 ì •ê°ìœ¼ë¡œ ê°„ì£¼í•œë‹¤.
+          // ë‹¨, ì´ ê¸°ë³¸ê°’ ë•Œë¬¸ì— ì™„ì „íˆ ë¹ˆ í–‰ì´ ìœ íš¨ ë°ì´í„°ë¡œ ë“¤ì–´ì˜¤ì§€ ì•Šë„ë¡
+          // ë¹ˆ í–‰ íŒì •ì—ëŠ” rawStart, rawEndë¥¼ ì‚¬ìš©í•œë‹¤.
+          const start = rawStart || "09:00";
+          const end = rawEnd || "18:00";
+
+          const hasAnyScheduleData = [date, name, position, weekdayRaw, rawStart, rawEnd].some((v) => String(v).trim() !== "");
+          if (!hasAnyScheduleData) return;
+
+          result.push({
+            ì´ë¦„: name,
+            ì§ê¸‰: position,
+            ì¼ì: date,
+            rawDate,
+            normalizedDate: date,
+            ìš”ì¼: weekdayRaw,
+            ìš”ì¼Parsed: parseWeekday(weekdayRaw),
+            ì¶œê·¼ì§€ì •ì‹œê°„: start,
+            í‡´ê·¼ì§€ì •ì‹œê°„: end,
+            ë¹„ê³ : note,
+            ì›ë³¸íŒŒì¼: file.name,
+            ì›ë³¸ì‹œíŠ¸: sheetName,
+            ì›ë³¸í–‰: row.__sourceRowNumber || index + 2
+          });
+        });
+      });
+
+      return result;
+    };
+
+    const isCandidateHeader = (header, candidates) => {
+      const normalized = normalizeHeader(header);
+      return candidates.map(normalizeHeader).includes(normalized);
+    };
+
+    const isMealStandardSourceHeader = (header) =>
+      isCandidateHeader(header, DATE_HEADERS) ||
+      isCandidateHeader(header, NAME_MEAL_HEADERS) ||
+      isCandidateHeader(header, PEOPLE_COUNT_HEADERS) ||
+      isCandidateHeader(header, AMOUNT_HEADERS) ||
+      isCandidateHeader(header, SERIAL_HEADERS);
+
+    const getMealDisplayHeaders = () => {
+      const extraHeaders = outputHeaders.filter((header) => !isMealStandardSourceHeader(header));
+      return [...MEAL_STANDARD_OUTPUT_HEADERS, ...extraHeaders];
+    };
+
+    const getMealDisplayRow = (row) => {
+      const out = {
+        "ì •ì‚°ì—°ë²ˆ": row.displaySerial || row.generatedSerial || "",
+        "ì œì¶œì—°ë²ˆ": row.rawSerial ?? "",
+        "ì¼ì": formatDateForOutput(row.normalizedDate || row.rawDate || ""),
+        "ì„±ëª…(êµ¬ë¶„)": row.nameMealText || row.rawNameMeal || "",
+        "ì¸ì›ìˆ˜": row.rawPeopleCount ?? row.peopleCount ?? "",
+        "ì‚¬ìš©ê¸ˆì•¡": row.rawAmount ?? row.amount ?? "",
+      };
+
+      outputHeaders.forEach((header) => {
+        if (!isMealStandardSourceHeader(header) && !(header in out)) {
+          out[header] = row.original[header] ?? "";
+        }
+      });
+
+      return out;
+    };
+
+    const getMealDisplayValue = (row, key) => {
+      if (key === "ì •ì‚°ì—°ë²ˆ") return row.generatedSerial || row.displaySerial || "";
+      return getMealDisplayRow(row)[key] ?? "";
+    };
+
+    const originalRowsForExport = (items) => items.map(getMealDisplayRow);
+
+    const reviewRowsForExport = (items) =>
+      items.map((row) => {
+        const out = {
+          ì •ì‚°ì—°ë²ˆ: row.generatedSerial || "",
+          ì œì¶œì—°ë²ˆ: row.rawSerial ?? ""
+        };
+        outputHeaders.forEach((header) => {
+          if (isCandidateHeader(header, DATE_HEADERS)) {
+            out[header] = formatDateForOutput(row.normalizedDate || row.original[header] || "");
+          } else {
+            out[header] = row.original[header] ?? "";
+          }
+        });
+        out.ê¸°ë³¸ê²€ì¦ = row.basicStatus;
+        out.ì§‘í–‰ëŒ€ìƒíŒì • = row.eligibility;
+        out.ì›ë³¸íŒŒì¼ = row.sourceFile;
+        out.ì›ë³¸ì‹œíŠ¸ = row.sourceSheet;
+        out.ì›ë³¸í–‰ = row.sourceRow;
+        return out;
+      });
+
+    const compareValues = (a, b, direction) => {
+      const dir = direction === "asc" ? 1 : -1;
+      const aDate = sortableDateNumber(a);
+      const bDate = sortableDateNumber(b);
+      if (aDate !== null && bDate !== null) return (aDate - bDate) * dir;
+
+      const aNumber = typeof a === "number" ? a : Number(String(a ?? "").replace(/[^0-9.-]/g, ""));
+      const bNumber = typeof b === "number" ? b : Number(String(b ?? "").replace(/[^0-9.-]/g, ""));
+      const aIsNumber = Number.isFinite(aNumber) && String(a ?? "").trim() !== "";
+      const bIsNumber = Number.isFinite(bNumber) && String(b ?? "").trim() !== "";
+
+      if (aIsNumber && bIsNumber) return (aNumber - bNumber) * dir;
+      return String(a ?? "").localeCompare(String(b ?? ""), "ko", { numeric: true }) * dir;
+    };
+
+
+    const mealSortOrder = (meal) => {
+      const text = String(meal || "");
+      if (text.includes("ì¡°ì‹")) return 1;
+      if (text.includes("ì¤‘ì‹")) return 2;
+      if (text.includes("ì„ì‹")) return 3;
+      return 9;
+    };
+
+    const mergeMealLabels = (meals) => {
+      const order = ["ì¡°ì‹", "ì¤‘ì‹", "ì„ì‹"];
+      const normalized = Array.from(new Set((meals || []).filter(Boolean)));
+      const known = order.filter((meal) => normalized.includes(meal));
+      const unknown = normalized
+        .filter((meal) => !order.includes(meal))
+        .sort((a, b) => String(a).localeCompare(String(b), "ko", { numeric: true }));
+      return [...known, ...unknown].join(", ");
+    };
+
+    const buildMergedAttendanceRows = (sourceRows) => {
+      const map = new Map();
+
+      (sourceRows || [])
+        .filter((row) => row.ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜ === "ì¼ì¹˜")
+        .forEach((row) => {
+          const key = makeScheduleKey(row.ì¼ì, row.ì„±ëª…);
+
+          if (!map.has(key)) {
+            map.set(key, {
+              ì´ë¦„: row.ì„±ëª…,
+              ì§ê¸‰: row.ì§ê¸‰,
+              ì¼ì: row.ì¼ì,
+              ìš”ì¼: row.ìš”ì¼,
+              ì¶œê·¼ì§€ì •ì‹œê°„: row.ì¶œê·¼ì§€ì •ì‹œê°„,
+              í‡´ê·¼ì§€ì •ì‹œê°„: row.í‡´ê·¼ì§€ì •ì‹œê°„,
+              mealSet: new Set()
+            });
+          }
+
+          if (row.êµ¬ë¶„) map.get(key).mealSet.add(row.êµ¬ë¶„);
+        });
+
+      return Array.from(map.values()).map((row) => ({
+        ì´ë¦„: row.ì´ë¦„,
+        ì§ê¸‰: row.ì§ê¸‰,
+        ì¼ì: row.ì¼ì,
+        ì‹ì‚¬êµ¬ë¶„: mergeMealLabels(Array.from(row.mealSet)),
+        ìš”ì¼: row.ìš”ì¼,
+        ì¶œê·¼ì§€ì •ì‹œê°„: row.ì¶œê·¼ì§€ì •ì‹œê°„,
+        í‡´ê·¼ì§€ì •ì‹œê°„: row.í‡´ê·¼ì§€ì •ì‹œê°„,
+        ë¹„ê³ : row.ë¹„ê³  || ""
+      }));
+    };
+
+    const compareAttendanceRows = (a, b) => {
+      const dir = attendanceSort.direction === "asc" ? 1 : -1;
+
+      if (attendanceSort.key === "ì¼ì") {
+        const dateCompare = compareValues(a.ì¼ì, b.ì¼ì, attendanceSort.direction);
+        if (dateCompare !== 0) return dateCompare;
+
+        const mealCompare = mealSortOrder(a.ì‹ì‚¬êµ¬ë¶„) - mealSortOrder(b.ì‹ì‚¬êµ¬ë¶„);
+        if (mealCompare !== 0) return mealCompare;
+
+        return String(a.ì´ë¦„ ?? "").localeCompare(String(b.ì´ë¦„ ?? ""), "ko", { numeric: true });
+      }
+
+      if (attendanceSort.key === "ì‹ì‚¬ìˆœ") {
+        const mealCompare = mealSortOrder(a.ì‹ì‚¬êµ¬ë¶„) - mealSortOrder(b.ì‹ì‚¬êµ¬ë¶„);
+        if (mealCompare !== 0) return mealCompare * dir;
+
+        const dateCompare = compareValues(a.ì¼ì, b.ì¼ì, "asc");
+        if (dateCompare !== 0) return dateCompare;
+
+        return String(a.ì´ë¦„ ?? "").localeCompare(String(b.ì´ë¦„ ?? ""), "ko", { numeric: true });
+      }
+
+      return compareValues(a[attendanceSort.key], b[attendanceSort.key], attendanceSort.direction);
+    };
+
+    const sortRows = () => {
+      sortedTransactionRows = [...filteredRows];
+      if (transactionSort.key) {
+        sortedTransactionRows.sort((a, b) =>
+          compareValues(getMealDisplayValue(a, transactionSort.key), getMealDisplayValue(b, transactionSort.key), transactionSort.direction)
+        );
+      }
+      sortedTransactionRows.forEach((row, index) => {
+        row.displaySerial = index + 1;
+      });
+
+      sortedScheduleRows = [...scheduleRows];
+      if (scheduleSort.key) {
+        sortedScheduleRows.sort((a, b) => compareValues(a[scheduleSort.key], b[scheduleSort.key], scheduleSort.direction));
+      }
+
+      sortedAttendanceRows = [...attendanceRows];
+      if (attendanceSort.key) {
+        sortedAttendanceRows.sort(compareAttendanceRows);
+      }
+
+      sortedLedgerRows = [...ledgerRows];
+      if (ledgerSort.key) {
+        sortedLedgerRows.sort((a, b) => compareValues(a[ledgerSort.key], b[ledgerSort.key], ledgerSort.direction));
+      }
+
+      sortedSummaryRows = [...summaryRows];
+      if (summarySort.key) {
+        sortedSummaryRows.sort((a, b) => compareValues(a[summarySort.key], b[summarySort.key], summarySort.direction));
+      }
+    };
+
+    const recalc = () => {
+      buildScheduleMaps();
+
+      const keyword = $("searchInput").value.trim().toLowerCase();
+
+      const recalculated = rows.map((row) => ({
+        ...row,
+        basicStatus: makeBasicStatus(row),
+        eligibility: evaluateTransactionEligibility(row)
+      }));
+
+      filteredRows = keyword
+        ? recalculated.filter((row) => {
+            const originalHit = outputHeaders.some((header) =>
+              String(row.original[header] ?? "").toLowerCase().includes(keyword)
+            );
+            const reviewHit = [row.basicStatus, row.eligibility, row.sourceFile, row.sourceSheet, row.sourceRow]
+              .some((value) => String(value).toLowerCase().includes(keyword));
+            return originalHit || reviewHit;
+          })
+        : recalculated;
+
+      ledgerRows = [];
+      filteredRows.forEach((row) => {
+        const nameEntries = Array.isArray(row.parsedNameMeals) && row.parsedNameMeals.length
+          ? row.parsedNameMeals
+          : (Array.isArray(row.parsedNames) ? row.parsedNames : []).map((name) => ({ name, meal: row.meal }));
+        const perPersonAmount = row.peopleCount > 0 ? Math.round((row.amount / row.peopleCount) * 100) / 100 : 0;
+
+        nameEntries.forEach((person) => {
+          const name = person.name;
+          const eligibility = evaluatePersonEligibility(row.normalizedDate, name);
+          ledgerRows.push({
+            ì •ì‚°ì—°ë²ˆ: row.generatedSerial || "",
+            ì œì¶œì—°ë²ˆ: row.rawSerial ?? "",
+            ì¼ì: row.normalizedDate,
+            ì„±ëª…: name,
+            êµ¬ë¶„: person.meal || row.meal,
+            ì¸ì›ìˆ˜: row.peopleCount,
+            ì´ì‚¬ìš©ê¸ˆì•¡: row.amount,
+            ë°°ë¶„ê¸ˆì•¡: perPersonAmount,
+            "ì„±ëª…(êµ¬ë¶„)": row.nameMealText,
+            ì§ê¸‰: eligibility.ì§ê¸‰,
+            ìš”ì¼: eligibility.ìš”ì¼,
+            ì¶œê·¼ì§€ì •ì‹œê°„: eligibility.ì¶œê·¼ì§€ì •ì‹œê°„,
+            í‡´ê·¼ì§€ì •ì‹œê°„: eligibility.í‡´ê·¼ì§€ì •ì‹œê°„,
+            ê·¼ë¬´ì‹œê°„: eligibility.ê·¼ë¬´ì‹œê°„,
+            ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜: eligibility.ê·¼ë¬´ì‹œê°„í‘œì¼ì¹˜,
+            ì§‘í–‰ëŒ€ìƒíŒì •: eligibility.íŒì •,
+            íŒì •ì‚¬ìœ : eligibility.ì‚¬ìœ ,
+            ê¸°ë³¸ê²€ì¦: row.basicStatus,
+            ì›ë³¸íŒŒì¼: row.sourceFile,
+            ì›ë³¸ì‹œíŠ¸: row.sourceSheet,
+            ì›ë³¸í–‰: row.sourceRow
+          });
+        });
+      });
+
+
+      attendanceRows = buildMergedAttendanceRows(ledgerRows);
+
+      const summaryMap = new Map();
+      ledgerRows.forEach((row) => {
+        const key = row.ì„±ëª… || "ì„±ëª… ë¯¸í™•ì¸";
+
+        if (!summaryMap.has(key)) {
+          summaryMap.set(key, {
+            ì„±ëª…: key,
+            ì°¸ì—¬ê±´ìˆ˜: 0,
+            ì¡°ì‹: 0,
+            ì¤‘ì‹: 0,
+            ì„ì‹: 0,
+            ë°°ë¶„ê¸ˆì•¡í•©ê³„: 0,
+            ëŒ€ìƒê±´ìˆ˜: 0,
+            ê²€í† í•„ìš”ê±´ìˆ˜: 0
+          });
+        }
+
+        const item = summaryMap.get(key);
+        item.ì°¸ì—¬ê±´ìˆ˜ += 1;
+        if (row.êµ¬ë¶„ === "ì¡°ì‹") item.ì¡°ì‹ += 1;
+        if (row.êµ¬ë¶„ === "ì¤‘ì‹") item.ì¤‘ì‹ += 1;
+        if (row.êµ¬ë¶„ === "ì„ì‹") item.ì„ì‹ += 1;
+        item.ë°°ë¶„ê¸ˆì•¡í•©ê³„ += Number(row.ë°°ë¶„ê¸ˆì•¡ || 0);
+        if (row.ì§‘í–‰ëŒ€ìƒíŒì • === "ëŒ€ìƒ") item.ëŒ€ìƒê±´ìˆ˜ += 1;
+        if (row.ê¸°ë³¸ê²€ì¦ !== "ì •ìƒ" || row.ì§‘í–‰ëŒ€ìƒíŒì • !== "ëŒ€ìƒ") item.ê²€í† í•„ìš”ê±´ìˆ˜ += 1;
+      });
+
+      summaryRows = Array.from(summaryMap.values());
+
+      const eligibilityActive = scheduleRows.length > 0;
+      reviewRows = filteredRows.filter((row) => {
+        if (row.basicStatus !== "ì •ìƒ") return true;
+        if (eligibilityActive && row.eligibility !== "ëŒ€ìƒ") return true;
+        return false;
+      });
+
+      sortRows();
+      render();
+    };
+
+    const formatNumber = (value) => Number(value || 0).toLocaleString();
+
+    const renderTransactionHead = () => {
+      const displayHeaders = getMealDisplayHeaders();
+
+      if (!displayHeaders.length) {
+        $("transactionHead").innerHTML = "<tr><th>ì—…ë¡œë“œ í›„ í‘œì¤€ ì»¬ëŸ¼ì´ í‘œì‹œë©ë‹ˆë‹¤.</th></tr>";
+        return;
+      }
+
+      $("transactionHead").innerHTML = "<tr>" + displayHeaders.map((header) => {
+        const mark = transactionSort.key === header ? (transactionSort.direction === "asc" ? " â–²" : " â–¼") : "";
+        return `<th data-transaction-sort="${escapeHtml(header)}">${escapeHtml(header)}${mark}</th>`;
+      }).join("") + "</tr>";
+
+      document.querySelectorAll("[data-transaction-sort]").forEach((th) => {
+        th.addEventListener("click", () => {
+          const key = th.getAttribute("data-transaction-sort");
+          if (transactionSort.key === key) {
+            transactionSort.direction = transactionSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            transactionSort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        });
+      });
+    };
+
+    const bindSortHeaders = () => {
+      document.querySelectorAll("[data-schedule-sort]").forEach((th) => {
+        const key = th.getAttribute("data-schedule-sort");
+        th.textContent = key + (scheduleSort.key === key ? (scheduleSort.direction === "asc" ? " â–²" : " â–¼") : "");
+        th.onclick = () => {
+          if (scheduleSort.key === key) {
+            scheduleSort.direction = scheduleSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            scheduleSort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+      });
+
+      const attendanceMealSortButton = $("attendanceMealSortButton");
+      if (attendanceMealSortButton) {
+        attendanceMealSortButton.onclick = () => {
+          if (attendanceSort.key === "ì‹ì‚¬ìˆœ") {
+            attendanceSort.direction = attendanceSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            attendanceSort = { key: "ì‹ì‚¬ìˆœ", direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+        attendanceMealSortButton.textContent =
+          attendanceSort.key === "ì‹ì‚¬ìˆœ" && attendanceSort.direction === "desc"
+            ? "ì‹ì‚¬ìˆœ ì •ë ¬(ì„ì‹â†’ì¤‘ì‹â†’ì¡°ì‹)"
+            : "ì‹ì‚¬ìˆœ ì •ë ¬(ì¡°ì‹â†’ì¤‘ì‹â†’ì„ì‹)";
+      }
+
+      document.querySelectorAll("[data-attendance-sort]").forEach((th) => {
+        const key = th.getAttribute("data-attendance-sort");
+        th.textContent = key + (attendanceSort.key === key ? (attendanceSort.direction === "asc" ? " â–²" : " â–¼") : "");
+        th.onclick = () => {
+          if (attendanceSort.key === key) {
+            attendanceSort.direction = attendanceSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            attendanceSort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+      });
+
+      document.querySelectorAll("[data-ledger-sort]").forEach((th) => {
+        const key = th.getAttribute("data-ledger-sort");
+        th.textContent = key + (ledgerSort.key === key ? (ledgerSort.direction === "asc" ? " â–²" : " â–¼") : "");
+        th.onclick = () => {
+          if (ledgerSort.key === key) {
+            ledgerSort.direction = ledgerSort.direction === "asc" ? "desc" : "asc";
+          } else {
+            ledgerSort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+      });
+
+      document.querySelectorAll("[data-summary-sort]").forEach((th) => {
+        const key = th.getAttribute("data-summary-sort");
+        th.textContent = key + (summarySort.key === key ? (summarySort.direction === "asc" ? " â–²" : " â–¼") : "");
+        th.onclick = () => {
+          if (summarySort.key === key) {
+            summarySort.direction = summarySort.direction === "asc" ? "desc" : "asc";
+          } else {
+            summarySort = { key, direction: "asc" };
+          }
+          sortRows();
+          render();
+        };
+      });
+    };
+
+
+
+    const buildDashboardStats = () => {
+      const uniqueUsers = new Set(ledgerRows.map((row) => row.ì„±ëª…).filter(Boolean));
+      const eligibleRows = ledgerRows.filter((row) => row.ì§‘í–‰ëŒ€ìƒíŒì • === "ëŒ€ìƒ" && row.ê¸°ë³¸ê²€ì¦ === "ì •ìƒ");
+      const eligibleUniqueUsers = new Set(eligibleRows.map((row) => row.ì„±ëª…).filter(Boolean));
+      const eligibleAmount = eligibleRows.reduce((sum, row) => sum + Number(row.ë°°ë¶„ê¸ˆì•¡ || 0), 0);
+
+      const mealMap = new Map();
+      ["ì¡°ì‹", "ì¤‘ì‹", "ì„ì‹", "ë¯¸í™•ì¸"].forEach((meal) => {
+        mealMap.set(meal, { êµ¬ë¶„: meal, ê±°ë˜ê±´ìˆ˜: 0, ì‚¬ìš©ê¸ˆì•¡: 0, ì§€ê¸‰ê°€ëŠ¥ê¸ˆì•¡: 0 });
+      });
+
+      filteredRows.forEach((row) => {
+        const meal = row.meal || "ë¯¸í™•ì¸";
+        if (!mealMap.has(meal)) {
+          mealMap.set(meal, { êµ¬ë¶„: meal, ê±°ë˜ê±´ìˆ˜: 0, ì‚¬ìš©ê¸ˆì•¡: 0, ì§€ê¸‰ê°€ëŠ¥ê¸ˆì•¡: 0 });
+        }
+        const item = mealMap.get(meal);
+        item.ê±°ë˜ê±´ìˆ˜ += 1;
+        item.ì‚¬ìš©ê¸ˆì•¡ += Number(row.amount || 0);
+      });
+
+      ledgerRows.forEach((row) => {
+        const meal = row.êµ¬ë¶„ || "ë¯¸í™•ì¸";
+        if (!mealMap.has(meal)) {
+          mealMap.set(meal, { êµ¬ë¶„: meal, ê±°ë˜ê±´ìˆ˜: 0, ì‚¬ìš©ê¸ˆì•¡: 0, ì§€ê¸‰ê°€ëŠ¥ê¸ˆì•¡: 0 });
+        }
+        if (row.ì§‘í–‰ëŒ€ìƒíŒì • === "ëŒ€ìƒ" && row.ê¸°ë³¸ê²€ì¦ === "ì •ìƒ") {
+          mealMap.get(meal).ì§€ê¸‰ê°€ëŠ¥ê¸ˆì•¡ += Number(row.ë°°ë¶„ê¸ˆì•¡ || 0);
+        }
+      });
+
+      const decisionMap = new Map();
+      ledgerRows.forEach((row) => {
+        const key = row.ì§‘í–‰ëŒ€ìƒíŒì • || "ë¯¸í™•ì¸";
+        if (!decisionMap.has(key)) {
+          decisionMap.set(key, { íŒì •: key, ì¸ì›Set: new Set(), ë°°ë¶„ê¸ˆì•¡: 0 });
+        }
+        const item = decisionMap.get(key);
+        if (row.ì„±ëª…) item.ì¸ì›Set.add(row.ì„±ëª…);
+        item.ë°°ë¶„ê¸ˆì•¡ += Number(row.ë°°ë¶„ê¸ˆì•¡ || 0);
+      });
+
+      const mealStats = Array.from(mealMap.values()).filter((row) =>
+        row.ê±°ë˜ê±´ìˆ˜ || row.ì‚¬ìš©ê¸ˆì•¡ || row.ì§€ê¸‰ê°€ëŠ¥ê¸ˆì•¡
+      );
+
+      const decisionStats = Array.from(decisionMap.values()).map((row) => ({
+        íŒì •: row.íŒì •,
+        ì¤‘ë³µì œì™¸ì¸ì›: row.ì¸ì›Set.size,
+        ë°°ë¶„ê¸ˆì•¡: row.ë°°ë¶„ê¸ˆì•¡
+      }));
+
+      return {
+        uniqueUsers: uniqueUsers.size,
+        eligibleUniqueUsers: eligibleUniqueUsers.size,
+        eligibleAmount,
+        mealStats,
+        decisionStats
+      };
+    };
+
+    const renderDashboardStats = (totalAmount) => {
+      const stats = buildDashboardStats();
+
+      $("statTotalAmount").textContent = `${formatNumber(totalAmount)}ì›`;
+      $("statTransactionCount").textContent = `${formatNumber(filteredRows.length)}ê±´`;
+      $("statUniqueUsers").textContent = `${formatNumber(stats.uniqueUsers)}ëª…`;
+      $("statEligibleAmount").textContent = `${formatNumber(Math.round(stats.eligibleAmount))}ì›`;
+      $("statEligibleUniqueUsers").textContent = `${formatNumber(stats.eligibleUniqueUsers)}ëª…`;
+      $("statReviewCount").textContent = `${formatNumber(reviewRows.length)}ê±´`;
+
+      const mealBody = $("mealStatsBody");
+      if (!stats.mealStats.length) {
+        mealBody.innerHTML = `<tr><td colspan="4" class="empty">ì§‘ê³„í•  ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.</td></tr>`;
+      } else {
+        mealBody.innerHTML = stats.mealStats.map((row) => `
+          <tr>
+            <td>${escapeHtml(row.êµ¬ë¶„)}</td>
+            <td class="right">${formatNumber(row.ê±°ë˜ê±´ìˆ˜)}</td>
+            <td class="right">${formatNumber(row.ì‚¬ìš©ê¸ˆì•¡)}</td>
+            <td class="right">${formatNumber(Math.round(row.ì§€ê¸‰ê°€ëŠ¥ê¸ˆì•¡))}</td>
+          </tr>
+        `).join("");
+      }
+
+      const decisionBody = $("decisionStatsBody");
+      if (!stats.decisionStats.length) {
+        decisionBody.innerHTML = `<tr><td colspan="4" class="empty">ì§‘ê³„í•  ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.</td></tr>`;
+      } else {
+        decisionBody.innerHTML = stats.decisionStats.map((row) => {
+          const canSupplement = row.íŒì • === "ë¯¸ê²€ì¦" || row.íŒì • === "ë¯¸í™•ì¸";
+          return `
+            <tr>
+              <td class="${row.íŒì • === "ëŒ€ìƒ" ? "" : "warn"}">${escapeHtml(row.íŒì •)}</td>
+              <td class="right">${formatNumber(row.ì¤‘ë³µì œì™¸ì¸ì›)}</td>
+              <td class="right">${formatNumber(Math.round(row.ë°°ë¶„ê¸ˆì•¡))}</td>
+              <td>${canSupplement ? `<button class="mini-button" type="button" data-decision-supplement="${escapeHtml(row.íŒì •)}">ê·¼ë¬´í‘œ ë³´ì™„</button>` : "-"}</td>
+            </tr>
+          `;
+        }).join("");
+
+        decisionBody.querySelectorAll("[data-decision-supplement]").forEach((button) => {
+          button.addEventListener("click", () => addScheduleRowsFromDecision(button.getAttribute("data-decision-supplement")));
+        });
+      }
+    };
+
+    const renderTabs = () => {
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        const target = button.getAttribute("data-tab");
+        button.classList.toggle("active", target === activeTab);
+        button.onclick = () => {
+          activeTab = target;
+          renderTabs();
+        };
+      });
+
+      document.querySelectorAll(".tab-panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.id === `tab-${activeTab}`);
+      });
+    };
+
+    const render = () => {
+      const totalAmount = filteredRows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+      const targetCount = ledgerRows.filter((row) => row.ì§‘í–‰ëŒ€ìƒíŒì • === "ëŒ€ìƒ").length;
+
+      $("stats").textContent =
+        `ë§¤ì‹ë¹„íŒŒì¼ ${files.length.toLocaleString()}ê°œ Â· ê·¼ë¬´ì‹œê°„í‘œ ${scheduleRows.length.toLocaleString()}ê±´ Â· ê±°ë˜ ${filteredRows.length.toLocaleString()}ê±´ Â· ëŒ€ìƒ ${targetCount.toLocaleString()}ëª… Â· í•©ê³„ ${totalAmount.toLocaleString()}ì› Â· ê²€í† í•„ìš” ${reviewRows.length.toLocaleString()}ê±´`;
+
+      renderDashboardStats(totalAmount);
+      renderTabs();
+
+      $("downloadXlsx").disabled = filteredRows.length === 0;
+      $("downloadCsv").disabled = filteredRows.length === 0;
+
+      const exportTransactionsButton = $("exportTransactionsButton");
+      const exportScheduleButton = $("exportScheduleButton");
+      const exportAttendanceButton = $("exportAttendanceButton");
+      const exportLedgerButton = $("exportLedgerButton");
+      const exportSummaryButton = $("exportSummaryButton");
+
+      if (exportTransactionsButton) exportTransactionsButton.disabled = sortedTransactionRows.length === 0;
+      if (exportScheduleButton) exportScheduleButton.disabled = sortedScheduleRows.length === 0;
+      if (exportAttendanceButton) exportAttendanceButton.disabled = sortedAttendanceRows.length === 0;
+      if (exportLedgerButton) exportLedgerButton.disabled = sortedLedgerRows.length === 0;
+      if (exportSummaryButton) exportSummaryButton.disabled = sortedSummaryRows.length === 0;
+
+      const mealFileChips = files.map((file) => `<span class="file-chip">ë§¤ì‹ë¹„: ${escapeHtml(file)}</span>`);
+      const scheduleFileChips = scheduleFiles.map((file) => `<span class="file-chip">ê·¼ë¬´ì‹œê°„í‘œ: ${escapeHtml(file)}</span>`);
+      $("fileList").innerHTML = [...mealFileChips, ...scheduleFileChips].join("");
+
+      renderTransactionHead();
+
+      const transactionBody = $("transactionBody");
+      const mealDisplayHeaders = getMealDisplayHeaders();
+      if (!sortedTransactionRows.length) {
+        const colspan = Math.max(mealDisplayHeaders.length, 1);
+        transactionBody.innerHTML = `<tr><td colspan="${colspan}" class="empty">í‘œì‹œí•  ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.</td></tr>`;
+      } else {
+        transactionBody.innerHTML = sortedTransactionRows.slice(0, 200).map((row) => {
+          const displayRow = getMealDisplayRow(row);
+          return `<tr>${mealDisplayHeaders.map((header) => `<td>${escapeHtml(displayRow[header] ?? "")}</td>`).join("")}</tr>`;
+        }).join("");
+      }
+
+      const scheduleBody = $("scheduleBody");
+      if (!sortedScheduleRows.length) {
+        scheduleBody.innerHTML = `<tr><td colspan="8" class="empty">ê·¼ë¬´ì‹œê°„í‘œë¥¼ ì—…ë¡œë“œí•˜ê±°ë‚˜ í–‰ì„ ì¶”ê°€í•˜ë©´ í‘œì‹œë©ë‹ˆë‹¤.</td></tr>`;
+      } else {
+        scheduleBody.innerHTML = sortedScheduleRows.slice(0, 300).map((row) => `
+          <tr>
+            <td class="schedule-edit-cell"><input class="schedule-input name" value="${escapeHtml(row.ì´ë¦„)}" onchange="updateScheduleCell('${row._scheduleId}', 'ì´ë¦„', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input position" value="${escapeHtml(row.ì§ê¸‰)}" onchange="updateScheduleCell('${row._scheduleId}', 'ì§ê¸‰', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input date" value="${escapeHtml(formatDateForOutput(getScheduleDate(row) || row.ì¼ì))}" onchange="updateScheduleCell('${row._scheduleId}', 'ì¼ì', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input weekday" value="${escapeHtml(row.ìš”ì¼)}" onchange="updateScheduleCell('${row._scheduleId}', 'ìš”ì¼', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input time" value="${escapeHtml(row.ì¶œê·¼ì§€ì •ì‹œê°„)}" onchange="updateScheduleCell('${row._scheduleId}', 'ì¶œê·¼ì§€ì •ì‹œê°„', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input time" value="${escapeHtml(row.í‡´ê·¼ì§€ì •ì‹œê°„)}" onchange="updateScheduleCell('${row._scheduleId}', 'í‡´ê·¼ì§€ì •ì‹œê°„', this.value)" /></td>
+            <td class="schedule-edit-cell"><input class="schedule-input note-cell" value="${escapeHtml(row.ë¹„ê³  || '')}" onchange="updateScheduleCell('${row._scheduleId}', 'ë¹„ê³ ', this.value)" /></td>
+            <td class="action-cell"><button class="mini-button danger" type="button" onclick="deleteScheduleRow('${row._scheduleId}')">ì‚­ì œ</button></td>
+          </tr>
+        `).join("");
+      }
+
+      const attendanceBody = $("attendanceBody");
+      if (!sortedAttendanceRows.length) {
+        attendanceBody.innerHTML = `<tr><td colspan="7" class="empty">ë§¤ì‹ë¹„ì™€ ê·¼ë¬´ì‹œê°„í‘œê°€ ê²¹ì¹˜ëŠ” í–‰ì´ í‘œì‹œë©ë‹ˆë‹¤.</td></tr>`;
+      } else {
+        attendanceBody.innerHTML = sortedAttendanceRows.slice(0, 300).map((row) => `
+          <tr>
+            <td>${escapeHtml(row.ì´ë¦„)}</td>
+            <td>${escapeHtml(row.ì§ê¸‰)}</td>
+            <td>${escapeHtml(formatDateForOutput(row.ì¼ì))}</td>
+            <td>${escapeHtml(row.ì‹ì‚¬êµ¬ë¶„)}</td>
+            <td>${escapeHtml(row.ìš”ì¼)}</td>
+            <td>${escapeHtml(row.ì¶œê·¼ì§€ì •ì‹œê°„)}</td>
+            <td>${escapeHtml(row.í‡´ê·¼ì§€ì •ì‹œê°„)}</td>
+          </tr>
+        `).join("");
+      }
+
+      const ledgerBody = $("ledgerBody");
+      if (!sortedLedgerRows.length) {
+        ledgerBody.innerHTML = `<tr><td colspan="12" class="empty">ê·¼ë¬´ì‹œê°„í‘œì™€ ë§¤ì‹ë¹„ íŒŒì¼ì„ ì—…ë¡œë“œí•˜ë©´ ê²€ì¦ ê²°ê³¼ê°€ í‘œì‹œë©ë‹ˆë‹¤.</td></tr>`;
+      } else {
+        ledgerBody.innerHTML = sortedLedgerRows.slice(0, 300).map((row) => `
+          <tr>
+            <td>${escapeHtml(formatDateForOutput(row.ì¼ì))}</td>
+            <td>${escapeHtml(row.ì„±ëª…)}</td>
+            <td>${escapeHtml(row.êµ¬ë¶„)}</td>
+            <td class="right">${formatNumber(row.ì¸ì›ìˆ˜)}</td>
+            <td class="right">${formatNumber(row.ì´ì‚¬ìš©ê¸ˆì•¡)}</td>
+            <td class="right">${formatNumber(row.ë°°ë¶„ê¸ˆì•¡)}</td>
+            <td>${escapeHtml(row.ìš”ì¼)}</td>
+            <td>${escapeHtml(row.ì¶œê·¼ì§€ì •ì‹œê°„)}</td>
+            <td>${escapeHtml(row.í‡´ê·¼ì§€ì •ì‹œê°„)}</td>
+            <td>${escapeHtml(row.ê·¼ë¬´ì‹œê°„)}</td>
+            <td class="${row.ì§‘í–‰ëŒ€ìƒíŒì • === "ëŒ€ìƒ" ? "" : "warn"}">${escapeHtml(row.ì§‘í–‰ëŒ€ìƒíŒì •)}</td>
+            <td class="${row.ì§‘í–‰ëŒ€ìƒíŒì • === "ëŒ€ìƒ" ? "" : "warn"}">${escapeHtml(row.íŒì •ì‚¬ìœ )}</td>
+          </tr>
+        `).join("");
+      }
+
+      const summaryBody = $("summaryBody");
+      if (!sortedSummaryRows.length) {
+        summaryBody.innerHTML = `<tr><td colspan="8" class="empty">ì§‘ê³„í•  ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤.</td></tr>`;
+      } else {
+        summaryBody.innerHTML = sortedSummaryRows.map((row) => `
+          <tr>
+            <td>${escapeHtml(row.ì„±ëª…)}</td>
+            <td class="right">${formatNumber(row.ì°¸ì—¬ê±´ìˆ˜)}</td>
+            <td class="right">${formatNumber(row.ì¡°ì‹)}</td>
+            <td class="right">${formatNumber(row.ì¤‘ì‹)}</td>
+            <td class="right">${formatNumber(row.ì„ì‹)}</td>
+            <td class="right">${formatNumber(Math.round(row.ë°°ë¶„ê¸ˆì•¡í•©ê³„))}</td>
+            <td class="right">${formatNumber(row.ëŒ€ìƒê±´ìˆ˜)}</td>
+            <td class="right ${row.ê²€í† í•„ìš”ê±´ìˆ˜ ? "warn" : ""}">${formatNumber(row.ê²€í† í•„ìš”ê±´ìˆ˜)}</td>
+          </tr>
+        `).join("");
+      }
+
+      bindSortHeaders();
+
+      $("note").textContent =
+        sortedTransactionRows.length > 200 || sortedScheduleRows.length > 300 || sortedAttendanceRows.length > 300 || sortedLedgerRows.length > 300
+          ? "í™”ë©´ì—ëŠ” ì¼ë¶€ í–‰ë§Œ í‘œì‹œí•©ë‹ˆë‹¤. ì €ì¥ íŒŒì¼ì—ëŠ” í˜„ì¬ ê²€ìƒ‰ ê²°ê³¼ ì „ì²´ê°€ í¬í•¨ë©ë‹ˆë‹¤."
+          : "";
+    };
+
+    const escapeHtml = (value) => {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
+
+    const addScheduleRowButton = $("addScheduleRowButton");
+    if (addScheduleRowButton) {
+      addScheduleRowButton.addEventListener("click", () => addScheduleRow());
+    }
+
+    const addUnverifiedScheduleRowsButton = $("addUnverifiedScheduleRowsButton");
+    if (addUnverifiedScheduleRowsButton) {
+      addUnverifiedScheduleRowsButton.addEventListener("click", addUnverifiedScheduleRows);
+    }
+
+    $("fileInput").addEventListener("change", async (event) => {
+      const selected = Array.from(event.target.files || []);
+      if (!selected.length) return;
+
+      try {
+        $("message").textContent = "ë§¤ì‹ë¹„ íŒŒì¼ì„ ì½ëŠ” ì¤‘ì…ë‹ˆë‹¤.";
+        const parsed = await Promise.all(selected.map(readMealFile));
+        const merged = parsed.flat();
+
+        rows = [...rows, ...merged];
+        rows.forEach((row, index) => {
+          row.generatedSerial = index + 1;
+        });
+        files = [...files, ...selected.map((file) => file.name)];
+
+        if (!transactionSort.key && outputHeaders.length) {
+          transactionSort = { key: "ì¼ì", direction: "asc" };
+        }
+
+        $("message").textContent = `${selected.length}ê°œ ë§¤ì‹ë¹„ íŒŒì¼ì—ì„œ ${merged.length.toLocaleString()}ê±´ì„ ì¶”ê°€í–ˆìŠµë‹ˆë‹¤.`;
+        event.target.value = "";
+        recalc();
+      } catch (error) {
+        console.error(error);
+        $("message").textContent = "íŒŒì¼ ì²˜ë¦¬ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. ì¼ì / ì„±ëª…(êµ¬ë¶„) / ì¸ì›ìˆ˜ / ì‚¬ìš©ê¸ˆì•¡ ì»¬ëŸ¼ì„ í™•ì¸í•˜ì„¸ìš”.";
+      }
+    });
+
+    $("scheduleInput").addEventListener("change", async (event) => {
+      const selected = Array.from(event.target.files || []);
+      if (!selected.length) return;
+
+      try {
+        $("message").textContent = "ê·¼ë¬´ì‹œê°„í‘œë¥¼ ì½ëŠ” ì¤‘ì…ë‹ˆë‹¤.";
+        const parsed = await Promise.all(selected.map(readScheduleFile));
+        const merged = parsed.flat();
+
+        scheduleRows = [...scheduleRows, ...merged.map(ensureScheduleRowMeta)];
+        scheduleFiles = [...scheduleFiles, ...selected.map((file) => file.name)];
+
+        $("message").textContent = `${selected.length}ê°œ ê·¼ë¬´ì‹œê°„í‘œì—ì„œ ${merged.length.toLocaleString()}ê±´ì„ ì¶”ê°€í–ˆìŠµë‹ˆë‹¤.`;
+        event.target.value = "";
+        recalc();
+      } catch (error) {
+        console.error(error);
+        $("message").textContent = "ê·¼ë¬´ì‹œê°„í‘œ ì²˜ë¦¬ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. ì´ë¦„ / ì§ê¸‰ / ì¼ì / ìš”ì¼ / ì¶œê·¼ì§€ì •ì‹œê°„ / í‡´ê·¼ì§€ì •ì‹œê°„ ì»¬ëŸ¼ì„ í™•ì¸í•˜ì„¸ìš”.";
+      }
+    });
+
+    $("searchInput").addEventListener("input", recalc);
+    $("limitInput").addEventListener("input", recalc);
+    $("thresholdInput").addEventListener("input", recalc);
+
+
+    const downloadSingleSheet = (rows, sheetName, fileName) => {
+      if (!rows || !rows.length) return;
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), sheetName);
+      XLSX.writeFile(workbook, fileName);
+    };
+
+    const scheduleRowsForExport = (items) =>
+      items.map((row) => ({
+        ì´ë¦„: row.ì´ë¦„,
+        ì§ê¸‰: row.ì§ê¸‰,
+        ì¼ì: formatDateForOutput(getScheduleDate(row) || row.ì¼ì),
+        ìš”ì¼: row.ìš”ì¼,
+        ì¶œê·¼ì§€ì •ì‹œê°„: row.ì¶œê·¼ì§€ì •ì‹œê°„,
+        í‡´ê·¼ì§€ì •ì‹œê°„: row.í‡´ê·¼ì§€ì •ì‹œê°„
+      }));
+
+    const ledgerRowsForExport = (items) =>
+      items.map((row) => ({
+        ...row,
+        ì¼ì: formatDateForOutput(row.ì¼ì)
+      }));
+
+    const attendanceRowsForExport = (items) =>
+      items.map((row) => ({
+        ì´ë¦„: row.ì´ë¦„,
+        ì§ê¸‰: row.ì§ê¸‰,
+        ì¼ì: formatDateForOutput(row.ì¼ì),
+        ì‹ì‚¬êµ¬ë¶„: row.ì‹ì‚¬êµ¬ë¶„,
+        ìš”ì¼: row.ìš”ì¼,
+        ì¶œê·¼ì§€ì •ì‹œê°„: row.ì¶œê·¼ì§€ì •ì‹œê°„,
+        í‡´ê·¼ì§€ì •ì‹œê°„: row.í‡´ê·¼ì§€ì •ì‹œê°„
+      }));
+
+    $("downloadXlsx").addEventListener("click", () => {
+      if (!sortedTransactionRows.length) return;
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(originalRowsForExport(sortedTransactionRows)), "í†µí•©ëª©ë¡");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(scheduleRowsForExport(sortedScheduleRows)), "ê·¼ë¬´ì‹œê°„í‘œì •ë¦¬");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(attendanceRowsForExport(sortedAttendanceRows)), "ì‚¬ìš©ìì¶œí‡´ê·¼í™•ì¸");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(ledgerRowsForExport(sortedLedgerRows)), "ì§‘í–‰ëŒ€ìƒê²€ì¦");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(sortedSummaryRows), "ê°œì¸ë³„í•©ê³„");
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(reviewRowsForExport(reviewRows)), "ê²€í† í•„ìš”");
+      XLSX.writeFile(workbook, "í†µì¼ë¶€_íŠ¹ê·¼ë§¤ì‹ë¹„_ì •ì‚°ê²°ê³¼.xlsx");
+    });
+
+    $("downloadCsv").addEventListener("click", () => {
+      if (!sortedTransactionRows.length) return;
+
+      const worksheet = XLSX.utils.json_to_sheet(originalRowsForExport(sortedTransactionRows));
+      const csv = XLSX.utils.sheet_to_csv(worksheet);
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "í†µì¼ë¶€_íŠ¹ê·¼ë§¤ì‹ë¹„_í†µí•©ëª©ë¡.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    $("downloadTemplate").addEventListener("click", () => {
+      const mealSheet = XLSX.utils.json_to_sheet([
+        { ì¼ì: "2026-04-01", "ì„±ëª…(êµ¬ë¶„)": "í™ê¸¸ë™", ì¸ì›ìˆ˜: 1, ì‚¬ìš©ê¸ˆì•¡: 9000, ì—°ë²ˆ: 1 },
+        { ì¼ì: "2026-04-05", "ì„±ëª…(êµ¬ë¶„)": "í™ê¸¸ë™, ê¹€ì² ìˆ˜(ì„ì‹)", ì¸ì›ìˆ˜: 2, ì‚¬ìš©ê¸ˆì•¡: 18000, ì—°ë²ˆ: 2 }
+      ]);
+
+      const scheduleSheet = XLSX.utils.json_to_sheet([
+        { ì´ë¦„: "í™ê¸¸ë™", ì§ê¸‰: "ì£¼ë¬´ê´€", ì¼ì: "2026-04-01", ìš”ì¼: "ìˆ˜", ì¶œê·¼ì§€ì •ì‹œê°„: "09:00", í‡´ê·¼ì§€ì •ì‹œê°„: "20:00" },
+        { ì´ë¦„: "í™ê¸¸ë™", ì§ê¸‰: "ì£¼ë¬´ê´€", ì¼ì: "2026-04-05", ìš”ì¼: "ì¼", ì¶œê·¼ì§€ì •ì‹œê°„: "10:00", í‡´ê·¼ì§€ì •ì‹œê°„: "13:00" },
+        { ì´ë¦„: "ê¹€ì² ìˆ˜", ì§ê¸‰: "ì£¼ë¬´ê´€", ì¼ì: "2026-04-05", ìš”ì¼: "ì¼", ì¶œê·¼ì§€ì •ì‹œê°„: "10:00", í‡´ê·¼ì§€ì •ì‹œê°„: "13:00" }
+      ]);
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, mealSheet, "ë§¤ì‹ë¹„ì œì¶œì–‘ì‹");
+      XLSX.utils.book_append_sheet(workbook, scheduleSheet, "ê·¼ë¬´ì‹œê°„í‘œì–‘ì‹");
+      XLSX.writeFile(workbook, "í†µì¼ë¶€_íŠ¹ê·¼ë§¤ì‹ë¹„_ì–‘ì‹.xlsx");
+    });
+
+
+    const bindOptionalClick = (id, handler) => {
+      const element = $(id);
+      if (element) element.addEventListener("click", handler);
+    };
+
+    bindOptionalClick("exportTransactionsButton", () => {
+      downloadSingleSheet(originalRowsForExport(sortedTransactionRows), "í†µí•©ëª©ë¡", "í†µì¼ë¶€_íŠ¹ê·¼ë§¤ì‹ë¹„_í†µí•©ëª©ë¡.xlsx");
+    });
+
+    bindOptionalClick("exportScheduleButton", () => {
+      downloadSingleSheet(scheduleRowsForExport(sortedScheduleRows), "ê·¼ë¬´ì‹œê°„í‘œì •ë¦¬", "í†µì¼ë¶€_íŠ¹ê·¼ë§¤ì‹ë¹„_ê·¼ë¬´ì‹œê°„í‘œì •ë¦¬.xlsx");
+    });
+
+    bindOptionalClick("exportAttendanceButton", () => {
+      downloadSingleSheet(attendanceRowsForExport(sortedAttendanceRows), "ì‚¬ìš©ìì¶œí‡´ê·¼í™•ì¸", "í†µì¼ë¶€_íŠ¹ê·¼ë§¤ì‹ë¹„_ì‚¬ìš©ìì¶œí‡´ê·¼í™•ì¸.xlsx");
+    });
+
+    bindOptionalClick("exportLedgerButton", () => {
+      downloadSingleSheet(ledgerRowsForExport(sortedLedgerRows), "ì§‘í–‰ëŒ€ìƒê²€ì¦", "í†µì¼ë¶€_íŠ¹ê·¼ë§¤ì‹ë¹„_ì§‘í–‰ëŒ€ìƒê²€ì¦.xlsx");
+    });
+
+    bindOptionalClick("exportSummaryButton", () => {
+      downloadSingleSheet(sortedSummaryRows, "ê°œì¸ë³„í•©ê³„", "í†µì¼ë¶€_íŠ¹ê·¼ë§¤ì‹ë¹„_ê°œì¸ë³„í•©ê³„.xlsx");
+    });
+
+    $("resetButton").addEventListener("click", () => {
+      rows = [];
+      files = [];
+      scheduleRows = [];
+      scheduleRowSeq = 0;
+      scheduleFiles = [];
+      scheduleByDateName = new Map();
+      scheduleByName = new Map();
+
+      outputHeaders = [];
+      filteredRows = [];
+      sortedTransactionRows = [];
+      ledgerRows = [];
+      sortedLedgerRows = [];
+      attendanceRows = [];
+      sortedAttendanceRows = [];
+      sortedScheduleRows = [];
+      summaryRows = [];
+      sortedSummaryRows = [];
+      reviewRows = [];
+
+      transactionSort = { key: null, direction: "asc" };
+      scheduleSort = { key: "ì¼ì", direction: "asc" };
+      attendanceSort = { key: "ì¼ì", direction: "asc" };
+      ledgerSort = { key: "ì¼ì", direction: "asc" };
+      summarySort = { key: "ì„±ëª…", direction: "asc" };
+      activeTab = "transactions";
+
+      $("searchInput").value = "";
+      $("mealHeaderRowInput").value = "";
+      $("scheduleHeaderRowInput").value = "";
+      $("limitInput").value = "9000";
+      $("thresholdInput").value = "60";
+      $("message").textContent = "ì´ˆê¸°í™”í–ˆìŠµë‹ˆë‹¤.";
+      render();
+    });
+
+    render();
+  </script>
+  <footer class="footer">Â© í†µì¼ë¶€ ë‚¨ë¶íšŒë‹´ë³¸ë¶€ íšŒë‹´ì§€ì›ê³¼ í™©ì§„ìš° ì£¼ë¬´ê´€ ì œì‘</footer>
+</body>
+</html>
