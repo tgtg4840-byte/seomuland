@@ -583,6 +583,73 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
  .desk-panel{padding:13px 8px 16px!important}.day{min-height:52px}
 }
 
+
+/* MOBILE BOOKMARK EDITION — desktop untouched; one immersive paper panel at a time. */
+.mobile-bookmarks{display:none}
+@media(max-width:820px){
+  .topbar{padding:9px 13px;gap:7px}.top-actions{margin-top:0}
+  .mobile-bookmarks{display:block;position:sticky;top:0;z-index:40;margin:0 0 11px;padding:9px 8px 7px;border:1px solid #a7835b;border-radius:10px;background:linear-gradient(180deg,#eedfca,#d4b995);box-shadow:0 4px 10px #3c241a55}
+  .mobile-bookmarks-head{display:flex;justify-content:space-between;align-items:center;padding:0 7px 7px;color:#61442e;font-size:10px;font-weight:850;letter-spacing:.07em}
+  .mobile-bookmarks-head small{font-size:8px;letter-spacing:.05em;color:#826d55}
+  .mobile-bookmark-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+  .mobile-bookmark{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:51px;padding:7px 2px 6px;border:1px solid #c1a88a;border-radius:7px 7px 3px 3px;background:#f9f2e5;color:#806347;box-shadow:inset 0 1px #fff9eb,0 2px 0 #9c7e5a;font-family:inherit;font-size:11px;font-weight:850;cursor:pointer}
+  .mobile-bookmark .petit-icon{width:19px;height:19px}
+  .mobile-bookmark.active,.mobile-bookmark[aria-selected="true"]{border-color:#8e7857;background:linear-gradient(#526a68,#314e56);color:#fff3d9;box-shadow:inset 0 1px #8ea1a0,0 2px 0 #6e503b}
+  .mobile-bookmark:focus-visible{outline:2px solid #dfb65c;outline-offset:2px}
+  .desktop-scene{overflow:hidden!important;padding:10px 8px 13px;box-shadow:0 8px 23px #291b1455}
+  .desktop-scene .desk-topline{margin:0 7px 9px;font-size:9px}
+  .desktop-scene .desk-topline:after{content:'✦';margin-left:auto;color:#f0ce86}
+  .desktop-scene .desk-book-place{grid-column:1/-1!important;grid-row:1!important}
+  body[data-mobile-view="today"] .desk-side,
+  body[data-mobile-view="notes"] .desk-side{display:none!important}
+  body[data-mobile-view="today"] .desktop-scene .left-leaf{display:none!important}
+  body[data-mobile-view="notes"] .desktop-scene .right-leaf{display:none!important}
+  body[data-mobile-view="today"] .desktop-scene .daily-spread,
+  body[data-mobile-view="notes"] .desktop-scene .daily-spread{display:block!important;min-height:0!important}
+  body[data-mobile-view="today"] .desktop-scene .diary-leaf,
+  body[data-mobile-view="notes"] .desktop-scene .diary-leaf{border:0!important;box-shadow:none!important;min-height:260px;padding:15px 14px 20px!important}
+  .desktop-scene .petit-book-head{display:flex;min-height:0!important;align-items:center;flex-wrap:wrap!important;gap:4px 8px!important}
+  .desktop-scene .petit-book-head .petit-identity{order:1;flex:1 1 calc(100% - 80px)!important;min-width:0!important}
+  .desktop-scene .petit-book-head .petit-identity h2{font-size:21px;white-space:nowrap;letter-spacing:-.05em}
+  .desktop-scene .petit-book-head .petit-identity .petit-overline{font-size:8px}
+  .desktop-scene .petit-book-head .petit-planet{order:2;flex:0 0 65px!important;max-width:65px;margin:0!important;transform:scale(.7)!important}
+  .desktop-scene .petit-book-head .header-stats-only{order:3!important;flex:0 0 100%!important;width:100%;max-width:100%!important;min-width:0!important;margin:0;padding:6px 0}
+  .desktop-scene .date-jump #pageIndicator{display:none}
+  .desktop-scene .date-jump{flex-wrap:nowrap!important}
+  .desktop-scene .date-jump input{width:158px}
+  .desktop-scene .header-stats-only{flex:1 1 100%;order:3;padding:3px 0 0}
+  .desktop-scene .book{padding:10px 8px 13px!important}
+  .desktop-scene .daily-navigation{margin:7px 0 10px;gap:5px}
+  .desktop-scene .daily-navigation .page-step{padding:8px 6px!important}
+  .desktop-scene .left-leaf .sticky-board{height:min(35dvh,265px);max-height:min(35dvh,265px);grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .desktop-scene .right-leaf .today-list{max-height:51dvh;overflow-y:auto;overscroll-behavior:contain}
+  .desktop-scene .journal-cover{min-height:390px}
+  body[data-mobile-view="desk"] .desk-book-place{display:none!important}
+  body[data-mobile-view="desk"] .desk-arrangement{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px!important}
+  body[data-mobile-view="desk"] .desk-side{display:flex!important;grid-row:1!important;padding:12px 4px!important;gap:12px!important}
+  body[data-mobile-view="desk"] .desk-side-left{grid-column:1!important}
+  body[data-mobile-view="desk"] .desk-side-right{grid-column:2!important}
+  body[data-mobile-view="desk"] .desk-bottomline{margin-top:8px}
+  body[data-mobile-view="today"] .desk-tools,
+  body[data-mobile-view="notes"] .desk-tools,
+  body[data-mobile-view="desk"] .desk-tools{display:none!important}
+  body[data-mobile-view="calendar"] .desktop-scene,
+  body[data-mobile-view="workflow"] .desktop-scene,
+  body[data-mobile-view="fields"] .desktop-scene{display:none!important}
+  body[data-mobile-view="calendar"] .desk-tools,
+  body[data-mobile-view="workflow"] .desk-tools,
+  body[data-mobile-view="fields"] .desk-tools{display:block!important;margin:0}
+  body[data-mobile-view="calendar"] .desk-panel,
+  body[data-mobile-view="workflow"] .desk-panel,
+  body[data-mobile-view="fields"] .desk-panel{display:none!important}
+  body[data-mobile-view="calendar"] #calendar,
+  body[data-mobile-view="workflow"] #kanban,
+  body[data-mobile-view="fields"] #fields{display:block!important}
+  .desk-panel{border-radius:12px}
+  .footer{margin-top:13px;font-size:9px}
+}
+@media(max-width:390px){.mobile-bookmark{font-size:10px;min-height:48px}.mobile-bookmark .petit-icon{width:17px;height:17px}.mobile-bookmarks-head small{font-size:7px}}
+
 </style>
 </head>
 <body>
@@ -609,6 +676,18 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
 <div class="top-actions"><button class="btn" id="backupBtn"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-archive"></use></svg> <span class="backup-text">백업</span></button><button class="btn" id="restoreBtn"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-planet"></use></svg> <span class="backup-text">복원</span></button><button class="btn primary" id="newTaskBtn"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 업무 추가</button><input accept=".json" class="hidden" id="restoreInput" type="file"/></div>
 </header>
 <main class="shell">
+<nav class="mobile-bookmarks" aria-label="모바일 업무수첩 메뉴">
+  <div class="mobile-bookmarks-head"><span>✦ 나의 작은 행성</span><small>PAGE · 페이지 선택</small></div>
+  <div class="mobile-bookmark-tabs" role="tablist" aria-label="업무 화면 선택">
+    <button type="button" class="mobile-bookmark active" data-mobile-tab="today" role="tab" aria-selected="true"><svg class="petit-icon" aria-hidden="true"><use href="#pi-feather"></use></svg><span>오늘</span></button>
+    <button type="button" class="mobile-bookmark" data-mobile-tab="notes" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-rose"></use></svg><span>메모</span></button>
+    <button type="button" class="mobile-bookmark" data-mobile-tab="calendar" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-calendar"></use></svg><span>달력</span></button>
+    <button type="button" class="mobile-bookmark" data-mobile-tab="workflow" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-star"></use></svg><span>칸반</span></button>
+    <button type="button" class="mobile-bookmark" data-mobile-tab="fields" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-fox"></use></svg><span>필드</span></button>
+    <button type="button" class="mobile-bookmark" data-mobile-tab="desk" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-planet"></use></svg><span>책상</span></button>
+  </div>
+</nav>
+
 
 <section class="desktop-scene" aria-label="위에서 바라보는 나의 작업 책상">
   <div class="desk-topline"><span class="desk-welcome">✦ MON PETIT BUREAU <small>나의 작은 책상</small></span><span class="desk-subtitle">UNE PAGE PAR JOUR · 하루 한 장씩</span></div>
@@ -878,6 +957,33 @@ tickFlipClock();setInterval(tickFlipClock,15000);
 renderDeskCalendar();
 
 render();
+})();
+</script>
+
+<script>
+/* UI-only mobile page navigation; tasks, notes, date sync, and storage use the original app. */
+(()=>{
+ const tabs=[...document.querySelectorAll('[data-mobile-tab]')];
+ const mobile=window.matchMedia('(max-width: 820px)');
+ const allowed=new Set(['today','notes','calendar','workflow','fields','desk']);
+ function show(tab,scroll=false){
+   if(!allowed.has(tab))return;
+   document.body.dataset.mobileView=tab;
+   for(const el of tabs){const active=el.dataset.mobileTab===tab;el.classList.toggle('active',active);el.setAttribute('aria-selected',String(active));el.tabIndex=active?0:-1;}
+   if(scroll&&mobile.matches)document.querySelector('.mobile-bookmarks').scrollIntoView({block:'start',behavior:'instant'});
+ }
+ tabs.forEach(tab=>tab.addEventListener('click',()=>show(tab.dataset.mobileTab,true)));
+ document.addEventListener('click',ev=>{
+   if(!mobile.matches)return;
+   if(ev.target.closest('[data-note-jump]'))show('notes');
+   else if(ev.target.closest('#newNoteBtn,#noteIndexAdd'))show('notes');
+ });
+ if(mobile.matches){
+   show('today');
+   const open=document.getElementById('openJournal'),book=document.getElementById('diaryBook');
+   if(book&&book.classList.contains('cover-closed')&&open)open.click();
+ }
+ mobile.addEventListener('change',ev=>{if(ev.matches){show(document.body.dataset.mobileView||'today');}else document.body.removeAttribute('data-mobile-view');});
 })();
 </script>
 </body>
