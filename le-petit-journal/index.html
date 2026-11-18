@@ -650,6 +650,64 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
 }
 @media(max-width:390px){.mobile-bookmark{font-size:10px;min-height:48px}.mobile-bookmark .petit-icon{width:17px;height:17px}.mobile-bookmarks-head small{font-size:7px}}
 
+
+/* MOBILE ONE-DESK EDITION — a single desk stays visible behind each journal page. */
+@media(max-width:820px){
+  .mobile-bookmark-tabs{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px}
+  .mobile-bookmarks{margin-bottom:7px!important;padding:7px 7px 6px!important}
+  .mobile-bookmarks-head{padding-bottom:5px!important}
+  .desktop-scene,
+  body[data-mobile-view="calendar"] .desktop-scene,
+  body[data-mobile-view="workflow"] .desktop-scene,
+  body[data-mobile-view="fields"] .desktop-scene{display:block!important;padding:9px 7px 10px!important;overflow:hidden!important}
+  .desktop-scene .desk-topline{margin:0 5px 7px!important}
+  .desktop-scene .desk-arrangement{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px 6px!important;align-items:start!important}
+  .desktop-scene .desk-side,
+  body[data-mobile-view="today"] .desktop-scene .desk-side,
+  body[data-mobile-view="notes"] .desktop-scene .desk-side{display:contents!important}
+  .desk-side-left .desk-left-caption,.desk-side-right .figurine-label{display:none!important}
+  .desktop-scene .desk-book-place{grid-column:1/-1!important;grid-row:3!important;min-width:0}
+  /* Objects share an illustrated desk shelf above the active book page. */
+  .desktop-scene .flip-clock-object{grid-column:1/3!important;grid-row:1!important;place-self:center;width:96%!important;max-width:156px!important;height:90px!important;padding:7px!important;transform:rotate(-2deg)!important;margin:0!important;min-width:0}
+  .desktop-scene .flip-clock-face{gap:2px!important}
+  .desktop-scene .flip-digit{height:41px!important;font-size:23px!important;min-width:0!important}
+  .desktop-scene .flip-clock-foot{font-size:8px!important}
+  .desktop-scene .candle-vignette{grid-column:3!important;grid-row:1!important;width:125px!important;height:165px!important;margin:0!important;transform:scale(.49)!important;transform-origin:top left!important;justify-self:start!important;pointer-events:none}
+  .desktop-scene .prince-figurine{grid-column:4!important;grid-row:1!important;width:135px!important;height:180px!important;margin:0!important;transform:scale(.49) rotate(-4deg)!important;transform-origin:top left!important;justify-self:start!important;pointer-events:none}
+  .desktop-scene .note-index-card{grid-column:1/3!important;grid-row:2!important;width:100%!important;min-width:0!important;max-width:none!important;max-height:116px!important;overflow:hidden!important;transform:rotate(-1deg)!important;margin:0!important;align-self:start!important}
+  .desktop-scene .note-index-head{padding:5px 7px!important}
+  .desktop-scene .note-index-head strong{font-size:10px!important}
+  .desktop-scene .note-index-date{font-size:8px!important}
+  .desktop-scene .note-index-list{max-height:63px!important;overflow-y:auto!important}
+  .desktop-scene .mini-calendar-object{grid-column:3/5!important;grid-row:2!important;justify-self:center;width:100%!important;max-width:168px!important;min-height:0!important;padding:12px 7px 5px!important;margin:0!important;transform:rotate(1deg) scale(.95)!important;transform-origin:top center!important}
+  .desktop-scene .calendar-rings{display:none!important}
+  .desktop-scene .mini-calendar-days button,.desktop-scene .mini-calendar-days span{min-height:16px!important;font-size:9px!important}
+  .desktop-scene .mini-calendar-week{font-size:8px!important}
+  .desktop-scene .mini-calendar-foot{display:none!important}
+  .desktop-scene .desk-bottomline{display:none!important}
+  /* The notebook swaps pages, not desks. */
+  body[data-mobile-view="today"] .desktop-scene .left-leaf{display:none!important}
+  body[data-mobile-view="notes"] .desktop-scene .right-leaf{display:none!important}
+  body[data-mobile-view="calendar"] .desktop-scene .desk-book-place,
+  body[data-mobile-view="workflow"] .desktop-scene .desk-book-place,
+  body[data-mobile-view="fields"] .desktop-scene .desk-book-place{display:none!important}
+  body[data-mobile-view="calendar"] .desk-tools,
+  body[data-mobile-view="workflow"] .desk-tools,
+  body[data-mobile-view="fields"] .desk-tools{display:block!important;margin:-3px 0 0!important;padding:10px 5px 9px!important;background:linear-gradient(135deg,#8c6040,#a5774f 46%,#7a4b34)!important;border-radius:0 0 13px 13px;box-shadow:0 8px 23px #291b1455}
+  body[data-mobile-view="calendar"] .desktop-scene,
+  body[data-mobile-view="workflow"] .desktop-scene,
+  body[data-mobile-view="fields"] .desktop-scene{border-radius:12px 12px 0 0!important}
+  body[data-mobile-view="today"] .desk-tools,
+  body[data-mobile-view="notes"] .desk-tools{display:none!important}
+  .desk-tools .desk-panel{margin:0!important}
+}
+@media(max-width:390px){
+ .desktop-scene .flip-clock-object{height:85px!important}
+ .desktop-scene .candle-vignette{transform:scale(.45)!important}
+ .desktop-scene .prince-figurine{transform:scale(.45) rotate(-4deg)!important}
+ .desktop-scene .mini-calendar-object{transform:rotate(1deg) scale(.92)!important}
+}
+
 </style>
 </head>
 <body>
@@ -684,7 +742,7 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
     <button type="button" class="mobile-bookmark" data-mobile-tab="calendar" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-calendar"></use></svg><span>달력</span></button>
     <button type="button" class="mobile-bookmark" data-mobile-tab="workflow" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-star"></use></svg><span>칸반</span></button>
     <button type="button" class="mobile-bookmark" data-mobile-tab="fields" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-fox"></use></svg><span>필드</span></button>
-    <button type="button" class="mobile-bookmark" data-mobile-tab="desk" role="tab" aria-selected="false"><svg class="petit-icon" aria-hidden="true"><use href="#pi-planet"></use></svg><span>책상</span></button>
+    
   </div>
 </nav>
 
@@ -965,7 +1023,7 @@ render();
 (()=>{
  const tabs=[...document.querySelectorAll('[data-mobile-tab]')];
  const mobile=window.matchMedia('(max-width: 820px)');
- const allowed=new Set(['today','notes','calendar','workflow','fields','desk']);
+ const allowed=new Set(['today','notes','calendar','workflow','fields']);
  function show(tab,scroll=false){
    if(!allowed.has(tab))return;
    document.body.dataset.mobileView=tab;
