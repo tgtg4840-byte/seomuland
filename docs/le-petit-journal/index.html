@@ -708,6 +708,59 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
  .desktop-scene .mini-calendar-object{transform:rotate(1deg) scale(.92)!important}
 }
 
+
+/* MOBILE DESK OVERVIEW: a balanced, glanceable miniature still-life. */
+@media(max-width:820px){
+ .desktop-scene .desk-arrangement{
+   grid-template-columns:repeat(4,minmax(0,1fr))!important;
+   grid-template-rows:104px 116px auto!important;
+   column-gap:7px!important;row-gap:9px!important;
+   align-items:start!important;
+ }
+ .desktop-scene .flip-clock-object{
+   grid-column:1/3!important;grid-row:1!important;
+   width:min(100%,164px)!important;max-width:164px!important;
+   height:86px!important;place-self:center!important;
+   transform:rotate(-1deg)!important;
+ }
+ .desktop-scene .flip-digit{height:39px!important;font-size:22px!important;letter-spacing:0!important}
+ .desktop-scene .flip-clock-foot{font-size:8px!important}
+ .desktop-scene .candle-vignette{
+   grid-column:3!important;grid-row:1!important;
+   place-self:start center!important;
+   width:125px!important;height:165px!important;
+   transform:scale(.53)!important;transform-origin:top center!important;
+ }
+ .desktop-scene .prince-figurine{
+   grid-column:4!important;grid-row:1!important;
+   place-self:start center!important;
+   width:135px!important;height:180px!important;
+   transform:scale(.50) rotate(-2deg)!important;transform-origin:top center!important;
+ }
+ .desktop-scene .note-index-card{
+   grid-column:1/3!important;grid-row:2!important;
+   width:100%!important;max-height:110px!important;
+   align-self:start!important;transform:rotate(-.5deg)!important;
+ }
+ .desktop-scene .note-index-list{max-height:58px!important}
+ .desktop-scene .mini-calendar-object{
+   grid-column:3/5!important;grid-row:2!important;
+   width:100%!important;max-width:158px!important;
+   justify-self:center!important;align-self:start!important;
+   transform:rotate(.5deg) scale(.85)!important;transform-origin:top center!important;
+ }
+ .desktop-scene .desk-book-place{grid-row:3!important;grid-column:1/-1!important}
+}
+@media(max-width:390px){
+ .desktop-scene .desk-arrangement{grid-template-rows:99px 109px auto!important;gap:6px!important}
+ .desktop-scene .flip-clock-object{height:80px!important;max-width:146px!important}
+ .desktop-scene .flip-digit{height:37px!important;font-size:21px!important}
+ .desktop-scene .candle-vignette{transform:scale(.47)!important}
+ .desktop-scene .prince-figurine{transform:scale(.45) rotate(-2deg)!important}
+ .desktop-scene .mini-calendar-object{transform:rotate(.5deg) scale(.8)!important}
+ .desktop-scene .note-index-card{max-height:103px!important}
+}
+
 </style>
 </head>
 <body>
