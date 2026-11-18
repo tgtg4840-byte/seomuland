@@ -170,11 +170,11 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
 .flip-clock-object{width:100%;max-width:225px;padding:13px 10px 12px;border:4px solid #242b30;border-radius:13px;background:linear-gradient(140deg,#424b51,#161e23 42%,#333e43);box-shadow:0 6px 0 #161716,0 12px 18px #1e160fa6,inset 0 2px 2px #e0e0d14a;transform:rotate(-3deg);color:#e6e2d5}
 .object-caption{display:block;font-size:8px;letter-spacing:.17em;text-align:center;color:#b0b1aa;margin-bottom:10px}
 .flip-clock-face{display:flex;align-items:center;justify-content:center;gap:4px}
-.flip-digit{position:relative;min-width:0;flex:1;display:grid;place-items:center;height:65px;border:1px solid #101519;border-radius:6px;background:linear-gradient(#393e43 0 49%,#13171b 49% 52%,#262c31 52%);box-shadow:inset 0 2px 2px #67707788,0 2px 3px #0b0c0d;font-family:Arial,sans-serif!important;font-size:clamp(23px,2.3vw,38px);font-weight:800;letter-spacing:-.08em;color:#f0e9d8;text-shadow:0 -2px #000}
+.flip-digit{position:relative;min-width:0;flex:1;white-space:nowrap;overflow:hidden;font-variant-numeric:tabular-nums;display:grid;place-items:center;height:65px;border:1px solid #101519;border-radius:6px;background:linear-gradient(#393e43 0 49%,#13171b 49% 52%,#262c31 52%);box-shadow:inset 0 2px 2px #67707788,0 2px 3px #0b0c0d;font-family:Arial,sans-serif!important;font-size:clamp(23px,2.3vw,38px);font-weight:800;letter-spacing:-.08em;color:#f0e9d8;text-shadow:0 -2px #000}
 .flip-digit:after{content:"";position:absolute;top:50%;left:1px;right:1px;height:1px;background:#060a0c99}
 .flip-digit.flip-tick{animation:flapTick .35s ease-out}
 .flip-colon{font-size:21px;color:#d4b788;font-weight:900}
-.flip-clock-foot{display:flex;justify-content:space-between;margin-top:11px;color:#c4b9a5;font-size:9px;letter-spacing:.1em}
+.flip-clock-foot{display:flex;justify-content:space-between;align-items:center;gap:4px;margin-top:11px;color:#c4b9a5;font-size:9px;letter-spacing:0;white-space:nowrap;overflow:hidden}.flip-clock-foot span{min-width:0;white-space:nowrap}
 @keyframes flapTick{0%{filter:brightness(1.6);transform:scaleY(.93)}100%{filter:brightness(1);transform:scaleY(1)}}
 /* Candle with wax body and soft light */
 .candle-vignette{position:relative;width:155px;height:191px;filter:drop-shadow(13px 15px 12px #27190e80)}
@@ -1005,7 +1005,7 @@ function tickFlipClock(){
   const el=$(id);if(el.textContent!==value){el.textContent=value;el.classList.remove("flip-tick");void el.offsetWidth;el.classList.add("flip-tick")}
  }
  $("flipMeridiem").textContent=now.getHours()<12?"AM":"PM";
- $("flipWeekday").textContent=new Intl.DateTimeFormat("ko-KR",{weekday:"long"}).format(now);
+ $("flipWeekday").textContent=new Intl.DateTimeFormat("ko-KR",{weekday:"short"}).format(now);
 }
 const originalRenderDesk=render;
 render=function(){originalRenderDesk();renderDeskCalendar()};
