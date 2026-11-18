@@ -761,6 +761,37 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
  .desktop-scene .note-index-card{max-height:103px!important}
 }
 
+
+/* MOBILE DESK: keep calendar within its own grid row, never over the journal. */
+@media(max-width:820px){
+ .desktop-scene .desk-arrangement{
+   grid-template-rows:104px minmax(170px,auto) auto!important;
+   row-gap:12px!important;
+ }
+ .desktop-scene .mini-calendar-object{
+   transform:rotate(.5deg)!important;
+   transform-origin:center top!important;
+   max-width:158px!important;
+   width:100%!important;
+   height:auto!important;
+   margin:0 auto 4px!important;
+   position:relative!important;
+   z-index:1!important;
+ }
+ .desktop-scene .note-index-card{position:relative!important;z-index:1!important}
+ .desktop-scene .desk-book-place{
+   grid-row:3!important;
+   margin-top:4px!important;
+   position:relative!important;
+   z-index:0!important;
+ }
+ .desktop-scene .desk-book-place button:focus:not(:focus-visible){outline:none!important}
+}
+@media(max-width:390px){
+ .desktop-scene .desk-arrangement{grid-template-rows:99px minmax(165px,auto) auto!important;row-gap:10px!important}
+ .desktop-scene .mini-calendar-object{transform:rotate(.5deg)!important;max-width:148px!important}
+}
+
 </style>
 </head>
 <body>
