@@ -6,7 +6,84 @@ const defaultData={fields:["서무","공무직급여","보안"],customTypes:[],t
 const statusMeta={planned:{label:"예정",mark:"○"},doing:{label:"진행 중",mark:"◐"},done:{label:"완료",mark:"●"},delayed:{label:"연기",mark:"△"}};
 let data=load(),month=new Date(new Date().getFullYear(),new Date().getMonth(),1),selectedDate=iso(),editingId=null,editingNoteId=null,selectedNoteId=null;
 const $=id=>document.getElementById(id);
-function load(){try{const saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&Array.isArray(saved.tasks))return{fields:Array.isArray(saved.fields)?saved.fields:[],customTypes:Array.isArray(saved.customTypes)?saved.customTypes:[],tasks:saved.tasks,notes:Array.isArray(saved.notes)?saved.notes:[],deskQuickMemo:typeof saved.deskQuickMemo==="string"?saved.deskQuickMemo:"",dailyResolutions:saved.dailyResolutions&&typeof saved.dailyResolutions==="object"&&!Array.isArray(saved.dailyResolutions)?saved.dailyResolutions:{}};}catch(e){}return structuredClone(defaultData)}
+/* Import only a bounded, validated JSON data model. Never overwrite existing records
+   until the complete incoming file has passed validation and storage succeeds. */
+const MAX_BACKUP_BYTES=2*1024*1024;
+const isRecord=v=>v!==null&&typeof v==="object"&&!Array.isArray(v);
+const validText=(v,max=5000)=>typeof v==="string"&&v.length<=max;
+const validDate=v=>v===""||(
+ typeof v==="string"&&/^\\d{4}-\\d{2}-\\d{2}$/.test(v)&&
+ !Number.isNaN(new Date(v+"T12:00:00").getTime())&&
+ new Date(v+"T12:00:00").toISOString().slice(0,10)===v
+);
+function validateNotebook(n){
+ if(!isRecord(n)||!Array.isArray(n.fields)||!Array.isArray(n.tasks)||
+    n.fields.length>100||n.tasks.length>5000)throw Error("업무 항목 또는 필드 형식이 올바르지 않습니다.");
+ const fields=n.fields.map(f=>{if(!validText(f,100)||!f.trim())throw Error("잘못된 업무 필드가 있습니다.");return f;});
+ const customTypes=n.customTypes===undefined?[]:n.customTypes;
+ if(!Array.isArray(customTypes)||customTypes.length>100||!customTypes.every(t=>validText(t,100)))throw Error("업무 유형 형식이 올바르지 않습니다.");
+ const validStatuses=new Set(["planned","doing","done","delayed"]);
+ const validModes=new Set(["temporary","routine"]);
+ const validKinds=new Set(["daily","weekly","monthly"]);
+ const usedTaskIds=new Set();
+ const tasks=n.tasks.map(t=>{
+  if(!isRecord(t)||!validText(t.id,100)||!t.id||usedTaskIds.has(t.id)||
+     !validText(t.title,1000)||!validText(t.field,100)||!validStatuses.has(t.status)||
+     !validText(t.type??"",100)||!validText(t.memo??"",10000)||
+     !validModes.has(t.mode??"temporary")||!validKinds.has(t.routineKind??"daily")||
+     !validText(String(t.routineValue??""),5)||!validDate(t.startDate??"")||
+     !validDate(t.deadline??"")||
+     (t.completedAt!==undefined&&!validText(t.completedAt,80))||
+     (t.createdAt!==undefined&&!validText(t.createdAt,80))||
+     (t.hiddenFromKanban!==undefined&&typeof t.hiddenFromKanban!=="boolean")
+  )throw Error("잘못된 업무 데이터 또는 진행 상태가 있습니다.");
+  usedTaskIds.add(t.id);
+  return {id:t.id,title:t.title,field:t.field,type:t.type??"",
+   memo:t.memo??"",status:t.status,mode:t.mode??"temporary",
+   routineKind:t.routineKind??"daily",routineValue:String(t.routineValue??""),
+   startDate:t.startDate??"",deadline:t.deadline??"",
+   hiddenFromKanban:t.hiddenFromKanban===true,
+   ...(t.completedAt?{completedAt:t.completedAt}:{}),
+   ...(t.createdAt?{createdAt:t.createdAt}:{})};
+ });
+ const rawNotes=n.notes===undefined?[]:n.notes;
+ if(!Array.isArray(rawNotes)||rawNotes.length>2000)throw Error("메모 개수가 허용 범위를 초과했습니다.");
+ const noteIds=new Set();
+ const notes=rawNotes.map(note=>{
+  if(!isRecord(note)||!validText(note.id,100)||!note.id||noteIds.has(note.id)||
+     !validText(note.title,1000)||!validText(note.content??"",10000)||
+     !validText(note.color??"yellow",20)||!validDate(note.date??"")||
+     (note.createdAt!==undefined&&!validText(note.createdAt,80))||
+     (note.updatedAt!==undefined&&!validText(note.updatedAt,80)))
+   throw Error("잘못된 메모 데이터가 있습니다.");
+  noteIds.add(note.id);
+  return {id:note.id,title:note.title,content:note.content??"",
+    color:["yellow","pink","blue","green"].includes(note.color)?note.color:"yellow",
+    date:note.date??"",...(note.createdAt?{createdAt:note.createdAt}:{}),
+    ...(note.updatedAt?{updatedAt:note.updatedAt}:{})};
+ });
+ const rawResolutions=n.dailyResolutions??{};
+ if(!isRecord(rawResolutions)||Object.keys(rawResolutions).length>3660)
+  throw Error("다짐 데이터 형식이 올바르지 않습니다.");
+ const resolutions=Object.create(null);
+ for(const [day,entry] of Object.entries(rawResolutions)){
+  if(!validDate(day)||!day||!validText(entry,120))throw Error("잘못된 날짜별 다짐입니다.");
+  Object.defineProperty(resolutions,day,{value:entry,writable:true,enumerable:true,configurable:true});
+ }
+ if(!validText(n.deskQuickMemo??"",10000))throw Error("메모 내용이 너무 깁니다.");
+ return {fields,customTypes:customTypes.slice(),tasks,notes,
+  deskQuickMemo:n.deskQuickMemo??"",dailyResolutions:resolutions};
+}
+function load(){
+ try{
+  const raw=localStorage.getItem(KEY);
+  if(raw){
+   if(new Blob([raw]).size>MAX_BACKUP_BYTES)throw Error("저장된 기록이 너무 큽니다.");
+   return validateNotebook(JSON.parse(raw));
+  }
+ }catch(e){console.warn("저장된 자료를 불러오지 못했습니다. 원본은 삭제하지 않았습니다.",e);}
+ return structuredClone(defaultData);
+}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data));render();return true}catch(e){toast("저장에 실패했습니다. 저장 공간을 확인해 주세요.");return false}}
 function saveDailyResolution(){
  const input=$("dailyResolutionInput"),content=input.value;
@@ -167,7 +244,36 @@ $("clearDone").onclick=()=>{const list=data.tasks.filter(t=>t.status==="done"&&!
 $("manageFields").onclick=()=>{$("fieldBackdrop").classList.remove("hidden");renderFields()};function renderFields(){$("fieldChips").innerHTML=data.fields.map(f=>`<span class="chip">${esc(f)}<button data-remove-field="${esc(f)}" aria-label="필드 삭제"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-cross"></use></svg></button></span>`).join("");document.querySelectorAll("[data-remove-field]").forEach(b=>b.onclick=()=>{const f=b.dataset.removeField;if(data.tasks.some(t=>t.field===f))return toast("연결된 업무가 있어 삭제할 수 없습니다.");data.fields=data.fields.filter(x=>x!==f);save();renderFields()})}
 $("addFieldBtn").onclick=()=>{const f=$("newFieldInput").value.trim();if(!f)return;if(data.fields.includes(f))return toast("이미 있는 업무 필드입니다.");data.fields.push(f);$("newFieldInput").value="";save();renderFields()};$("newFieldInput").onkeydown=e=>{if(e.key==="Enter")$("addFieldBtn").click()};
 $("modeSelect").onchange=updateRoutineUI;$("routineKind").onchange=updateRoutineUI;document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll(".modal-backdrop").forEach(b=>b.onclick=e=>{if(e.target===b)b.classList.add("hidden")});
-$("backupBtn").onclick=()=>{const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),notebook:data},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`서무랜드_업무수첩_백업_${iso()}.json`;a.click();URL.revokeObjectURL(a.href);toast("백업 파일을 저장했습니다.")};$("restoreBtn").onclick=()=>$("restoreInput").click();$("restoreInput").onchange=e=>{const file=e.target.files?.[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const v=JSON.parse(r.result),n=v.notebook||v;if(!Array.isArray(n.tasks)||!Array.isArray(n.fields))throw 0;if(!confirm("현재 업무수첩을 백업 파일의 내용으로 바꿀까요?")){e.target.value="";return;}data={...n,customTypes:Array.isArray(n.customTypes)?n.customTypes:[],notes:Array.isArray(n.notes)?n.notes:[],deskQuickMemo:typeof n.deskQuickMemo==="string"?n.deskQuickMemo:"",dailyResolutions:n.dailyResolutions&&typeof n.dailyResolutions==="object"&&!Array.isArray(n.dailyResolutions)?n.dailyResolutions:{}};save();toast("백업을 복원했습니다.")}catch(err){toast("올바른 업무수첩 백업 파일이 아닙니다.")}e.target.value=""};r.readAsText(file,"utf-8")};
+$("backupBtn").onclick=()=>{
+ const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),notebook:data},null,2)],{type:"application/json"});
+ const a=document.createElement("a"),url=URL.createObjectURL(blob);
+ a.href=url;a.download=`나의_작은별_이야기_백업_${iso()}.json`;
+ a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ toast("백업 파일을 저장했습니다.");
+};
+$("restoreBtn").onclick=()=>$("restoreInput").click();
+$("restoreInput").onchange=async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{
+  if(file.size>MAX_BACKUP_BYTES)throw Error("백업 파일은 2MB 이하여야 합니다.");
+  if(!/\\.json$/i.test(file.name))throw Error("JSON 백업 파일만 복원할 수 있습니다.");
+  const raw=await file.text();
+  const v=JSON.parse(raw);
+  if(!isRecord(v))throw Error("JSON 객체 형식이 아닙니다.");
+  if(v.version!==undefined&&v.version!==1)throw Error("지원하지 않는 백업 버전입니다.");
+  const candidate=validateNotebook(v.notebook??v);
+  if(!confirm("현재 업무수첩을 검증된 백업 파일 내용으로 바꿀까요?"))return;
+  const serialized=JSON.stringify(candidate);
+  if(new Blob([serialized]).size>MAX_BACKUP_BYTES)throw Error("복원 데이터 크기가 2MB를 초과했습니다.");
+  /* Commit storage first: invalid files and quota failures never erase existing data. */
+  localStorage.setItem(KEY,serialized);
+  data=candidate;render();
+  toast("검증된 백업을 복원했습니다.");
+ }catch(err){
+  toast(err instanceof Error?err.message:"백업 파일을 복원할 수 없습니다.");
+  console.warn("백업 복원 거부:",err);
+ }finally{e.target.value="";}
+};
 
 // Cover opens the dated spread; no changes to stored tasks, notes or backup format.
 function toggleJournalCover(open){
