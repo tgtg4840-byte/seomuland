@@ -2,7 +2,7 @@
 (()=>{
 "use strict";
 const KEY="seomuHub.notebook.v1";
-const defaultData={fields:["서무","공무직급여","보안"],customTypes:[],tasks:[],notes:[],deskQuickMemo:"",dailyResolutions:{}};
+const defaultData={fields:["서무","공무직급여","보안"],customTypes:[],tasks:[],notes:[],deskQuickMemo:"",dailyResolutions:{},fontStep:0,dday:{title:"",date:""}};
 const statusMeta={planned:{label:"예정",mark:"○"},doing:{label:"진행 중",mark:"◐"},done:{label:"완료",mark:"●"},delayed:{label:"연기",mark:"△"}};
 const $=id=>document.getElementById(id);
 /* Import only a bounded, validated JSON data model. Never overwrite existing records
@@ -70,8 +70,11 @@ function validateNotebook(n){
   Object.defineProperty(resolutions,day,{value:entry,writable:true,enumerable:true,configurable:true});
  }
  if(!validText(n.deskQuickMemo??"",10000))throw Error("메모 내용이 너무 깁니다.");
+ const fontStep=n.fontStep??0;if(!Number.isInteger(fontStep)||fontStep<0||fontStep>5)throw Error("글꼴 크기 설정이 올바르지 않습니다.");
+ const dday=n.dday??{title:"",date:""};
+ if(!isRecord(dday)||!validText(dday.title??"",60)||!validDate(dday.date??""))throw Error("D-day 데이터가 올바르지 않습니다.");
  return {fields,customTypes:customTypes.slice(),tasks,notes,
-  deskQuickMemo:n.deskQuickMemo??"",dailyResolutions:resolutions};
+  deskQuickMemo:n.deskQuickMemo??"",dailyResolutions:resolutions,fontStep,dday:{title:dday.title??"",date:dday.date??""}};
 }
 function load(){
  try{
@@ -107,6 +110,45 @@ function scheduleLabel(t){if(t.mode!=="routine"){const a=t.startDate||t.deadline
 function occurs(t,d){const v=iso(d);if(t.mode!=="routine"){const a=t.startDate||t.deadline,b=t.deadline||t.startDate;return!!(a&&b&&a<=v&&v<=b)}if(t.startDate&&t.startDate>v)return false;if(t.routineKind==="weekly")return String(d.getDay())===String(t.routineValue||0);if(t.routineKind==="monthly")return String(d.getDate())===String(Number(t.routineValue||1));return true}
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.remove("hidden");clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add("hidden"),2300)}
 function taskCard(t){return `<article class="card"><div class="card-top"><span class="pill">${esc(t.field)}</span><button class="edit" data-edit="${esc(t.id)}" aria-label="업무 수정"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-pencil"></use></svg></button></div><h3>${esc(t.title)}</h3>${t.memo?`<p>${esc(t.memo)}</p>`:""}<div class="meta"><span>${t.type?"#"+esc(t.type):"일반 업무"}</span><span>${esc(scheduleLabel(t))}</span></div><select data-status="${esc(t.id)}" aria-label="진행 상태">${Object.entries(statusMeta).map(([k,v])=>`<option value="${k}" ${t.status===k?"selected":""}>${v.label}</option>`).join("")}</select></article>`}
+/* Official Korea public-holiday almanac for 2026–2027; no remote API required.
+   Source: Korea AeroSpace Administration annual calendar notices (2026/2027).
+   Other years show only fixed-date observances, not an exhaustive legal holiday list. */
+const HOLIDAY_DATA={
+2026:{
+ "01-01":"신정","02-16":"설 연휴","02-17":"설날","02-18":"설 연휴",
+ "03-01":"삼일절","03-02":"삼일절 대체공휴일","05-01":"노동절",
+ "05-05":"어린이날","05-24":"부처님오신날","05-25":"부처님오신날 대체공휴일",
+ "06-03":"전국동시지방선거일","06-06":"현충일","07-17":"제헌절",
+ "08-15":"광복절","08-17":"광복절 대체공휴일",
+ "09-24":"추석 연휴","09-25":"추석","09-26":"추석 연휴",
+ "10-03":"개천절","10-05":"개천절 대체공휴일","10-09":"한글날","12-25":"기독탄신일"
+},
+2027:{
+ "01-01":"신정","02-06":"설 연휴","02-07":"설날","02-08":"설 연휴","02-09":"설날 대체공휴일",
+ "03-01":"삼일절","05-01":"노동절","05-03":"노동절 대체공휴일",
+ "05-05":"어린이날","05-13":"부처님오신날","06-06":"현충일",
+ "07-17":"제헌절","07-19":"제헌절 대체공휴일",
+ "08-15":"광복절","08-16":"광복절 대체공휴일",
+ "09-14":"추석 연휴","09-15":"추석","09-16":"추석 연휴",
+ "10-03":"개천절","10-04":"개천절 대체공휴일",
+ "10-09":"한글날","10-11":"한글날 대체공휴일",
+ "12-25":"기독탄신일","12-27":"기독탄신일 대체공휴일"
+}};
+const FIXED_HOLIDAYS={"01-01":"신정","03-01":"삼일절","05-01":"노동절","05-05":"어린이날","06-06":"현충일","07-17":"제헌절","08-15":"광복절","10-03":"개천절","10-09":"한글날","12-25":"기독탄신일"};
+const NATIONAL_OBSERVANCES={
+ "02-28":"2·28 민주운동 기념일","03-15":"3·15 의거 기념일", "04-03":"제주 4·3 희생자 추념일",
+ "04-05":"식목일","04-11":"대한민국임시정부 수립 기념일","04-19":"4·19 혁명 기념일",
+ "05-18":"5·18 민주화운동 기념일","06-10":"6·10 민주항쟁 기념일",
+ "06-25":"6·25 전쟁일","08-29":"경술국치일","10-01":"국군의 날","11-17":"순국선열의 날"
+};
+function getSpecialDate(day){
+ const year=Number(day.slice(0,4)),md=day.slice(5);
+ const holiday=(HOLIDAY_DATA[year]&&HOLIDAY_DATA[year][md])||(!HOLIDAY_DATA[year]&&FIXED_HOLIDAYS[md]);
+ return holiday?{label:holiday,kind:"holiday",confirmed:!!HOLIDAY_DATA[year]}:
+ NATIONAL_OBSERVANCES[md]?{label:NATIONAL_OBSERVANCES[md],kind:"observance",confirmed:true}:null;
+}
+function shortSpecial(text,max=11){return text.length>max?text.slice(0,max-1)+"…":text;}
+
 /* One stable Little Prince-inspired sentence for each diary date. */
 const petitDailyLines=[
  "정말 소중한 것은 눈으로만 볼 수 없어요.",
@@ -133,6 +175,7 @@ function render(){
  $("pageIndicator").textContent=fullDiaryDate(selectedDate);
  $("dailyResolutionInput").value=typeof data.dailyResolutions?.[selectedDate]==="string"?data.dailyResolutions[selectedDate]:"";
  renderPetitDailyLine();
+ renderDeskExtras();
  renderCalendar();
  renderNotes();
  $("kanbanBoard").innerHTML=Object.entries(statusMeta).map(([s,m])=>{const list=data.tasks.filter(t=>t.status===s&&!t.hiddenFromKanban);return`<section class="column"><header><span>${m.mark} ${m.label}</span><b>${list.length}</b></header><div class="cards">${list.length?list.map(taskCard).join(""):`<p class="column-empty">업무 없음</p>`}</div></section>`}).join("");
@@ -236,7 +279,7 @@ $("deleteNoteBtn").onclick=()=>{
  data.notes=data.notes.filter(n=>n.id!==editingNoteId);
  $("noteBackdrop").classList.add("hidden");save();toast("메모를 삭제했습니다.");
 };
-function renderCalendar(){const y=month.getFullYear(),m=month.getMonth(),last=new Date(y,m+1,0).getDate(),first=new Date(y,m,1).getDay();$("monthTitle").textContent=`${y}년 ${m+1}월`;let html="";for(let i=0;i<first;i++)html+='<div class="day blank"></div>';for(let d=1;d<=last;d++){const date=new Date(y,m,d),v=iso(date),list=data.tasks.filter(t=>occurs(t,date)).slice(0,3);html+=`<div class="day ${v===selectedDate?"selected":""} ${v===iso()?"today":""}"><button class="num" data-date="${v}">${d}</button><div class="events">${list.map(t=>`<button class="event ${t.status}" data-edit="${esc(t.id)}" title="${esc(t.title)}">${esc(t.title)}</button>`).join("")}</div></div>`}const total=first+last;for(let i=total;i%7;i++)html+='<div class="day blank"></div>';$("calendarGrid").innerHTML=html;const date=new Date(selectedDate+"T00:00:00"),list=data.tasks.filter(t=>occurs(t,date));$("agendaDate").textContent=new Intl.DateTimeFormat("ko-KR",{month:"long",day:"numeric",weekday:"short"}).format(date);$("agendaCount").textContent=`${list.length}개의 업무`;$("agendaList").innerHTML=list.length?list.map(t=>`<button class="agenda-item" data-edit="${esc(t.id)}"><b>${esc(t.title)}</b><small>${esc(t.field)} · ${statusMeta[t.status].label}</small></button>`).join(""):`<div class="empty" style="padding:22px">등록된 업무가 없습니다.</div>`}
+function renderCalendar(){const y=month.getFullYear(),m=month.getMonth(),last=new Date(y,m+1,0).getDate(),first=new Date(y,m,1).getDay();$("monthTitle").textContent=`${y}년 ${m+1}월`;let html="";for(let i=0;i<first;i++)html+='<div class="day blank"></div>';for(let d=1;d<=last;d++){const date=new Date(y,m,d),v=iso(date),special=getSpecialDate(v),list=data.tasks.filter(t=>occurs(t,date)).slice(0,3);html+=`<div class="day ${v===selectedDate?"selected":""} ${v===iso()?"today":""} ${special?"is-"+special.kind:""}"><button class="num" data-date="${v}" aria-label="${v}${special?" "+esc(special.label):""}">${d}</button>${special?`<small class="holiday-label ${special.kind}" title="${esc(special.label)}">${esc(shortSpecial(special.label))}</small>`:""}<div class="events">${list.map(t=>`<button class="event ${t.status}" data-edit="${esc(t.id)}" title="${esc(t.title)}">${esc(t.title)}</button>`).join("")}</div></div>`}const total=first+last;for(let i=total;i%7;i++)html+='<div class="day blank"></div>';$("calendarGrid").innerHTML=html;const date=new Date(selectedDate+"T00:00:00"),list=data.tasks.filter(t=>occurs(t,date));$("agendaDate").textContent=new Intl.DateTimeFormat("ko-KR",{month:"long",day:"numeric",weekday:"short"}).format(date);const agendaSpecial=getSpecialDate(selectedDate);$("agendaCount").textContent=`${list.length}개의 업무${agendaSpecial?" · "+agendaSpecial.label:""}`;$("agendaList").innerHTML=list.length?list.map(t=>`<button class="agenda-item" data-edit="${esc(t.id)}"><b>${esc(t.title)}</b><small>${esc(t.field)} · ${statusMeta[t.status].label}</small></button>`).join(""):`<div class="empty" style="padding:22px">등록된 업무가 없습니다.</div>`}
 function bindDynamic(){document.querySelectorAll("[data-edit]").forEach(el=>el.onclick=e=>{e.stopPropagation();openTask("",el.dataset.edit)});document.querySelectorAll("[data-status]").forEach(el=>el.onchange=()=>{const t=data.tasks.find(x=>x.id===el.dataset.status);if(t){if(t.status!==el.value)t.hiddenFromKanban=false;t.status=el.value;t.completedAt=el.value==="done"?(t.completedAt||new Date().toISOString()):undefined;save()}});document.querySelectorAll("[data-date]").forEach(el=>el.onclick=()=>setDiaryDate(el.dataset.date));document.querySelectorAll("[data-add-field]").forEach(el=>el.onclick=()=>openTask("",null,el.dataset.addField))}
 function fillFields(selected=""){$("fieldSelect").innerHTML='<option value="">선택</option>'+data.fields.map(f=>`<option ${f===selected?"selected":""}>${esc(f)}</option>`).join("")}
 function updateRoutineUI(){const routine=$("modeSelect").value==="routine";$("deadlineLabel").classList.toggle("hidden",routine);$("routineKindLabel").classList.toggle("hidden",!routine);$("routineValueLabel").classList.toggle("hidden",!routine||$("routineKind").value==="daily");$("startLabel").firstChild.textContent=routine?"반복 시작일":"시작 날짜";const kind=$("routineKind").value,sel=$("routineValue");if(kind==="weekly"){$("routineValueText").textContent="요일";sel.innerHTML=["일","월","화","수","목","금","토"].map((x,i)=>`<option value="${i}">${x}요일</option>`).join("")}else if(kind==="monthly"){ $("routineValueText").textContent="날짜";sel.innerHTML=Array.from({length:31},(_,i)=>`<option value="${i+1}">${i+1}일</option>`).join("")}}
@@ -313,7 +356,7 @@ function setDiaryDate(next,animate=true){
  const direction=next>selectedDate?"turn-next":"turn-prev";
  const spread=$("dailySpread");spread.classList.remove("turn-next","turn-prev");
  void spread.offsetWidth;
- selectedDate=next;month=new Date(parsed.getFullYear(),parsed.getMonth(),1);render();
+ selectedDate=next;indexYear=parsed.getFullYear();month=new Date(parsed.getFullYear(),parsed.getMonth(),1);render();
  if(diaryFlipTimer)clearTimeout(diaryFlipTimer);
  if(animate&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
   spread.classList.add(direction);diaryFlipTimer=setTimeout(()=>{spread.classList.remove("turn-next","turn-prev");diaryFlipTimer=null},560);
@@ -341,8 +384,8 @@ function renderDeskCalendar(){
  let content="";
  for(let n=0;n<first;n++)content+="<span></span>";
  for(let d=1;d<=count;d++){
-  const v=iso(new Date(y,m,d));
-  content+=`<button type="button" data-mini-date="${v}" class="${v===selectedDate?'selected ':''}${v===today?'today-mark':''}" aria-label="${v} 다이어리로 이동" ${v===selectedDate?'aria-current="date"':''}>${d}</button>`;
+  const v=iso(new Date(y,m,d)),special=getSpecialDate(v);
+  content+=`<button type="button" data-mini-date="${v}" class="${v===selectedDate?'selected ':''}${v===today?'today-mark ':''}${special?'is-'+special.kind:''}" aria-label="${v}${special?' '+esc(special.label):''} 다이어리로 이동" title="${special?esc(special.label):v}" ${v===selectedDate?'aria-current="date"':''}>${d}</button>`;
  }
  $("miniCalendarDays").innerHTML=content;
  document.querySelectorAll("[data-mini-date]").forEach(el=>el.onclick=()=>setDiaryDate(el.dataset.miniDate));
@@ -362,6 +405,77 @@ const originalRenderDesk=render;
 render=function(){originalRenderDesk();renderDeskCalendar()};
 const originalSetDiaryDate=setDiaryDate;
 setDiaryDate=function(next,animate=true){originalSetDiaryDate(next,animate);if(/^\d{4}-\d{2}-\d{2}$/.test(next)){const p=new Date(next+'T00:00:00');if(!Number.isNaN(p.getTime())){deskCalendarMonth=new Date(p.getFullYear(),p.getMonth(),1);renderDeskCalendar()}}};
+
+/* New index, font scale and D-day widgets. Only validated notebook fields are persisted. */
+let indexYear=Number(selectedDate.slice(0,4)),indexFilter="all";
+function renderDateStamp(){
+ const day=new Date(selectedDate+"T12:00:00"),part=getSpecialDate(selectedDate);
+ $("stampDate").textContent=`${day.getMonth()+1}월 ${day.getDate()}일`;
+ $("stampWeekday").textContent=new Intl.DateTimeFormat("ko-KR",{weekday:"long"}).format(day)+(selectedDate===iso()?" · 오늘":"");
+ const tag=$("stampSpecial");
+ tag.textContent=part?part.label:"";tag.hidden=!part;tag.className="stamp-special"+(part?.kind==="observance"?" observance":"");
+}
+function getIndexMarkedDates(){
+ const marked=new Set();
+ for(const n of data.notes||[]){if(n.date)marked.add(n.date)}
+ for(const t of data.tasks||[]){if(t.startDate)marked.add(t.startDate);if(t.deadline)marked.add(t.deadline)}
+ for(const day of Object.keys(data.dailyResolutions||{}))marked.add(day);
+ return marked;
+}
+function renderDateIndex(){
+ const list=$("dateIndexList");if(!list)return;
+ $("indexYear").textContent=indexYear+"";
+ const marked=getIndexMarkedDates(),query=$("indexSearch").value.trim();
+ let html="",number=0;
+ for(let m=0;m<12;m++){
+  let rows="";const last=new Date(indexYear,m+1,0).getDate();
+  for(let d=1;d<=last;d++){
+   const day=iso(new Date(indexYear,m,d)),part=getSpecialDate(day),hasRecord=marked.has(day);
+   if(indexFilter==="marked"&&!hasRecord)continue;
+   const text=`${m+1}월 ${d}일 ${part?.label||""} ${hasRecord?"기록":""}`;
+   if(query&&!text.includes(query))continue;
+   number++;
+   rows+=`<button type="button" class="day-index-row ${day===selectedDate?"active":""} ${part?.kind==="holiday"?"special":""}" data-index-day="${day}" title="${esc(text)}"><b>${m+1}/${String(d).padStart(2,"0")}</b><span class="day-index-detail">${hasRecord?"✎ ":""}${esc(part?.label||"날짜 열기")}</span></button>`;
+  }
+  if(rows)html+=`<div class="day-index-month">${m+1}월</div>${rows}`;
+ }
+ list.innerHTML=html||'<div class="note-index-empty">조건에 맞는 날짜가 없습니다.</div>';
+ $("indexCount").textContent=`${number}일 표시`;
+ list.querySelectorAll("[data-index-day]").forEach(b=>b.onclick=()=>{setDiaryDate(b.dataset.indexDay,false);toggleJournalCover(true)});
+}
+function applyFontStep(){
+ const step=Math.max(0,Math.min(5,Number(data.fontStep)||0));
+ document.documentElement.style.setProperty("--journal-font-extra",step+"px");
+ $("fontValue").textContent=step?`+${step}px`:"기본";
+ $("fontSmaller").disabled=step===0;$("fontLarger").disabled=step===5;
+}
+function renderDday(){
+ const d=data.dday||{title:"",date:""},date=d.date;
+ $("ddayTitleDisplay").textContent=d.title||"기념일을 설정하세요";
+ $("ddayTargetDate").textContent=date||"날짜 미설정";
+ if(!date){$("ddayCount").textContent="D–?";return;}
+ const target=new Date(date+"T12:00:00"),current=new Date(iso()+"T12:00:00");
+ const days=Math.round((target-current)/86400000);
+ $("ddayCount").textContent=days===0?"D-DAY":days>0?`D-${days}`:`D+${-days}`;
+}
+function renderDeskExtras(){renderDateStamp();renderDateIndex();renderDday();applyFontStep()}
+$("fontSmaller").onclick=()=>{data.fontStep=Math.max(0,(data.fontStep||0)-1);save();applyFontStep()};
+$("fontLarger").onclick=()=>{data.fontStep=Math.min(5,(data.fontStep||0)+1);save();applyFontStep()};
+$("indexPrevYear").onclick=()=>{indexYear=Math.max(1900,indexYear-1);renderDateIndex()};
+$("indexNextYear").onclick=()=>{indexYear=Math.min(2100,indexYear+1);renderDateIndex()};
+$("indexSearch").addEventListener("input",renderDateIndex);
+$("indexShowAll").onclick=()=>{indexFilter="all";$("indexShowAll").classList.add("active");$("indexShowMarked").classList.remove("active");renderDateIndex()};
+$("indexShowMarked").onclick=()=>{indexFilter="marked";$("indexShowMarked").classList.add("active");$("indexShowAll").classList.remove("active");renderDateIndex()};
+$("ddayEditToggle").onclick=()=>{
+ const node=$("ddayWidget"),willOpen=!node.classList.contains("editing");node.classList.toggle("editing",willOpen);
+ if(willOpen){$("ddayTitleInput").value=data.dday?.title||"";$("ddayDateInput").value=data.dday?.date||"";$("ddayTitleInput").focus()}
+};
+$("ddaySave").onclick=()=>{
+ const title=$("ddayTitleInput").value.trim().slice(0,60),date=$("ddayDateInput").value;
+ if(date&&!validDate(date)){toast("올바른 D-day 날짜를 선택하세요.");return}
+ data.dday={title,date};if(save()){$("ddayWidget").classList.remove("editing");renderDday()}
+};
+
 tickFlipClock();setInterval(tickFlipClock,15000);
 renderDeskCalendar();
 
