@@ -972,6 +972,100 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
 .daily-resolution-foot{display:block;margin-top:7px;color:#aa9577;font:italic 8px Georgia,serif;letter-spacing:.15em;text-align:right}
 @media(max-width:820px){.daily-resolution{margin-top:22px}.daily-resolution input{font-size:15px}}
 
+
+/* DESK INSTRUMENTS: an integrated family of vintage office objects.
+   Desktop only. Paper/brass calendar, walnut-framed slate, ivory magnetic board. */
+@media(min-width:821px){
+  .desk-tools{--oak:#785538;--oak-dark:#4a301e;--brass:#b89a69;--ivory:#f8f1e2;--ink:#534536;max-width:1480px;margin:40px auto 0!important;gap:43px!important}
+  .desk-tools .desk-panel{position:relative;isolation:isolate;overflow:visible;border-radius:12px!important;box-shadow:0 7px 0 #4a3020,0 16px 24px #2d1d1559,0 29px 45px #24160f26!important}
+  .desk-tools .desk-panel>.section-head{position:relative;z-index:2;margin-bottom:22px!important}
+  .desk-tools .desk-panel>.section-head .eyebrow{font:700 10px Georgia,serif!important;letter-spacing:.2em!important}
+  .desk-tools .desk-panel>.section-head h2{font-size:23px;letter-spacing:-.03em}
+  .desk-tools .desk-panel .btn{border-radius:6px}
+  /* A loose-leaf analog calendar held in a wood-backed ring frame. */
+  #calendar.desk-panel{
+    padding:61px 27px 30px!important;border:12px solid #815d40!important;
+    border-bottom-width:16px!important;
+    background:
+      repeating-linear-gradient(90deg,transparent 0 5px,#977b5510 5px 6px),
+      linear-gradient(165deg,#f9f2e6 0%,#f0e5d1 100%)!important;
+    box-shadow:inset 0 0 0 2px #d1b18a,0 9px 0 #4d301d,0 19px 25px #301c125c!important;
+  }
+  #calendar.desk-panel:before{
+    content:"";pointer-events:none;position:absolute;top:9px;left:50%;width:240px;height:35px;transform:translateX(-50%);
+    background:
+      radial-gradient(ellipse at 50% 0%,transparent 0 10px,#b89868 11px 13px,#e9d5ab 14px,#68543b 16px,transparent 17px) 9% 0/54px 34px no-repeat,
+      radial-gradient(ellipse at 50% 0%,transparent 0 10px,#b89868 11px 13px,#e9d5ab 14px,#68543b 16px,transparent 17px) 91% 0/54px 34px no-repeat;
+    filter:drop-shadow(1px 2px 2px #614a3299);z-index:3;
+  }
+  #calendar.desk-panel:after{
+    content:"";pointer-events:none;position:absolute;top:45px;left:17px;right:17px;height:4px;
+    background:linear-gradient(#d5c19e,#f9f0dc 56%,#bba17b);
+    box-shadow:0 2px 3px #6e54352f;
+  }
+  #calendar .section-head .eyebrow,#calendar .section-head h2{color:#76573d}
+  #calendar .calendar-layout{position:relative;z-index:1;grid-template-columns:minmax(0,1fr) minmax(230px,270px);gap:16px}
+  #calendar .calendar-card{border:1px solid #d2bda0;border-radius:3px 3px 8px 8px;background:#fffaf0;box-shadow:0 3px 0 #eadbc4,0 6px 0 #dac4a6,0 10px 13px #85674738;overflow:hidden}
+  #calendar .calendar-nav{border-bottom:2px solid #d5bca0;background:linear-gradient(#efe0c8,#f7ecd9);padding:14px}
+  #calendar .calendar-nav b{font-family:Georgia,'Malgun Gothic',serif;color:#70503a;letter-spacing:.04em}
+  #calendar .calendar-nav button{border:1px solid #baa080;background:linear-gradient(#fff9ed,#ebdabe);border-radius:50%;box-shadow:0 2px 2px #785a3d33}
+  #calendar .weekdays{background:#fbf4e7}
+  #calendar .weekdays span{color:#97795c}
+  #calendar .calendar-grid .day{border-color:#e5d9c7;background:linear-gradient(#fffdf8,#faf5eb);min-height:94px}
+  #calendar .calendar-grid .day.blank{background:#f0e7d8}
+  #calendar .day.selected{background:#ede2ca!important}
+  #calendar .day.today .num{background:#b96d56;color:#fff}
+  #calendar .agenda{border:1px solid #c8ae8b;border-radius:5px;background:repeating-linear-gradient(0deg,transparent 0 31px,#b4a99526 32px,transparent 33px),linear-gradient(#fff9e9,#eee0c7);box-shadow:2px 4px 0 #dfccaa,4px 8px 12px #6b4e3429}
+  #calendar .agenda>span,#calendar .agenda h3{color:#8c684d}
+  #calendar .agenda-item{border:1px solid #d8c5a7;border-radius:5px;background:#fffaf0}
+  #calendar .event{background:#ebdfc7;color:#685039}
+  /* Kanban as a proper walnut-framed dark green chalkboard with a chalk tray. */
+  #kanban.desk-panel{
+    padding:31px 25px 49px!important;
+    border:16px ridge #866042!important;border-radius:7px!important;
+    background:repeating-linear-gradient(37deg,#f2f7e405 0 3px,transparent 3px 12px),radial-gradient(ellipse at 29% 14%,#4a715625,transparent 55%),linear-gradient(160deg,#315b42,#224632 75%,#1b3e2b)!important;
+    box-shadow:inset 0 0 0 2px #142d20,inset 0 0 45px #0a281a9c,0 7px 0 #4b2f1e,0 19px 25px #24160f65!important;
+  }
+  #kanban.desk-panel:before{content:"";pointer-events:none;position:absolute;left:0;right:0;bottom:-17px;height:15px;background:linear-gradient(#a87b53,#6c482d 55%,#392516);box-shadow:0 5px 8px #27170d77;z-index:3}
+  #kanban.desk-panel:after{content:"";pointer-events:none;position:absolute;bottom:-11px;right:45px;width:75px;height:6px;border-radius:4px;background:linear-gradient(90deg,#f3eedf 0 42%,#d5d0c1 42% 73%,#b4b2a7 73%);box-shadow:3px 1px 2px #37251b88;z-index:4}
+  #kanban>.section-head h2,#kanban>.section-head .eyebrow,#kanban .section-note{color:#f0e9d8!important;text-shadow:0 1px 1px #142b1d}
+  #kanban .section-head .petit-icon{color:#e3d0a7}
+  #kanban #clearDone{border-color:#bfa985!important;background:linear-gradient(#f4ead7,#dfcaaa)!important;color:#584331!important}
+  #kanban .kanban{gap:15px;grid-template-columns:repeat(4,minmax(190px,1fr));padding:3px 2px 10px}
+  #kanban .column{min-height:320px;border:0;border-radius:4px;padding:12px;background:linear-gradient(#f9efda,#eedec1);box-shadow:0 3px 0 #c2aa83,2px 7px 10px #10291d55;transform:rotate(-.25deg)}
+  #kanban .column:nth-child(even){transform:rotate(.3deg)}
+  #kanban .column>header{color:#654d3b;border-bottom:1px solid #c6ae8a;margin-bottom:9px;padding-bottom:10px}
+  #kanban .column>header b{background:#cfbd98;color:#654d3b;border-radius:50%}
+  #kanban .card{position:relative;border:1px solid #d6c2a1;border-radius:4px;background:linear-gradient(#fffdf8,#f7f0e3);box-shadow:1px 3px 5px #5a453223}
+  #kanban .card:before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe6da,#ae5e4d 70%);box-shadow:0 1px 2px #5c3229a0;pointer-events:none}
+  #kanban .card .pill{background:#e9dbbd;color:#70563d}
+  #kanban .card select{border-color:#ccb693;background:#fffcf3}
+  #kanban .column-empty{color:#a68d72}
+  /* Magnetic ivory memo board, but framed with the very same dark walnut. */
+  #fields.desk-panel{
+    padding:30px 27px 37px!important;border:15px ridge #8a6343!important;border-radius:8px!important;
+    background:linear-gradient(137deg,#ffffff70,transparent 32%),linear-gradient(#f5f2e9,#eeeae0)!important;
+    box-shadow:inset 0 0 0 2px #c8b69a,inset 0 0 35px #c2b39f77,0 7px 0 #4b3020,0 19px 25px #24160f65!important;
+  }
+  #fields.desk-panel:before{content:"";pointer-events:none;position:absolute;inset:15px;background:linear-gradient(125deg,#ffffff55,transparent 40%);z-index:-1}
+  #fields.desk-panel:after{content:"";pointer-events:none;position:absolute;bottom:4px;left:12%;right:12%;height:10px;border-radius:0 0 7px 7px;background:linear-gradient(#c8b593,#8d7558);box-shadow:0 2px 2px #4d3d2b33}
+  #fields>.section-head h2,#fields>.section-head .eyebrow{color:#625241}
+  #fields #manageFields{background:linear-gradient(#faf5e8,#e6d9c4)!important;border-color:#baa688!important;color:#5f4d38!important}
+  #fields .field-grid{position:relative;z-index:1;gap:20px}
+  #fields .field-box{position:relative;overflow:visible;border:1px solid #c9b9a2;border-radius:3px;background:linear-gradient(#fffdf7,#f7f1e5);box-shadow:1px 3px 0 #e2d5be,3px 7px 12px #6b563822}
+  #fields .field-box:before{content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:17px;height:17px;z-index:3;border:1px solid #8c7049;border-radius:50%;background:radial-gradient(circle at 35% 27%,#f7e4b6,#b89559 55%,#725437 100%);box-shadow:0 2px 3px #4f3a2788}
+  #fields .field-box>header{padding:18px 15px 14px;border-bottom:1px solid #d7c7ae;background:transparent}
+  #fields .field-box>header h3{color:#69503c}
+  #fields .field-box>header b{color:#9a7b5a}
+  #fields .field-task{border:1px solid #e4d7c3;border-radius:4px;background:#fffdfa}
+  #fields .field-add{border-color:#baa688;border-radius:5px;background:#f8efdf;color:#6c523c}
+}
+@media(min-width:821px) and (max-width:1150px){
+ #calendar .calendar-layout{grid-template-columns:1fr}
+ #kanban .kanban{grid-template-columns:repeat(4,minmax(180px,1fr))}
+ #fields .field-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
 </style>
 </head>
 <body>
