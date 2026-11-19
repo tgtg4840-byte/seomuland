@@ -876,17 +876,15 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
  .desktop-scene .right-leaf:before,.desktop-scene .endpaper-right:before{left:3px}
  .desktop-scene .daily-spread:after{width:27px;background:linear-gradient(90deg,#5a3d261f,transparent 46%,#fffaf093 55%,#563e271e)}
  .binder-rings{
-   position:absolute;z-index:9;top:6%;bottom:6%;left:50%;width:58px;
+   position:absolute;z-index:9;top:11%;bottom:11%;left:50%;width:40px;
    transform:translateX(-50%);display:flex;flex-direction:column;justify-content:space-around;
    align-items:center;pointer-events:none;
  }
  .binder-rings span{
-   display:block;width:54px;height:18px;border:5px solid transparent;border-radius:60%;
-   background:linear-gradient(#ffffff26,#ffffff26) padding-box,
-     linear-gradient(175deg,#f5f5ef 0%,#a6aaa7 20%,#535b5e 39%,#edf0e7 57%,#8b9190 82%,#eef0e6 100%) border-box;
-   box-shadow:0 3px 3px #37271c77,inset 0 1px 3px #1e292a8c,0 -1px 1px #fff9;
-   transform:rotate(-5deg);
+   display:block;width:38px;height:12px;border:2px solid #a1a5a1;border-radius:50%;
+   background:transparent;box-shadow:0 2px 2px #49382a4a,inset 0 1px 0 #f7f6ed;
  }
+ .binder-rings span:nth-child(n+5){display:none}
  .book-close-wrap{gap:8px;align-items:center}
  .last-page-toggle{font-size:11px!important;background:#e7d9bf!important;border-color:#c8b28e!important}
  .desktop-scene .book.show-last-page>.daily-navigation,
