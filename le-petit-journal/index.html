@@ -6,6 +6,9 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>나의 작은별 이야기_어린왕자 업무일지</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%23314e60%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2225%22%20fill%3D%22%23d4b779%22%2F%3E%3Cpath%20d%3D%22M14%2023%2011%2017l12%204%209-14%206%2012%2014-3-6%2013-8-4H22Z%22%20fill%3D%22%23f1cb69%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2213%22%20fill%3D%22%23f5d9b5%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2230%22%20r%3D%221.5%22%20fill%3D%22%23604435%22%2F%3E%3Ccircle%20cx%3D%2237%22%20cy%3D%2230%22%20r%3D%221.5%22%20fill%3D%22%23604435%22%2F%3E%3Cpath%20d%3D%22M16%2051q16-14%2032%200v13H16Z%22%20fill%3D%22%236f987d%22%2F%3E%3Cpath%20d%3D%22M25%2044h16m-7%200%2012%2014%22%20stroke%3D%22%23e4b859%22%20stroke-width%3D%224%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet"/>
 <style>
 :root{--ink:#242536;--muted:#77798a;--line:#e6e6ee;--bg:#f7f7fa;--violet:#655ad9;--violet2:#5148bd;--green:#2b9a72;--rose:#c85b6c;--amber:#c78a2f;--shadow:0 18px 55px rgba(39,37,71,.08)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;letter-spacing:-.02em}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{min-height:100vh}.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px max(24px,calc((100vw - 1320px)/2));border-bottom:1px solid rgba(226,226,235,.9);background:rgba(255,255,255,.91);backdrop-filter:blur(16px)}
@@ -1184,6 +1187,42 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
     box-shadow:inset 0 0 0 2px #c8b69a,inset 0 0 28px #c2b39f55,0 5px 12px #25180f30,0 14px 27px #25180f2c!important;
   }
   .desk-tools #fields.desk-panel:after{content:none!important;display:none!important}
+}
+
+
+/* Soft, rounded diary typography: playful headings, legible handwritten-feel text.
+   Jua is limited to titles, while Gowun Dodum keeps dense work records readable. */
+:root{--petit-font-body:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;--petit-font-title:'Jua','Gowun Dodum','Malgun Gothic',sans-serif}
+html,body,body .app,body .shell,body .desktop-scene{font-family:var(--petit-font-body)!important;letter-spacing:-.025em}
+body button,body input,body select,body textarea{font-family:var(--petit-font-body)}
+.topbar .brand strong,
+.desktop-scene .petit-identity h2,
+.journal-cover .cover-title,
+.desktop-scene .section-head h2,
+.desktop-scene .desk-panel>.section-head h2,
+.mobile-bookmarks-head,
+.journal-last-page h3,
+.endpaper-leaf h3{font-family:var(--petit-font-title)!important;font-weight:400!important;letter-spacing:-.01em!important}
+.desktop-scene .section-head h2{line-height:1.32}
+.desktop-scene .petit-identity h2{letter-spacing:0!important}
+.journal-cover .cover-title{letter-spacing:.005em!important}
+.topbar .brand small,
+.petit-overline,.eyebrow,.object-caption,.desk-welcome,.desk-subtitle,
+.endpaper-overline,.daily-resolution-foot{font-family:Georgia,var(--petit-font-body)!important}
+.today-list .journal-task-copy strong,
+.today-list .journal-task-status select,
+#kanban .column>header,
+#fields .field-box h3,
+#calendar .calendar-nav b,
+.desktop-scene .date-jump button,
+.desktop-scene .daily-navigation button{font-family:var(--petit-font-body)!important}
+.desktop-scene .journal-task-copy strong{font-weight:700!important}
+.desktop-scene .journal-task-status select{letter-spacing:-.03em}
+.desktop-scene .petit-rotating-quote{font-family:var(--petit-font-body)!important;font-size:13px;letter-spacing:-.02em}
+.daily-resolution input{font-family:var(--petit-font-body)!important;font-weight:400}
+@media(max-width:820px){
+ .topbar .brand strong{font-size:15px!important;line-height:1.24}
+ .journal-cover .cover-title{font-size:23px!important}
 }
 
 </style>
