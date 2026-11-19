@@ -954,6 +954,11 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
  }
 }
 
+
+/* One quiet line from the themes of The Little Prince. */
+.petit-identity .petit-rotating-quote{min-height:1.6em;max-width:360px;line-height:1.6;opacity:1;transition:opacity .4s ease;overflow-wrap:keep-all;word-break:keep-all}
+.petit-identity .petit-rotating-quote.is-fading{opacity:.16}
+@media(prefers-reduced-motion:reduce){.petit-identity .petit-rotating-quote{transition:none}}
 </style>
 </head>
 <body>
@@ -1012,7 +1017,7 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
     <div class="desk-book-place"><div class="book cover-closed" id="diaryBook">
 <div class="journal-cover" id="journalCover" aria-label="Le Petit Journal 가죽 표지"><span class="cover-binding" aria-hidden="true"></span><span class="cover-elastic" aria-hidden="true"></span><div class="cover-stars" aria-hidden="true"></div><span class="cover-overline">MON PETIT MONDE · 2026</span><div class="cover-emblem" aria-hidden="true"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></div><h2 class="cover-title">Le Petit Journal</h2><p class="cover-subtitle">나의 작은 행성, 하루의 기록</p><button class="cover-open" id="openJournal" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-book"></use></svg> 다이어리 펼치기</button></div>
 
-<div class="petit-book-head"><div class="petit-identity"><span class="petit-overline">CARNET DE TRAVAIL · VOL. 01</span><h2>Le Petit Journal</h2><p>하루 한 장, 작은 행성의 기록</p></div><div class="header-work-memo header-stats-only" aria-label="업무 대시보드"><div class="header-memo-title"><span>오늘의 업무 현황</span><small id="todayText"></small></div><div class="summary" aria-label="업무 현황"><div><strong id="todayCount">0</strong><span>오늘 할 일</span></div><div><strong id="doingCount">0</strong><span>진행 중</span></div><div><strong id="doneCount">0</strong><span>완료</span></div></div></div><div aria-hidden="true" class="petit-planet"><span class="planet-rose"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></span><span class="planet-star s1"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s2"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s3"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span></div></div>
+<div class="petit-book-head"><div class="petit-identity"><span class="petit-overline">CARNET DE TRAVAIL · VOL. 01</span><h2>Le Petit Journal</h2><p class="petit-rotating-quote" id="petitRotatingQuote" aria-label="어린왕자에서 영감을 받은 오늘의 문장">정말 소중한 것은 눈으로만 볼 수 없어요.</p></div><div class="header-work-memo header-stats-only" aria-label="업무 대시보드"><div class="header-memo-title"><span>오늘의 업무 현황</span><small id="todayText"></small></div><div class="summary" aria-label="업무 현황"><div><strong id="todayCount">0</strong><span>오늘 할 일</span></div><div><strong id="doingCount">0</strong><span>진행 중</span></div><div><strong id="doneCount">0</strong><span>완료</span></div></div></div><div aria-hidden="true" class="petit-planet"><span class="planet-rose"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></span><span class="planet-star s1"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s2"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s3"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span></div></div>
 
 
 
@@ -1317,6 +1322,26 @@ render();
  }
  mobile.addEventListener('change',ev=>{if(ev.matches){show(document.body.dataset.mobileView||'today');}else document.body.removeAttribute('data-mobile-view');});
 })();
+
+/* Short original Korean paraphrases of themes in The Little Prince—not quotations from a published translation. */
+(function(){
+ const el=document.getElementById("petitRotatingQuote");if(!el)return;
+ const lines=[
+  "정말 소중한 것은 눈으로만 볼 수 없어요.",
+  "함께한 시간이 서로를 특별하게 만듭니다.",
+  "당신이 돌본 장미는 그래서 더욱 소중합니다.",
+  "사막의 아름다움은 보이지 않는 우물에 있습니다.",
+  "누군가에게는 작은 별 하나가 온 우주가 됩니다."
+ ];
+ let i=0;const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ window.setInterval(()=>{
+   i=(i+1)%lines.length;
+   if(reduced){el.textContent=lines[i];return;}
+   el.classList.add("is-fading");
+   window.setTimeout(()=>{el.textContent=lines[i];el.classList.remove("is-fading")},420);
+ },12000);
+})();
+
 </script>
 </body>
 </html>
