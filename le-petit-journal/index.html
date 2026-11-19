@@ -1411,20 +1411,25 @@ function load(){
    if(new Blob([raw]).size>MAX_BACKUP_BYTES)throw Error("저장된 기록이 너무 큽니다.");
    return validateNotebook(JSON.parse(raw));
   }
- }catch(e){console.warn("저장된 자료를 불러오지 못했습니다. 원본은 삭제하지 않았습니다.",e);}
+ }catch(e){storageLoadProblem=true;console.warn("저장된 자료를 불러오지 못했습니다. 원본 보호를 위해 저장을 차단합니다.",e);}
  return structuredClone(defaultData);
 }
+let storageLoadProblem=false;
 let data=load(),month=new Date(new Date().getFullYear(),new Date().getMonth(),1),selectedDate=iso(),editingId=null,editingNoteId=null,selectedNoteId=null;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(data));render();return true}catch(e){toast("저장에 실패했습니다. 저장 공간을 확인해 주세요.");return false}}
+function writeData(){
+ if(storageLoadProblem)throw Error("기존 데이터 검증에 실패하여 덮어쓰기를 차단했습니다. 저장된 기록을 먼저 확인하세요.");
+ localStorage.setItem(KEY,JSON.stringify(data));
+}
+function save(){try{writeData();render();return true}catch(e){toast("저장에 실패했습니다. 저장 공간을 확인해 주세요.");return false}}
 function saveDailyResolution(){
  const input=$("dailyResolutionInput"),content=input.value;
  if(!data.dailyResolutions||typeof data.dailyResolutions!=="object")data.dailyResolutions={};
  if(content.trim())data.dailyResolutions[selectedDate]=content;
  else delete data.dailyResolutions[selectedDate];
- try{localStorage.setItem(KEY,JSON.stringify(data))}
+ try{writeData()}
  catch(e){toast("오늘의 다짐을 저장하지 못했습니다.")}
 }
-function saveQuickMemo(){data.deskQuickMemo=$("deskQuickMemo").value;try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){toast("메모를 저장하지 못했습니다. 저장 공간을 확인해 주세요.")}}
+function saveQuickMemo(){data.deskQuickMemo=$("deskQuickMemo").value;try{writeData()}catch(e){toast("메모를 저장하지 못했습니다. 저장 공간을 확인해 주세요.")}}
 function iso(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`}
 function uid(){return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`}
 function esc(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
@@ -1520,7 +1525,7 @@ function focusNoteFromIndex(id){
  }
 }
 function persistInlineNote(){
- try{localStorage.setItem(KEY,JSON.stringify(data));return true}
+ try{writeData();return true}
  catch(e){toast("메모 저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.");return false}
 }
 function addInlineNote(){
@@ -1598,6 +1603,7 @@ $("restoreInput").onchange=async e=>{
   if(new Blob([serialized]).size>MAX_BACKUP_BYTES)throw Error("복원 데이터 크기가 2MB를 초과했습니다.");
   /* Commit storage first: invalid files and quota failures never erase existing data. */
   localStorage.setItem(KEY,serialized);
+  storageLoadProblem=false;
   data=candidate;render();
   toast("검증된 백업을 복원했습니다.");
  }catch(err){
