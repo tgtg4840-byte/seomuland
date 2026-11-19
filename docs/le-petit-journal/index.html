@@ -1082,6 +1082,20 @@ function scheduleLabel(t){if(t.mode!=="routine"){const a=t.startDate||t.deadline
 function occurs(t,d){const v=iso(d);if(t.mode!=="routine"){const a=t.startDate||t.deadline,b=t.deadline||t.startDate;return!!(a&&b&&a<=v&&v<=b)}if(t.startDate&&t.startDate>v)return false;if(t.routineKind==="weekly")return String(d.getDay())===String(t.routineValue||0);if(t.routineKind==="monthly")return String(d.getDate())===String(Number(t.routineValue||1));return true}
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.remove("hidden");clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add("hidden"),2300)}
 function taskCard(t){return `<article class="card"><div class="card-top"><span class="pill">${esc(t.field)}</span><button class="edit" data-edit="${esc(t.id)}" aria-label="업무 수정"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-pencil"></use></svg></button></div><h3>${esc(t.title)}</h3>${t.memo?`<p>${esc(t.memo)}</p>`:""}<div class="meta"><span>${t.type?"#"+esc(t.type):"일반 업무"}</span><span>${esc(scheduleLabel(t))}</span></div><select data-status="${esc(t.id)}" aria-label="진행 상태">${Object.entries(statusMeta).map(([k,v])=>`<option value="${k}" ${t.status===k?"selected":""}>${v.label}</option>`).join("")}</select></article>`}
+/* One stable Little Prince-inspired sentence for each diary date. */
+const petitDailyLines=[
+ "정말 소중한 것은 눈으로만 볼 수 없어요.",
+ "함께한 시간이 서로를 특별하게 만듭니다.",
+ "당신이 돌본 장미는 그래서 더욱 소중합니다.",
+ "사막의 아름다움은 보이지 않는 우물에 있습니다.",
+ "누군가에게는 작은 별 하나가 온 우주가 됩니다."
+];
+function renderPetitDailyLine(){
+ const el=document.getElementById("petitRotatingQuote");if(!el)return;
+ const index=Math.floor(new Date(selectedDate+"T12:00:00").getTime()/86400000)%petitDailyLines.length;
+ el.textContent=petitDailyLines[(index+petitDailyLines.length)%petitDailyLines.length];
+}
+
 function render(){
 
  const today=new Date(),diaryDay=new Date(selectedDate+"T00:00:00"),todayTasks=data.tasks.filter(t=>occurs(t,diaryDay));
@@ -1324,20 +1338,6 @@ render();
  mobile.addEventListener('change',ev=>{if(ev.matches){show(document.body.dataset.mobileView||'today');}else document.body.removeAttribute('data-mobile-view');});
 })();
 
-/* One stable Little Prince-inspired sentence for each diary date. */
-const petitDailyLines=[
- "정말 소중한 것은 눈으로만 볼 수 없어요.",
- "함께한 시간이 서로를 특별하게 만듭니다.",
- "당신이 돌본 장미는 그래서 더욱 소중합니다.",
- "사막의 아름다움은 보이지 않는 우물에 있습니다.",
- "누군가에게는 작은 별 하나가 온 우주가 됩니다."
-];
-function renderPetitDailyLine(){
- const el=document.getElementById("petitRotatingQuote");if(!el)return;
- const index=Math.floor(new Date(selectedDate+"T12:00:00").getTime()/86400000)%petitDailyLines.length;
- el.textContent=petitDailyLines[(index+petitDailyLines.length)%petitDailyLines.length];
-}
-renderPetitDailyLine();
 
 </script>
 </body>
