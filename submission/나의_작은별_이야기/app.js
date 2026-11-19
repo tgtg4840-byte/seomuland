@@ -4,7 +4,6 @@
 const KEY="seomuHub.notebook.v1";
 const defaultData={fields:["서무","공무직급여","보안"],customTypes:[],tasks:[],notes:[],deskQuickMemo:"",dailyResolutions:{}};
 const statusMeta={planned:{label:"예정",mark:"○"},doing:{label:"진행 중",mark:"◐"},done:{label:"완료",mark:"●"},delayed:{label:"연기",mark:"△"}};
-let data=load(),month=new Date(new Date().getFullYear(),new Date().getMonth(),1),selectedDate=iso(),editingId=null,editingNoteId=null,selectedNoteId=null;
 const $=id=>document.getElementById(id);
 /* Import only a bounded, validated JSON data model. Never overwrite existing records
    until the complete incoming file has passed validation and storage succeeds. */
@@ -84,6 +83,7 @@ function load(){
  }catch(e){console.warn("저장된 자료를 불러오지 못했습니다. 원본은 삭제하지 않았습니다.",e);}
  return structuredClone(defaultData);
 }
+let data=load(),month=new Date(new Date().getFullYear(),new Date().getMonth(),1),selectedDate=iso(),editingId=null,editingNoteId=null,selectedNoteId=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data));render();return true}catch(e){toast("저장에 실패했습니다. 저장 공간을 확인해 주세요.");return false}}
 function saveDailyResolution(){
  const input=$("dailyResolutionInput"),content=input.value;
