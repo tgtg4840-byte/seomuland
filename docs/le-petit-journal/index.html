@@ -803,6 +803,132 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
  .desktop-scene .flip-weekday-led{height:16px;min-width:24px;padding:1px 4px;font-size:10px!important}
 }
 
+
+/* PC DIARY CRAFT EDITION: embossed leather, cloth hinge, paper fibres and nickel rings. */
+.journal-last-page{display:none}
+.binder-rings{display:none}
+.cover-binding,.cover-elastic{display:none}
+@media(min-width:821px){
+ .desktop-scene .book{
+   border-color:#654630!important;
+   background:linear-gradient(90deg,#d2bd9c 0%,#e8d9bf 2%,#f4ebda 45%,#c9b497 50%,#f4ebdb 55%,#e9ddc7 98%,#d4bea0 100%)!important;
+   box-shadow:0 5px 0 #3b2a22,0 11px 0 #aa9477,0 16px 4px #32231d78,14px 27px 42px #26150f9e,inset 0 0 0 2px #b39a7a!important;
+ }
+ .journal-cover{
+   border:9px solid #2e3c40!important;
+   border-left:25px solid #26373a!important;
+   border-radius:12px 23px 25px 11px!important;
+   background:
+     radial-gradient(ellipse at 35% 15%,#82919a35 0,transparent 55%),
+     repeating-linear-gradient(101deg,#ffffff0b 0 1px,#00000008 1px 2px,transparent 2px 5px),
+     repeating-linear-gradient(5deg,#ffffff09 0 1px,#00000009 1px 2px,transparent 2px 4px),
+     linear-gradient(125deg,#37545c 0%,#29424b 28%,#20343f 60%,#142d36 100%)!important;
+   box-shadow:inset 2px 2px 0 #c2d0c12e,inset 0 0 0 2px #142b31,inset 0 0 0 8px #c2a77a22,inset 20px 0 23px #050f1680,0 9px 14px #1b120f99,7px 20px 27px #1d1510b3!important;
+ }
+ .journal-cover:before{inset:16px 16px 16px 20px;border:1px dashed #bca47a99;border-radius:4px}
+ .journal-cover:after{inset:23px 23px 23px 27px;border:1px solid #d3bd8d38}
+ .journal-cover .cover-binding{
+   display:block;position:absolute;top:0;bottom:0;left:0;width:21px;
+   background:repeating-linear-gradient(0deg,#00000020 0 2px,transparent 2px 6px),linear-gradient(90deg,#111f27,#536169 30%,#172f36 73%,#13252d);
+   box-shadow:inset -2px 0 3px #c4b48a55,3px 0 9px #0008;pointer-events:none;
+ }
+ .journal-cover .cover-elastic{
+   display:block;position:absolute;z-index:2;top:-5%;bottom:-5%;right:8%;width:14px;
+   background:linear-gradient(90deg,#0b1b20,#4e6465 29%,#293d42 65%,#0b1b20);
+   border-left:1px solid #80928a66;border-right:1px solid #020d14;
+   box-shadow:-4px 0 7px #0007,3px 0 3px #0008;opacity:.83;pointer-events:none;
+ }
+ .journal-cover .cover-overline{font-family:Georgia,serif;font-size:11px;letter-spacing:.28em;color:#d7bd87;text-shadow:0 1px #121e22}
+ .journal-cover .cover-emblem{
+   width:122px;height:122px;border:3px double #e1c98b;
+   background:radial-gradient(circle at 34% 28%,#e9d9a2,#b6a078 57%,#725f43 73%);
+   box-shadow:0 0 0 8px #b59d6d21,0 0 0 9px #d7bc7955,inset 0 3px 5px #fff7d78c,0 7px 18px #07191e9e;
+ }
+ .journal-cover .cover-title{
+   font-family:Georgia,'Noto Serif KR',serif!important;
+   font-weight:600;letter-spacing:.015em;
+   color:#ead4a0;text-shadow:0 1px 0 #f9e5b65c,0 3px 3px #08191e,1px 1px #5b4b30;
+ }
+ .journal-cover .cover-subtitle{color:#d1c1a2}
+ .journal-cover .cover-open{background:linear-gradient(#e6d6ae,#c5a66f)!important;border:1px solid #b89c66!important;box-shadow:inset 0 1px #fff9,0 4px 0 #80663b,0 9px 12px #07171c9e!important}
+ .desktop-scene .daily-spread,
+ .desktop-scene .journal-last-page{
+   background:linear-gradient(90deg,#e8dbc5,#f6eedf 47%,#bca98d 50%,#f8f1e4 53%,#eadcc6)!important;
+   border:1px solid #c4b195;
+   box-shadow:0 2px 0 #f5e9d6,0 4px 0 #d9c6a7,0 7px 0 #bfa788,0 11px 14px #49362969;
+ }
+ .desktop-scene .diary-leaf{
+   background:
+     repeating-linear-gradient(0deg,transparent 0 33px,#a4b6b52a 34px,transparent 35px),
+     repeating-linear-gradient(91deg,#5f472708 0 1px,transparent 1px 6px),
+     radial-gradient(ellipse at 60% 20%,#ffffff91,transparent 75%),
+     linear-gradient(#fffaf0,#f0e5d2)!important;
+   box-shadow:inset 0 0 23px #a0875c19;
+ }
+ .desktop-scene .left-leaf{box-shadow:inset -11px 0 17px #6e53302b,inset 0 0 18px #a0875c18}
+ .desktop-scene .right-leaf{box-shadow:inset 11px 0 17px #6e53302b,inset 0 0 18px #a0875c18}
+ .desktop-scene .diary-leaf:before,.desktop-scene .endpaper-leaf:before{
+   content:"";position:absolute;z-index:4;top:4%;bottom:4%;width:17px;
+   background:radial-gradient(circle at center,#584a3d 0 3px,#d5c2a4 3.5px 6px,transparent 6.5px) center top/17px 16.6667% repeat-y;
+   opacity:.75;pointer-events:none;
+ }
+ .desktop-scene .left-leaf:before,.desktop-scene .endpaper-left:before{right:3px}
+ .desktop-scene .right-leaf:before,.desktop-scene .endpaper-right:before{left:3px}
+ .desktop-scene .daily-spread:after{width:27px;background:linear-gradient(90deg,#5a3d261f,transparent 46%,#fffaf093 55%,#563e271e)}
+ .binder-rings{
+   position:absolute;z-index:9;top:6%;bottom:6%;left:50%;width:58px;
+   transform:translateX(-50%);display:flex;flex-direction:column;justify-content:space-around;
+   align-items:center;pointer-events:none;
+ }
+ .binder-rings span{
+   display:block;width:54px;height:18px;border:5px solid transparent;border-radius:60%;
+   background:linear-gradient(#ffffff26,#ffffff26) padding-box,
+     linear-gradient(175deg,#f5f5ef 0%,#a6aaa7 20%,#535b5e 39%,#edf0e7 57%,#8b9190 82%,#eef0e6 100%) border-box;
+   box-shadow:0 3px 3px #37271c77,inset 0 1px 3px #1e292a8c,0 -1px 1px #fff9;
+   transform:rotate(-5deg);
+ }
+ .book-close-wrap{gap:8px;align-items:center}
+ .last-page-toggle{font-size:11px!important;background:#e7d9bf!important;border-color:#c8b28e!important}
+ .desktop-scene .book.show-last-page>.daily-navigation,
+ .desktop-scene .book.show-last-page>.daily-spread{display:none!important}
+ .desktop-scene .book.show-last-page>.journal-last-page{display:grid!important}
+ .journal-last-page{
+   position:relative;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+   min-height:520px;overflow:hidden;border-radius:5px 9px 9px 5px;
+ }
+ .endpaper-leaf{
+   position:relative;min-width:0;display:flex;flex-direction:column;
+   justify-content:center;align-items:center;padding:38px 30px;
+   text-align:center;overflow:hidden;color:#6c5947;
+   background:repeating-linear-gradient(102deg,#5d4b3510 0 1px,transparent 1px 7px),linear-gradient(125deg,#f2e7d4,#e7d8bd);
+   box-shadow:inset 0 0 26px #8d70522e;
+ }
+ .endpaper-left{border-right:1px solid #b6a285}
+ .endpaper-right{background:repeating-linear-gradient(102deg,#5d4b3510 0 1px,transparent 1px 7px),linear-gradient(135deg,#e9dbc2,#f1e5d0)}
+ .endpaper-overline{font:700 11px Georgia,serif;letter-spacing:.22em;color:#9e8664}
+ .endpaper-ornament{font-size:25px;letter-spacing:.25em;color:#bc9b66;margin:35px 0 8px}
+ .endpaper-left h3{font:600 clamp(24px,2.4vw,38px)/1.5 'Noto Serif KR',Georgia,serif;letter-spacing:-.04em;margin:8px 0 20px;color:#584a3d}
+ .endpaper-left p{font-size:14px;line-height:2.1;margin:0;color:#8d7862}
+ .endpaper-signature{margin-top:45px;font:italic 15px Georgia,serif;color:#ae906d}
+ .endpaper-pocket{
+   position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+   width:min(82%,320px);min-height:230px;padding:38px 20px;
+   background:linear-gradient(135deg,#e4d0aa,#ccb58f);
+   clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+   border:1px solid #ae9570;box-shadow:inset 0 3px 8px #fff5,0 7px 15px #6a52373c;
+ }
+ .endpaper-pocket:after{
+   content:"";position:absolute;left:0;right:0;bottom:0;height:48%;
+   background:linear-gradient(155deg,#d8c29e,#bda47e);clip-path:polygon(0 0,50% 70%,100% 0,100% 100%,0 100%);
+   border-top:1px solid #a58b68;opacity:.7;pointer-events:none;
+ }
+ .endpaper-pocket-mark{font-size:32px;color:#9c815b}
+ .endpaper-pocket-title{font:600 17px Georgia,serif;letter-spacing:.12em;color:#6d5b42;margin:12px 0}
+ .endpaper-pocket-sub{font:10px Georgia,serif;letter-spacing:.13em;color:#9d8669}
+ .return-diary{margin-top:24px}
+}
+@media(max-width:820px){#lastPageBtn{display:none!important}.binder-rings{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -859,13 +985,31 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
       <div class="desk-left-caption">« Chaque jour est une nouvelle page. »</div>
     </aside>
     <div class="desk-book-place"><div class="book cover-closed" id="diaryBook">
-<div class="journal-cover" id="journalCover" aria-label="Le Petit Journal 가죽 표지"><div class="cover-stars" aria-hidden="true"></div><span class="cover-overline">MON PETIT MONDE · 2026</span><div class="cover-emblem" aria-hidden="true"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></div><h2 class="cover-title">Le Petit Journal</h2><p class="cover-subtitle">나의 작은 행성, 하루의 기록</p><button class="cover-open" id="openJournal" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-book"></use></svg> 다이어리 펼치기</button></div>
+<div class="journal-cover" id="journalCover" aria-label="Le Petit Journal 가죽 표지"><span class="cover-binding" aria-hidden="true"></span><span class="cover-elastic" aria-hidden="true"></span><div class="cover-stars" aria-hidden="true"></div><span class="cover-overline">MON PETIT MONDE · 2026</span><div class="cover-emblem" aria-hidden="true"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></div><h2 class="cover-title">Le Petit Journal</h2><p class="cover-subtitle">나의 작은 행성, 하루의 기록</p><button class="cover-open" id="openJournal" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-book"></use></svg> 다이어리 펼치기</button></div>
 
 <div class="petit-book-head"><div class="petit-identity"><span class="petit-overline">CARNET DE TRAVAIL · VOL. 01</span><h2>Le Petit Journal</h2><p>하루 한 장, 작은 행성의 기록</p></div><div class="header-work-memo header-stats-only" aria-label="업무 대시보드"><div class="header-memo-title"><span>오늘의 업무 현황</span><small id="todayText"></small></div><div class="summary" aria-label="업무 현황"><div><strong id="todayCount">0</strong><span>오늘 할 일</span></div><div><strong id="doingCount">0</strong><span>진행 중</span></div><div><strong id="doneCount">0</strong><span>완료</span></div></div></div><div aria-hidden="true" class="petit-planet"><span class="planet-rose"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></span><span class="planet-star s1"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s2"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s3"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span></div></div>
 
 
 
-<div class="book-close-wrap"><button class="btn" type="button" id="closeJournal"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-book"></use></svg> 표지 덮기</button></div><div class="daily-navigation"><button class="btn page-step" id="pagePrev" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-left"></use></svg> 전날</button><div class="date-jump"><span id="pageIndicator"></span><input aria-label="다이어리 날짜 선택" id="diaryDate" type="date"/><button class="btn" id="goToday" type="button">오늘</button></div><button class="btn page-step" id="pageNext" type="button">다음날 <svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-right"></use></svg></button></div><div class="daily-spread" id="dailySpread"><section aria-label="스티커 메모" class="diary-leaf left-leaf" id="notes"><div class="section-head"><div><span class="eyebrow">QUICK NOTES</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 스티커 메모</h2></div><button class="btn" id="newNoteBtn" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 메모 붙이기</button></div><span class="leaf-date" id="noteDateHeader"></span><div class="inline-note-compose inside-left-leaf"><textarea id="inlineNoteInput" aria-label="스티커 메모 직접 입력" placeholder="여기에 바로 메모를 작성하세요…" rows="2"></textarea><button id="inlineNoteAdd" type="button" aria-label="스티커 메모 추가"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 추가</button></div><div class="sticky-board" id="stickyBoard" aria-label="이 날짜에 붙인 스티커 메모 목록"></div></section><section aria-label="오늘 예정 업무" class="diary-leaf right-leaf" id="today"><div class="section-head"><div><span class="eyebrow">TODAY</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 오늘의 할 일</h2></div><button class="btn" id="newTodayBtn"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 오늘 업무 추가</button></div><span class="leaf-date" id="taskDateHeader"></span><div class="today-list" id="todayList"></div></section></div></div></div>
+<div class="book-close-wrap"><button class="btn last-page-toggle" type="button" id="lastPageBtn" aria-pressed="false"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg> <span class="last-page-label">마지막 페이지</span></button><button class="btn" type="button" id="closeJournal"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-book"></use></svg> 표지 덮기</button></div><div class="daily-navigation"><button class="btn page-step" id="pagePrev" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-left"></use></svg> 전날</button><div class="date-jump"><span id="pageIndicator"></span><input aria-label="다이어리 날짜 선택" id="diaryDate" type="date"/><button class="btn" id="goToday" type="button">오늘</button></div><button class="btn page-step" id="pageNext" type="button">다음날 <svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-right"></use></svg></button></div><div class="daily-spread" id="dailySpread"><section aria-label="스티커 메모" class="diary-leaf left-leaf" id="notes"><div class="section-head"><div><span class="eyebrow">QUICK NOTES</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 스티커 메모</h2></div><button class="btn" id="newNoteBtn" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 메모 붙이기</button></div><span class="leaf-date" id="noteDateHeader"></span><div class="inline-note-compose inside-left-leaf"><textarea id="inlineNoteInput" aria-label="스티커 메모 직접 입력" placeholder="여기에 바로 메모를 작성하세요…" rows="2"></textarea><button id="inlineNoteAdd" type="button" aria-label="스티커 메모 추가"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 추가</button></div><div class="sticky-board" id="stickyBoard" aria-label="이 날짜에 붙인 스티커 메모 목록"></div></section><section aria-label="오늘 예정 업무" class="diary-leaf right-leaf" id="today"><div class="section-head"><div><span class="eyebrow">TODAY</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 오늘의 할 일</h2></div><button class="btn" id="newTodayBtn"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 오늘 업무 추가</button></div><span class="leaf-date" id="taskDateHeader"></span><div class="today-list" id="todayList"></div></section><div class="binder-rings" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+<div class="journal-last-page" id="journalLastPage" aria-hidden="true">
+  <section class="endpaper-leaf endpaper-left">
+    <div class="endpaper-overline">LE PETIT JOURNAL · VOL. 01</div>
+    <div class="endpaper-ornament" aria-hidden="true">✦ · ✧ · ✦</div>
+    <h3>오늘의 기록을<br>마치며</h3>
+    <p>작은 하루들이 모여<br>하나의 별자리가 됩니다.</p>
+    <div class="endpaper-signature">Chaque jour, une petite étoile.</div>
+  </section>
+  <section class="endpaper-leaf endpaper-right">
+    <div class="endpaper-pocket">
+      <span class="endpaper-pocket-mark">✧</span>
+      <span class="endpaper-pocket-title">LE PETIT JOURNAL</span>
+      <span class="endpaper-pocket-sub">MEMORIES & LITTLE THINGS</span>
+    </div>
+    <button type="button" class="btn return-diary" id="returnDiaryBtn" tabindex="-1"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-left"></use></svg> 다시 본문으로</button>
+  </section>
+  <div class="binder-rings" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+</div></div></div>
     <aside class="desk-side desk-side-right" aria-label="책상 오른쪽의 어린왕자 인형과 탁상 달력">
       <div class="mini-calendar-object" aria-label="날짜를 선택할 수 있는 탁상 달력">
         <div class="calendar-rings" aria-hidden="true"><i></i><i></i></div>
@@ -1047,7 +1191,17 @@ function toggleJournalCover(open){
  if(open)$("closeJournal").focus();else $("openJournal").focus();
 }
 $("openJournal").onclick=()=>toggleJournalCover(true);
-$("closeJournal").onclick=()=>toggleJournalCover(false);
+function showJournalLastPage(show){
+ const book=$("diaryBook"),page=$("journalLastPage"),button=$("lastPageBtn"),back=$("returnDiaryBtn");
+ book.classList.toggle("show-last-page",show);
+ page.setAttribute("aria-hidden",String(!show));
+ button.setAttribute("aria-pressed",String(show));
+ button.querySelector(".last-page-label").textContent=show?"본문으로 돌아가기":"마지막 페이지";
+ back.tabIndex=show?0:-1;
+}
+$("lastPageBtn").onclick=()=>showJournalLastPage(!$("diaryBook").classList.contains("show-last-page"));
+$("returnDiaryBtn").onclick=()=>{showJournalLastPage(false);$("lastPageBtn").focus()};
+$("closeJournal").onclick=()=>{showJournalLastPage(false);toggleJournalCover(false)};
 
 // Only dates turn. Dashboard, calendar, Kanban and field manager stay on the desk.
 let diaryFlipTimer=null;
