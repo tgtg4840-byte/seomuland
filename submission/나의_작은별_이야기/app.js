@@ -12,7 +12,7 @@ const MAX_BACKUP_BYTES=2*1024*1024;
 const isRecord=v=>v!==null&&typeof v==="object"&&!Array.isArray(v);
 const validText=(v,max=5000)=>typeof v==="string"&&v.length<=max;
 const validDate=v=>v===""||(
- typeof v==="string"&&/^\\d{4}-\\d{2}-\\d{2}$/.test(v)&&
+ typeof v==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&
  !Number.isNaN(new Date(v+"T12:00:00").getTime())&&
  new Date(v+"T12:00:00").toISOString().slice(0,10)===v
 );
@@ -256,7 +256,7 @@ $("restoreInput").onchange=async e=>{
  const file=e.target.files?.[0];if(!file)return;
  try{
   if(file.size>MAX_BACKUP_BYTES)throw Error("백업 파일은 2MB 이하여야 합니다.");
-  if(!/\\.json$/i.test(file.name))throw Error("JSON 백업 파일만 복원할 수 있습니다.");
+  if(!/\.json$/i.test(file.name))throw Error("JSON 백업 파일만 복원할 수 있습니다.");
   const raw=await file.text();
   const v=JSON.parse(raw);
   if(!isRecord(v))throw Error("JSON 객체 형식이 아닙니다.");
