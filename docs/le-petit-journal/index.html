@@ -1107,6 +1107,67 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
  .journal-cover .cover-title{font-size:23px!important}
 }
 
+
+/* Calendar reference: TheCalendar paper-ring desk calendar (250x170 / 270x175 stand).
+   Six ivory paper loops in a 3+3 grouping; rough-gloss cream sheets and a folded brown stand. */
+@media(min-width:821px){
+ #calendar.desk-panel{
+  padding:63px 31px 40px!important;
+  border:0!important;border-radius:6px 6px 8px 8px!important;
+  background:
+   repeating-linear-gradient(100deg,transparent 0 3px,#92745008 3px 4px),
+   linear-gradient(180deg,#fbf8f0 0,#f6f0e5 72%,#e9deca 100%)!important;
+  box-shadow:
+   inset 0 0 0 1px #e1d6c3,
+   0 3px 0 #efe5d5,0 6px 0 #dfd0bc,
+   0 11px 0 #6e503b,0 17px 0 #4d3428,
+   0 23px 26px #2f1e155e!important;
+ }
+ #calendar.desk-panel:before{
+  content:"";position:absolute;z-index:2;pointer-events:none;
+  top:30px;left:24px;right:24px;width:auto;height:1px;transform:none;
+  background:linear-gradient(90deg,transparent,#ccb99a 8%,#ccb99a 92%,transparent);
+  filter:none;
+ }
+ #calendar.desk-panel:after{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  top:auto;bottom:-26px;left:5%;right:5%;height:29px;
+  background:linear-gradient(170deg,#927457,#694b39 48%,#483324);
+  box-shadow:inset 0 2px 2px #ddc3a344,0 10px 15px #2c1b1373;
+  clip-path:polygon(0 0,100% 0,96% 100%,4% 100%);
+ }
+ #calendar .calendar-paper-binding{
+  position:absolute;z-index:5;top:-8px;left:50%;transform:translateX(-50%);
+  width:min(56%,410px);height:45px;display:flex;align-items:flex-start;
+  justify-content:space-between;padding:0 6px;pointer-events:none;
+ }
+ #calendar .calendar-paper-binding span{
+  position:relative;display:block;flex:0 0 22px;width:22px;height:41px;
+  border:5px solid #ece7d9;border-bottom-color:#d9d0be;
+  border-radius:13px 13px 10px 10px;
+  background:transparent;
+  box-shadow:inset 1px 1px 2px #ab9e8b55,1px 2px 3px #705a4147;
+ }
+ #calendar .calendar-paper-binding span:nth-child(3){margin-right:auto}
+ #calendar .calendar-paper-binding span:nth-child(4){margin-left:22%}
+ #calendar .section-head{padding:4px 7px 8px;border-bottom:1px solid #d6c5ac}
+ #calendar .calendar-layout{position:relative;z-index:1}
+ #calendar .calendar-card{
+  border:1px solid #ded1bc;border-radius:3px!important;
+  background:linear-gradient(#fffefa,#fbf8f0)!important;
+  box-shadow:0 1px 0 #fff,0 4px 0 #f2e9dc,0 8px 14px #81694822!important;
+ }
+ #calendar .calendar-nav{background:linear-gradient(#faf5ec,#f3e9dc)!important}
+ #calendar .calendar-grid .day{background:#fffdfa}
+ #calendar .calendar-grid .day.blank{background:#f7f1e7}
+ #calendar .agenda{background:repeating-linear-gradient(0deg,transparent 0 31px,#b4a99520 32px,transparent 33px),linear-gradient(#fffdf7,#f7efdf)!important}
+}
+@media(min-width:821px) and (max-width:1100px){
+ #calendar .calendar-paper-binding{width:min(68%,330px)}
+ #calendar .calendar-paper-binding span{width:19px;flex-basis:19px;height:36px;border-width:4px}
+}
+@media(max-width:820px){#calendar .calendar-paper-binding{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -1203,7 +1264,7 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
     </aside>
   </div>
   <div class="desk-bottomline" aria-hidden="true"><span>✒ &nbsp; JOURNAL DES PETITES CHOSES</span><span>✧ &nbsp; 01 / 365</span></div>
-</section><div class="desk-tools" id="deskTools"><section aria-label="업무 달력" class="section desk-panel" id="calendar"><div class="section-head"><div><span class="eyebrow">CALENDAR</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-calendar"></use></svg> 업무 달력</h2></div></div><div class="calendar-layout"><div class="calendar-card"><div class="calendar-nav"><button id="prevMonth"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-left"></use></svg></button><b id="monthTitle"></b><button id="nextMonth"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-right"></use></svg></button></div><div class="weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="calendar-grid" id="calendarGrid"></div></div><aside class="agenda"><span id="agendaDate"></span><h3 id="agendaCount"></h3><div class="agenda-list" id="agendaList"></div><button class="btn" id="agendaAdd"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 이 날짜에 업무 추가</button></aside></div></section><section aria-label="업무 진행 현황" class="section desk-panel" id="kanban"><div class="section-head"><div><span class="eyebrow">WORKFLOW</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-planet"></use></svg> 업무 진행 현황</h2></div><div class="section-tools"><span class="section-note">상태를 바꾸면 즉시 반영됩니다</span><button class="btn" id="clearDone"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-archive"></use></svg> 완료항목 일괄 정리</button></div></div><div class="kanban" id="kanbanBoard"></div></section><section aria-label="업무 필드" class="section desk-panel" id="fields"><div class="section-head"><div><span class="eyebrow">WORK FIELDS</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-fox"></use></svg> 필드별 업무</h2></div><button class="btn" id="manageFields"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-planet"></use></svg> 필드 관리</button></div><div class="field-grid" id="fieldGrid"></div></section></div>
+</section><div class="desk-tools" id="deskTools"><section aria-label="업무 달력" class="section desk-panel" id="calendar"><div class="calendar-paper-binding" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="section-head"><div><span class="eyebrow">CALENDAR</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-calendar"></use></svg> 업무 달력</h2></div></div><div class="calendar-layout"><div class="calendar-card"><div class="calendar-nav"><button id="prevMonth"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-left"></use></svg></button><b id="monthTitle"></b><button id="nextMonth"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-right"></use></svg></button></div><div class="weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="calendar-grid" id="calendarGrid"></div></div><aside class="agenda"><span id="agendaDate"></span><h3 id="agendaCount"></h3><div class="agenda-list" id="agendaList"></div><button class="btn" id="agendaAdd"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 이 날짜에 업무 추가</button></aside></div></section><section aria-label="업무 진행 현황" class="section desk-panel" id="kanban"><div class="section-head"><div><span class="eyebrow">WORKFLOW</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-planet"></use></svg> 업무 진행 현황</h2></div><div class="section-tools"><span class="section-note">상태를 바꾸면 즉시 반영됩니다</span><button class="btn" id="clearDone"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-archive"></use></svg> 완료항목 일괄 정리</button></div></div><div class="kanban" id="kanbanBoard"></div></section><section aria-label="업무 필드" class="section desk-panel" id="fields"><div class="section-head"><div><span class="eyebrow">WORK FIELDS</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-fox"></use></svg> 필드별 업무</h2></div><button class="btn" id="manageFields"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-planet"></use></svg> 필드 관리</button></div><div class="field-grid" id="fieldGrid"></div></section></div>
 <p class="footer">모든 자료는 현재 브라우저에 저장됩니다. 중요한 자료는 백업 파일로 별도 보관해 주세요.</p>
 </main>
 </div>
