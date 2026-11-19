@@ -1168,6 +1168,24 @@ body{background:repeating-linear-gradient(92deg,rgba(48,27,12,.075) 0 2px,transp
 }
 @media(max-width:820px){#calendar .calendar-paper-binding{display:none!important}}
 
+
+/* Cleaner lower edges: remove flat decorative plinths and shelf bars. */
+@media(min-width:821px){
+  .desk-tools #calendar.desk-panel{
+    box-shadow:inset 0 0 0 1px #dfd2bd,0 3px 7px #2e201225,0 13px 25px #2e20122b!important;
+  }
+  .desk-tools #calendar.desk-panel:after{content:none!important;display:none!important}
+  .desk-tools #kanban.desk-panel{
+    box-shadow:inset 0 0 0 2px #142d20,inset 0 0 34px #0a281a70,0 5px 12px #25180f35,0 14px 27px #25180f35!important;
+  }
+  .desk-tools #kanban.desk-panel:before,
+  .desk-tools #kanban.desk-panel:after{content:none!important;display:none!important}
+  .desk-tools #fields.desk-panel{
+    box-shadow:inset 0 0 0 2px #c8b69a,inset 0 0 28px #c2b39f55,0 5px 12px #25180f30,0 14px 27px #25180f2c!important;
+  }
+  .desk-tools #fields.desk-panel:after{content:none!important;display:none!important}
+}
+
 </style>
 </head>
 <body>
