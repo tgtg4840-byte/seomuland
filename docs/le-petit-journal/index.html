@@ -1092,6 +1092,7 @@ function render(){
  $("noteDateHeader").textContent=fullDiaryDate(selectedDate);
  $("diaryDate").value=selectedDate;
  $("pageIndicator").textContent=fullDiaryDate(selectedDate);
+ renderPetitDailyLine();
  renderCalendar();
  renderNotes();
  $("kanbanBoard").innerHTML=Object.entries(statusMeta).map(([s,m])=>{const list=data.tasks.filter(t=>t.status===s&&!t.hiddenFromKanban);return`<section class="column"><header><span>${m.mark} ${m.label}</span><b>${list.length}</b></header><div class="cards">${list.length?list.map(taskCard).join(""):`<p class="column-empty">업무 없음</p>`}</div></section>`}).join("");
@@ -1323,24 +1324,20 @@ render();
  mobile.addEventListener('change',ev=>{if(ev.matches){show(document.body.dataset.mobileView||'today');}else document.body.removeAttribute('data-mobile-view');});
 })();
 
-/* Short original Korean paraphrases of themes in The Little Prince—not quotations from a published translation. */
-(function(){
+/* One stable Little Prince-inspired sentence for each diary date. */
+const petitDailyLines=[
+ "정말 소중한 것은 눈으로만 볼 수 없어요.",
+ "함께한 시간이 서로를 특별하게 만듭니다.",
+ "당신이 돌본 장미는 그래서 더욱 소중합니다.",
+ "사막의 아름다움은 보이지 않는 우물에 있습니다.",
+ "누군가에게는 작은 별 하나가 온 우주가 됩니다."
+];
+function renderPetitDailyLine(){
  const el=document.getElementById("petitRotatingQuote");if(!el)return;
- const lines=[
-  "정말 소중한 것은 눈으로만 볼 수 없어요.",
-  "함께한 시간이 서로를 특별하게 만듭니다.",
-  "당신이 돌본 장미는 그래서 더욱 소중합니다.",
-  "사막의 아름다움은 보이지 않는 우물에 있습니다.",
-  "누군가에게는 작은 별 하나가 온 우주가 됩니다."
- ];
- let i=0;const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
- window.setInterval(()=>{
-   i=(i+1)%lines.length;
-   if(reduced){el.textContent=lines[i];return;}
-   el.classList.add("is-fading");
-   window.setTimeout(()=>{el.textContent=lines[i];el.classList.remove("is-fading")},420);
- },12000);
-})();
+ const index=Math.floor(new Date(selectedDate+"T12:00:00").getTime()/86400000)%petitDailyLines.length;
+ el.textContent=petitDailyLines[(index+petitDailyLines.length)%petitDailyLines.length];
+}
+renderPetitDailyLine();
 
 </script>
 </body>
