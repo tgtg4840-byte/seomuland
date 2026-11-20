@@ -1260,6 +1260,244 @@ body button,body input,body select,body textarea{font-family:var(--petit-font-bo
 .day-index-heading>span:last-child{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
 .day-index-heading>span:last-child strong{font-variant-numeric:tabular-nums}
 .day-index-heading>span:last-child button{padding:3px 5px;min-width:19px}
+
+/* 2026-11-19 diary layout refinement: one index, title date ribbon, edge page tabs */
+.note-index-open{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:2px 3px;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;max-width:100%}
+.note-index-open:hover{color:#8b5d39}.note-index-open:focus-visible{outline:2px solid #69889e;outline-offset:3px;border-radius:3px}
+.note-index-open .note-index-prompt{display:block;font-size:9px;font-weight:700;letter-spacing:0;color:#94785b}
+.date-index-overlay[hidden]{display:none!important}
+.date-index-overlay{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:rgba(32,23,16,.68);backdrop-filter:blur(3px)}
+.date-index-dialog{position:relative;width:min(500px,100%);max-height:min(760px,92dvh);display:flex;flex-direction:column;padding:23px 25px 20px;border:7px solid #e2d1b3;border-radius:9px;background:repeating-linear-gradient(0deg,#fcf5e7 0 31px,#e9ddc9 31px 32px);color:#533f2e;box-shadow:0 20px 65px #1f120d99,inset 0 0 0 1px #ac8d66;transform:none}
+.date-index-dialog .day-index-heading{padding:0 32px 12px 2px;flex:none;font-size:15px}
+.date-index-dialog .day-index-actions{margin:14px 0 9px;flex:none}.date-index-dialog .day-index-actions input{font-size:13px;padding:11px}
+.date-index-dialog .day-index-filter{margin-bottom:10px;flex:none}.date-index-dialog .day-index-filter button{font-size:12px;padding:9px 5px}
+.date-index-dialog .day-index-scroll{height:auto;min-height:120px;max-height:none;flex:1;overflow-y:auto;scrollbar-width:thin;padding-right:9px}
+.date-index-dialog .day-index-month{font-size:13px;padding:9px 8px}.date-index-dialog .day-index-row{grid-template-columns:69px minmax(0,1fr);padding:10px 9px;font-size:13px}.date-index-dialog .day-index-row b{font-size:13px}.date-index-dialog .day-index-row .day-index-detail{font-size:12px}
+.date-index-dialog .day-index-hint{font-size:11px;margin-top:12px;flex:none}.date-index-close{position:absolute;top:11px;right:11px;border:1px solid #bea788;border-radius:50%;width:32px;height:32px;background:#fff9ec;color:#6e5138;font-size:22px;line-height:1;cursor:pointer}
+.date-index-close:hover{background:#eddcc2}.date-index-close:focus-visible{outline:2px solid #69889e;outline-offset:2px}
+body.date-index-opened{overflow:hidden}
+/* Date belongs to the ruled heading strip outside the diary leaves. */
+.desktop-scene .book .daily-navigation{display:flex;flex-direction:column;align-items:stretch;gap:2px;margin:8px 0 14px}
+.diary-date-ribbon{display:flex;align-items:center;justify-content:center;gap:14px;min-height:53px;padding:5px 6px 9px;border-bottom:1px solid #bca98c;color:#634c34;text-align:center}
+.diary-date-ribbon:before,.diary-date-ribbon:after{content:"";height:1px;flex:1 1 20px;background:linear-gradient(90deg,transparent,#bca98c)}
+.diary-date-ribbon:after{transform:rotate(180deg)}
+.diary-date-ribbon .stamp-date{font-size:clamp(23px,2.3vw,32px);font-weight:900;line-height:1.15;letter-spacing:-.055em;white-space:nowrap;color:#57412d}
+.diary-date-ribbon .stamp-weekday{font-size:12px;font-weight:750;white-space:nowrap;color:#8d7151}
+.diary-date-ribbon .stamp-special{font-size:11px;font-weight:800;background:#f5e7d9;color:#994d45;padding:4px 7px;border-radius:5px}
+.diary-date-ribbon .stamp-special.observance{background:#eef0e6;color:#61704d}
+.desktop-scene .daily-navigation .date-jump{display:flex;align-items:center;justify-content:flex-end;gap:8px;width:100%;font-size:11px;margin:3px 0 0}
+.desktop-scene .daily-navigation .date-jump input{height:29px;max-width:135px;padding:3px 7px;font-size:11px}.desktop-scene .daily-navigation .date-jump .btn{height:29px;padding:3px 9px;font-size:11px}
+/* One page-turn tab at each OUTER edge, not in the central book gutter. */
+.desktop-scene .daily-spread .spread-page-tab{position:absolute;top:47%;z-index:15;width:36px;height:83px;display:grid;place-items:center;border:1px solid #a88863;background:linear-gradient(145deg,#f4e6cb,#d8bf96);color:#715437;padding:0;cursor:pointer;box-shadow:0 4px 7px #3b241e3b,inset 0 1px #fff5dc;font-size:0;transition:background .15s ease,transform .15s ease}
+.desktop-scene .daily-spread .spread-page-tab.page-prev-edge{left:-24px;border-radius:13px 4px 4px 13px;transform:translateY(-50%) rotate(-2deg)}
+.desktop-scene .daily-spread .spread-page-tab.page-next-edge{right:-24px;border-radius:4px 13px 13px 4px;transform:translateY(-50%) rotate(2deg)}
+.desktop-scene .daily-spread .spread-page-tab:hover{background:linear-gradient(#fff4d9,#dec29a)}
+.desktop-scene .daily-spread .spread-page-tab:focus-visible{outline:3px solid #6889a0;outline-offset:3px}
+.desktop-scene .daily-spread .spread-page-tab .petit-icon{width:22px;height:22px}
+@media(max-width:820px){
+ .date-index-overlay{padding:12px}.date-index-dialog{max-height:92dvh;padding:18px 13px 13px;border-width:5px}
+ .desktop-scene .book .daily-navigation{margin:4px 0 10px}
+ .diary-date-ribbon{flex-wrap:wrap;gap:7px;min-height:47px}
+ .diary-date-ribbon .stamp-date{font-size:24px}.diary-date-ribbon .stamp-weekday{font-size:11px}
+ .desktop-scene .daily-navigation .date-jump{justify-content:center!important;margin-top:5px}
+ .desktop-scene .daily-spread .spread-page-tab{width:27px;height:61px;top:45%}
+ .desktop-scene .daily-spread .spread-page-tab.page-prev-edge{left:-13px}
+ .desktop-scene .daily-spread .spread-page-tab.page-next-edge{right:-13px}
+ .desktop-scene .daily-spread .spread-page-tab .petit-icon{width:17px;height:17px}
+}
+
+
+/* The existing index tab remains a compact stationery label. */
+.note-index-head .note-index-open{display:inline-flex!important;align-items:center!important;justify-content:flex-start!important;gap:4px!important;width:auto!important;height:auto!important;min-height:20px!important;border:0!important;border-radius:2px!important;padding:2px 0!important;background:transparent!important;box-shadow:none!important;font-size:10px!important;line-height:1.25!important;white-space:nowrap!important}
+.note-index-head .note-index-open strong{display:inline!important;margin:0!important;font-size:10px!important;letter-spacing:.07em!important;white-space:nowrap!important}
+.note-index-head .note-index-open strong small{font-size:7px!important;letter-spacing:0!important}
+.note-index-head .note-index-open .petit-icon{flex:none!important;width:14px!important;height:14px!important;margin:0!important}
+.note-index-head .note-index-open:hover strong{text-decoration:underline;text-underline-offset:3px}
+
+/* Notebook index: recorded days on the left, contents on the right. */
+.date-index-dialog{width:min(900px,100%);max-height:min(800px,94dvh)}
+.date-index-layout{display:grid;grid-template-columns:minmax(225px,.82fr) minmax(0,1.18fr);min-height:0;flex:1;gap:15px;margin-top:13px}
+.date-index-left,.date-index-preview{min-height:0;display:flex;flex-direction:column}
+.date-index-left{padding-right:13px;border-right:1px solid #cbb899}
+.date-index-left .day-index-actions{margin:0 0 8px}.date-index-left .day-index-filter{margin:0 0 9px}
+.date-index-left .day-index-scroll{min-height:100px;flex:1;overflow-y:auto}
+.date-index-dialog .day-index-row{display:flex;align-items:flex-start;gap:9px;padding:10px 8px;line-height:1.4;border-radius:5px}
+.date-index-dialog .day-index-row b{min-width:52px;font-variant-numeric:tabular-nums}
+.day-index-entry{display:flex;flex-direction:column;min-width:0;gap:3px;flex:1}
+.date-index-dialog .day-index-row .day-index-detail{display:block;white-space:normal;overflow-wrap:anywhere;line-height:1.4}
+.day-index-snippet{display:block;color:#765e49;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day-index-preview{padding:4px 1px 0 0;overflow:hidden}
+.day-index-preview-heading{border-bottom:1px solid #cbb899;padding-bottom:10px;margin-bottom:11px}
+.day-index-preview-heading strong{display:block;font-size:17px;color:#5f4630}
+.day-index-preview-heading small{font-size:11px;color:#90775f}
+.day-index-preview-content{flex:1;overflow-y:auto;min-height:0;padding:2px 9px 8px 0;scrollbar-width:thin}
+.day-index-preview-item{padding:11px 12px;margin:0 0 9px;background:#fffaf0;border:1px solid #dfcfb5;border-left:3px solid #bb9472;border-radius:5px;overflow-wrap:anywhere}
+.day-index-preview-item.note{border-left-color:#b6a16b}.day-index-preview-item.resolution{border-left-color:#9e8395}
+.day-index-preview-kind{display:block;margin-bottom:5px;font-size:10px;color:#917054;font-weight:750}
+.day-index-preview-item strong{display:block;font-size:13px;color:#4c392d;margin-bottom:5px;line-height:1.4}
+.day-index-preview-item p{margin:0;font-size:12px;color:#75614d;white-space:pre-wrap;line-height:1.6;overflow-wrap:anywhere}
+.day-index-preview-open{flex:none;width:100%;margin-top:10px;padding:10px;border:1px solid #9b7d5d;border-radius:5px;background:linear-gradient(#9b7b5b,#775840);color:white;font-weight:800;cursor:pointer}
+.day-index-preview-empty{padding:28px 10px;text-align:center;color:#967e67;font-size:12px;line-height:1.7}
+.date-index-dialog .day-index-hint{margin:8px 0 0}
+@media(max-width:680px){
+ .date-index-dialog{width:min(540px,100%);max-height:95dvh}
+ .date-index-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:8px}
+ .date-index-left{padding-right:7px}
+ .date-index-dialog .day-index-row{padding:7px 4px;gap:4px;flex-direction:column}
+ .date-index-dialog .day-index-row b{font-size:11px}
+ .day-index-snippet{font-size:10px}
+ .day-index-preview-item{padding:8px 7px}
+ .day-index-preview-heading strong{font-size:14px}
+ .day-index-preview-item strong{font-size:12px}
+ .day-index-preview-item p{font-size:11px}
+ .date-index-left .day-index-filter button{font-size:10px}
+}
+
+
+/* First-run browser tab pin guide — offline, no remote dependencies */
+.pin-guide-backdrop{position:fixed;inset:0;z-index:2200;display:grid;place-items:center;padding:18px;background:rgba(31,26,22,.58);backdrop-filter:blur(3px)}
+.pin-guide-backdrop[hidden]{display:none!important}
+.pin-guide-card{position:relative;width:min(440px,100%);padding:28px 30px 24px;border:2px solid #c5a87c;border-radius:17px;background:linear-gradient(155deg,#fffdf5,#f3e9d7);box-shadow:0 25px 70px #23170e77,inset 0 0 0 4px #fffaf088;color:#493c31;font-family:inherit;line-height:1.65}
+.pin-guide-close{position:absolute;right:13px;top:9px;display:grid;place-items:center;width:33px;height:33px;border:none;background:transparent;color:#78634e;font-size:23px;cursor:pointer}
+.pin-guide-mark{display:block;text-align:center;color:#b58a4e;font-size:26px;line-height:1.4}
+.pin-guide-card h2{margin:5px 0 10px;text-align:center;font-size:21px;font-weight:800;letter-spacing:-.04em;color:#56422e}
+.pin-guide-card p{margin:0 0 15px;text-align:center;font-size:13px;word-break:keep-all}
+.pin-guide-instruction{padding:15px 16px;margin:0 0 12px;background:#fffbf1;border:1px solid #dfcfb8;border-radius:10px;font-size:13px;text-align:center}
+.pin-guide-instruction strong{display:block;margin-bottom:4px;color:#6d4b2f}
+.pin-guide-instruction b{font-weight:800;color:#5f7657}
+.pin-guide-caption{font-size:11px!important;color:#8b7b68}
+.pin-guide-opt{display:flex;align-items:center;gap:8px;margin:8px 0 16px;font-size:12px;cursor:pointer}
+.pin-guide-opt input{accent-color:#7b6043;width:16px;height:16px;margin:0}
+.pin-guide-accept{display:block;width:100%;padding:11px 16px;border:1px solid #6e543d;border-radius:9px;background:linear-gradient(#927254,#70553c);color:white;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.pin-guide-accept:hover{filter:brightness(1.09)}
+@media(max-width:480px){.pin-guide-card{padding:24px 20px 20px}.pin-guide-card h2{font-size:19px}}
+
+
+/* First-screen stationery INDEX: latest notes from every saved date, up to three cards. */
+.note-index-card{display:flex;flex-direction:column;max-height:none!important;min-height:0!important}
+.note-index-head{flex:none}
+.note-index-list{display:grid!important;gap:4px!important;overflow:visible!important;max-height:none!important;padding-right:3px!important}
+.note-index-item.index-note-preview{display:block!important;min-height:0!important;padding:6px 7px!important;border:1px solid #d7c5a8!important;border-radius:3px!important;background:rgba(255,251,240,.76)!important;text-align:left;box-shadow:0 1px 1px #6f5a3830!important}
+.note-index-item.index-note-preview:hover,.note-index-item.index-note-preview:focus-visible{background:#fff5da!important;outline:1px solid #a98a5a}
+.index-note-preview .index-note-top{display:flex;align-items:baseline;justify-content:space-between;gap:4px;min-width:0}
+.index-note-preview .index-note-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:calc(10px + var(--journal-font-extra,0px));font-weight:800;color:#4e4032}
+.index-note-preview .index-note-day{flex:none;font-size:calc(8px + var(--journal-font-extra,0px));font-variant-numeric:tabular-nums;color:#8c7150}
+.index-note-preview .index-note-snippet{display:block;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:calc(9px + var(--journal-font-extra,0px));color:#816d59}
+.note-index-more{flex:none;display:flex;justify-content:center;gap:6px;align-items:center;width:100%;margin-top:6px;padding:5px 7px;border:1px solid #baa585;border-radius:3px;background:#f2e4cc;color:#634e35;font-family:inherit;font-size:calc(10px + var(--journal-font-extra,0px));font-weight:800;line-height:1.3;white-space:nowrap;cursor:pointer}
+.note-index-more:hover,.note-index-more:focus-visible{background:#e9d5b5;outline:1px solid #8a6d45}
+@media(max-width:820px){
+ .desktop-scene .note-index-card{max-height:none!important;overflow:visible!important;align-self:start!important}
+ .desktop-scene .note-index-list{max-height:none!important;overflow:visible!important}
+ .desktop-scene .desk-arrangement{grid-template-rows:104px minmax(225px,auto) auto!important}
+}
+@media(max-width:390px){
+ .desktop-scene .desk-arrangement{grid-template-rows:99px minmax(225px,auto) auto!important}
+}
+
+
+/* Mobile refinement v8 — preserve the desktop tabletop and all application logic. */
+@media (max-width:820px){
+ html{scroll-padding-top:104px}
+ body{overflow-x:clip}
+ .topbar{padding:10px 12px!important;gap:8px!important}
+ .topbar .brand{min-width:0}
+ .topbar .brand strong{font-size:calc(16px + var(--journal-font-extra,0px))!important}
+ .top-actions{gap:7px!important}
+ .top-actions .btn{min-height:43px!important;border-radius:9px!important;font-size:calc(11px + var(--journal-font-extra,0px))!important;box-shadow:inset 0 1px #ffffff35,0 2px 3px #1421282c}
+ .mobile-bookmarks{z-index:45!important;top:0!important;padding:8px 8px 9px!important;margin:0 0 9px!important;border-radius:11px!important;background:linear-gradient(180deg,#f2e3c9,#dec8a6)!important;box-shadow:0 3px 0 #967550,0 7px 14px #40281642!important}
+ .mobile-bookmarks-head{padding:0 4px 6px!important;font-size:calc(10px + var(--journal-font-extra,0px))!important}
+ .mobile-bookmark-tabs{gap:5px!important}
+ .mobile-bookmark{min-height:51px!important;gap:3px!important;padding:6px 1px!important;border-radius:8px!important;line-height:1.25!important;transition:background .15s ease,transform .15s ease}
+ .mobile-bookmark .petit-icon{height:19px!important;width:19px!important}
+ .mobile-bookmark.active,.mobile-bookmark[aria-selected="true"]{background:linear-gradient(160deg,#566f70,#36545b)!important;box-shadow:inset 0 1px #adc0b7,0 2px 0 #806a50!important}
+ .mobile-bookmark:active{transform:translateY(1px)}
+ .desktop-scene{border-radius:14px!important;padding:11px 9px 16px!important;box-shadow:inset 0 1px #ffffff2c,0 9px 24px #2819105c!important}
+ .desktop-scene .desk-topline{margin:0 3px 10px!important;display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.35}
+ .desktop-scene .desk-topline>span:first-child{font-size:calc(9px + var(--journal-font-extra,0px));letter-spacing:.09em}
+ .font-size-tools{margin-left:auto;min-width:0;gap:5px;padding:4px 5px!important}
+ .font-size-tools button{min-width:32px!important;min-height:32px!important}
+ .desktop-scene .desk-arrangement{grid-template-rows:100px minmax(196px,auto) auto auto!important;row-gap:11px!important;column-gap:10px!important}
+ .desktop-scene .flip-clock-object{height:82px!important;max-width:167px!important;border-radius:10px!important;transform:rotate(-1deg)!important}
+ .desktop-scene .note-index-card{grid-row:2!important;max-height:none!important;min-height:184px!important;padding-bottom:6px!important;transform:rotate(-.35deg)!important;overflow:hidden!important}
+ .desktop-scene .note-index-head{padding:7px 8px 4px!important}
+ .desktop-scene .note-index-list{max-height:124px!important;overflow-y:auto!important;overscroll-behavior:contain!important;scrollbar-width:thin}
+ .note-index-item.index-note-preview{padding:6px 7px!important;min-height:35px!important}
+ .index-note-preview .index-note-title{font-size:calc(10px + var(--journal-font-extra,0px))!important}
+ .index-note-preview .index-note-snippet{font-size:calc(9px + var(--journal-font-extra,0px))!important}
+ .desktop-scene .note-index-more{min-height:32px!important;margin-top:5px!important;padding:6px!important}
+ .desktop-scene .mini-calendar-object{grid-row:2!important;max-width:168px!important;transform:rotate(.4deg)!important;justify-self:stretch!important;align-self:start!important;margin-top:2px!important}
+ .desktop-scene .desk-book-place{grid-row:3!important;margin-top:2px!important}
+ .desktop-scene .book{border-width:6px!important;border-radius:14px!important;padding:12px 9px 15px!important;box-shadow:0 4px 0 #4e3525,0 9px 16px #281b1680,inset 0 0 0 1px #b99d7b!important}
+ .desktop-scene .petit-book-head{padding:6px 5px 9px!important;column-gap:8px!important}
+ .desktop-scene .petit-book-head .petit-identity h2{font-size:calc(20px + var(--journal-font-extra,0px))!important;white-space:normal!important;line-height:1.2!important;overflow-wrap:anywhere}
+ .desktop-scene .petit-book-head .header-stats-only{padding:7px 0 0!important}
+ .desktop-scene .header-stats-only .summary{gap:5px!important}
+ .desktop-scene .header-stats-only .summary div{min-width:0!important;padding:9px 5px!important}
+ .desktop-scene .header-stats-only .summary strong{font-size:calc(18px + var(--journal-font-extra,0px))!important}
+ .desktop-scene .diary-date-ribbon{justify-content:center!important;min-width:0;gap:5px!important;padding:6px 0!important}
+ .desktop-scene .diary-date-ribbon .stamp-date{font-size:calc(25px + var(--journal-font-extra,0px))!important;letter-spacing:-.035em!important}
+ .desktop-scene .daily-navigation{margin:7px 0 12px!important}
+ .desktop-scene .date-jump{padding:2px 0 0!important;gap:7px!important}
+ .desktop-scene .date-jump input{width:min(170px,58vw)!important;min-height:40px!important;padding:6px 10px!important;border-radius:8px!important}
+ .desktop-scene .date-jump #goToday{min-height:40px!important;padding:8px 14px!important}
+ .desktop-scene .daily-spread{overflow:visible!important;border-radius:8px!important}
+ .desktop-scene .daily-spread .spread-page-tab{width:30px!important;height:62px!important;border-radius:9px!important;box-shadow:0 3px 7px #38251645!important}
+ .desktop-scene .daily-spread .spread-page-tab.page-prev-edge{left:-15px!important}
+ .desktop-scene .daily-spread .spread-page-tab.page-next-edge{right:-15px!important}
+ body[data-mobile-view="today"] .desktop-scene .diary-leaf,body[data-mobile-view="notes"] .desktop-scene .diary-leaf{padding:16px 13px 19px!important}
+ .desktop-scene .diary-leaf .section-head{margin-bottom:10px!important}
+ .desktop-scene .diary-leaf .section-head h2{line-height:1.35!important}
+ .desktop-scene .diary-leaf .section-head .btn{min-height:42px!important}
+ .desktop-scene .left-leaf .sticky-board{height:min(42dvh,330px)!important;max-height:min(42dvh,330px)!important;gap:10px!important}
+ .desktop-scene .right-leaf .today-list{max-height:58dvh!important;scrollbar-width:thin}
+ .desktop-scene .diary-leaf textarea,.desktop-scene .daily-resolution input{font-size:calc(15px + var(--journal-font-extra,0px))!important;line-height:1.55!important}
+ .desktop-scene .today-item,.desktop-scene .journal-task{line-height:1.5!important}
+ /* Full-width, horizontal D-day card, after the book instead of a tiny narrow slip. */
+ .desktop-scene .dday-object{grid-column:1/-1!important;grid-row:4!important;justify-self:stretch!important;align-self:start!important;width:100%!important;max-width:none!important;margin:1px 2px 2px!important;min-height:84px!important;padding:12px 14px!important;border-width:3px!important;border-radius:10px!important;transform:none!important;text-align:left!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;column-gap:12px!important;row-gap:3px!important;align-items:center!important;box-shadow:0 4px 0 #523e2c,0 7px 11px #2f211a44!important}
+ .desktop-scene .dday-object .dday-overline{grid-column:1!important;grid-row:1!important;font-size:calc(9px + var(--journal-font-extra,0px))!important;letter-spacing:.1em!important}
+ .desktop-scene .dday-object .dday-title{grid-column:1!important;grid-row:2!important;margin:0!important;font-size:calc(13px + var(--journal-font-extra,0px))!important}
+ .desktop-scene .dday-object .dday-count{grid-column:2!important;grid-row:1/4!important;justify-self:end!important;margin:0!important;font-size:calc(33px + var(--journal-font-extra,0px))!important;white-space:nowrap!important}
+ .desktop-scene .dday-object .dday-date{grid-column:1!important;grid-row:3!important;font-size:calc(10px + var(--journal-font-extra,0px))!important}
+ .desktop-scene .dday-object .dday-edit-toggle{grid-column:1/-1!important;grid-row:4!important;justify-self:start!important;margin:4px 0 0!important;min-height:32px!important;padding:5px 11px!important}
+ .desktop-scene .dday-object .dday-edit{grid-column:1/-1!important;grid-row:5!important;max-width:100%!important}
+ .desktop-scene .dday-object.editing .dday-edit{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+ .desktop-scene .dday-object .dday-edit button{grid-column:1/-1;min-height:40px!important}
+ .desktop-scene .dday-object .dday-edit input{font-size:16px!important;min-width:0!important}
+ /* More legible task panels and a compact, usable mobile calendar. */
+ .desk-tools{padding:0!important}
+ .desk-panel{padding:17px 12px 21px!important;border-radius:12px!important}
+ .desk-panel .section-head{gap:9px!important;align-items:center!important}
+ .calendar-nav button{min-width:39px!important;min-height:39px!important}
+ #calendar .day{min-height:62px!important;padding:4px 2px!important}
+ #calendar .num{width:26px!important;height:26px!important}
+ #calendar .event{line-height:1.3!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #calendar .agenda{border-radius:9px!important;padding:15px!important}
+ #kanban .kanban{grid-template-columns:repeat(4,minmax(220px,1fr))!important;scroll-snap-type:x proximity;scrollbar-width:thin;padding-bottom:12px!important}
+ #kanban .column{scroll-snap-align:start;min-height:310px!important}
+ #fields .field-grid{grid-template-columns:minmax(0,1fr)!important}
+ .modal-backdrop{padding:10px!important}
+ .modal{border-radius:13px!important;max-height:92dvh!important}
+ .modal>header,.modal>footer{padding:14px!important}
+ .modal button.close{min-width:42px!important;min-height:42px!important}
+ .date-index-dialog{width:100%!important;max-height:92dvh!important}
+ .date-index-layout{gap:9px!important}
+ .date-index-left,.date-index-preview{min-width:0!important}
+ .date-index-dialog .day-index-row{min-height:47px!important}
+ .pin-guide-card{width:min(100%,410px)!important}
+}
+@media(max-width:390px){
+ .mobile-bookmarks{padding:7px 6px 8px!important}
+ .mobile-bookmark-tabs{gap:4px!important}
+ .mobile-bookmark{font-size:calc(10px + var(--journal-font-extra,0px))!important}
+ .desktop-scene .desk-arrangement{grid-template-rows:94px minmax(190px,auto) auto auto!important;column-gap:6px!important;row-gap:10px!important}
+ .desktop-scene .note-index-card{min-height:180px!important}
+ .desktop-scene .mini-calendar-object{max-width:150px!important}
+ .desktop-scene .dday-object{padding:11px!important}
+ .desktop-scene .dday-object .dday-count{font-size:calc(29px + var(--journal-font-extra,0px))!important}
+ .desktop-scene .diary-date-ribbon .stamp-date{font-size:calc(23px + var(--journal-font-extra,0px))!important}
+}
+@media(prefers-reduced-motion:reduce){.mobile-bookmark{transition:none!important}}
+
 </style>
 </head>
 <body>
@@ -1278,7 +1516,7 @@ body button,body input,body select,body textarea{font-family:var(--petit-font-bo
 <symbol id="pi-right" viewBox="0 0 32 32"><path d="m12 6 10 10-10 10" fill="none" stroke="#8f7558" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="7" r="2" fill="#c4a35d"/></symbol>
 <symbol id="pi-archive" viewBox="0 0 32 32"><path d="M5 9h22v17H5Z" fill="#e8d9b8" stroke="#947755" stroke-width="1.5"/><path d="M3 5h26v7H3Z" fill="#c5aa7a" stroke="#8f7454" stroke-width="1"/><path d="M12 18h8" stroke="#947755" stroke-width="2"/><path d="m16 14 4 4-4 4" fill="none" stroke="#947755" stroke-width="1.5"/></symbol>
 <symbol id="pi-pencil" viewBox="0 0 32 32"><path d="m6 23 17-17 4 4-17 17-6 1Z" fill="#e2c071" stroke="#a07b47" stroke-width="1.4"/><path d="m6 23 4 4-6 1Z" fill="#5d5149"/><path d="m20 9 4 4" stroke="#977347" stroke-width="1.4"/></symbol>
-<symbol id="pi-cross" viewBox="0 0 32 32"><path d="m10 10 12 12m0-12L10 22" fill="none" stroke="#98755c" stroke-width="2.5" stroke-linecap="round"/><path d="M16 3c2 4 2 6 0 9-2-3-2-5 0-9" fill="#b36a70"/></symbol>
+<symbol id="pi-cross" viewBox="0 0 32 32"><path d="M10 10L22 22M22 10L10 22" fill="none" stroke="#765e4a" stroke-width="2.5" stroke-linecap="round"/></symbol>
 </defs></svg>
 <div class="app">
 <header class="topbar">
@@ -1310,26 +1548,20 @@ body button,body input,body select,body textarea{font-family:var(--petit-font-bo
       </div>
       <div class="candle-vignette" aria-hidden="true"><div class="candle-halo"></div><div class="candle-flame"></div><div class="candle-wick"></div><div class="candle-body"></div><div class="candle-saucer"></div><div class="candle-caption">UNE PETITE LUMIÈRE</div></div>
       <section class="note-index-card" aria-label="스티커 메모 인덱스">
-        <div class="note-index-head"><div><strong><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-note"></use></svg> INDEX <small>· PAPETERIE</small></strong><div class="note-index-date" id="noteIndexDate"></div></div><button type="button" id="noteIndexAdd" class="icon-only" aria-label="새 스티커 메모 추가" title="새 메모 추가"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></button></div>
-        <div class="note-index-list" id="noteIndexList"></div>
+        <div class="note-index-head"><div><button type="button" id="openDateIndex" class="note-index-open" aria-haspopup="dialog" aria-controls="dateIndexDialog" title="날짜 인덱스 목록 열기"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-note"></use></svg> <strong>INDEX <small>· PAPETERIE</small></strong></button><div class="note-index-date" id="noteIndexDate"></div></div><button type="button" id="noteIndexAdd" class="icon-only" aria-label="새 스티커 메모 추가" title="새 메모 추가"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></button></div>
+        <div class="note-index-list" id="noteIndexList"></div><button type="button" class="note-index-more" id="noteIndexMore" aria-haspopup="dialog" aria-controls="dateIndexDialog">전체 인덱스 더보기</button>
       </section>
-      <section class="day-index-card" aria-label="연도별 모든 날짜 인덱스">
-      <div class="day-index-heading"><span>✦ 날짜 INDEX</span><span><button id="indexPrevYear" type="button" aria-label="전년도">‹</button> <strong id="indexYear">2026</strong> <button id="indexNextYear" type="button" aria-label="다음 연도">›</button></span></div>
-      <div class="day-index-actions"><input id="indexSearch" type="search" placeholder="날짜·기념일 검색" aria-label="날짜 검색" /></div>
-      <div class="day-index-filter"><button id="indexShowAll" type="button" class="active">전체 날짜</button><button id="indexShowMarked" type="button">기록 있는 날</button></div>
-      <div id="dateIndexList" class="day-index-scroll" role="navigation" aria-label="연간 날짜 선택"></div>
-      <p class="day-index-hint" id="indexCount">365일 표시</p>
-    </section>
+
     <div class="desk-left-caption">« Chaque jour est une nouvelle page. »</div>
     </aside>
     <div class="desk-book-place"><div class="book cover-closed" id="diaryBook">
 <div class="journal-cover" id="journalCover" aria-label="Le Petit Journal 가죽 표지"><span class="cover-binding" aria-hidden="true"></span><span class="cover-elastic" aria-hidden="true"></span><div class="cover-stars" aria-hidden="true"></div><span class="cover-overline">MON PETIT MONDE · 2026</span><div class="cover-emblem" aria-hidden="true"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></div><h2 class="cover-title">나의 작은별 이야기</h2><p class="cover-subtitle">나의 작은 행성, 하루의 기록</p><button class="cover-open" id="openJournal" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-book"></use></svg> 다이어리 펼치기</button></div>
 
-<div class="petit-book-head"><div class="petit-identity"><span class="petit-overline">CARNET DE TRAVAIL · VOL. 01</span><h2>나의 작은별 이야기</h2><p class="petit-rotating-quote" id="petitRotatingQuote" aria-label="어린왕자에서 영감을 받은 오늘의 문장">정말 소중한 것은 눈으로만 볼 수 없어요.</p></div><div class="header-work-memo header-stats-only" aria-label="업무 대시보드"><div class="header-memo-title"><span>오늘의 업무 현황</span><small id="todayText"></small></div><div class="summary" aria-label="업무 현황"><div><strong id="todayCount">0</strong><span>오늘 할 일</span></div><div><strong id="doingCount">0</strong><span>진행 중</span></div><div><strong id="doneCount">0</strong><span>완료</span></div></div></div><div aria-hidden="true" class="petit-planet"><span class="planet-rose"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></span><span class="planet-star s1"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s2"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s3"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span></div></div>
+<div class="petit-book-head"><div class="petit-identity"><span class="petit-overline">CARNET DE TRAVAIL · VOL. 01</span><h2>나의 작은별 이야기</h2><p class="petit-rotating-quote" id="petitRotatingQuote" aria-label="어린왕자 프랑스어 원문을 한국어로 옮긴 오늘의 문장">가장 중요한 것은 눈에 보이지 않아.</p></div><div class="header-work-memo header-stats-only" aria-label="업무 대시보드"><div class="header-memo-title"><span>오늘의 업무 현황</span><small id="todayText"></small></div><div class="summary" aria-label="업무 현황"><div><strong id="todayCount">0</strong><span>오늘 할 일</span></div><div><strong id="doingCount">0</strong><span>진행 중</span></div><div><strong id="doneCount">0</strong><span>완료</span></div></div></div><div aria-hidden="true" class="petit-planet"><span class="planet-rose"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg></span><span class="planet-star s1"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s2"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span><span class="planet-star s3"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></span></div></div>
 
 
 
-<div class="book-close-wrap"><button class="btn last-page-toggle" type="button" id="lastPageBtn" aria-pressed="false"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg> <span class="last-page-label">마지막 페이지</span></button><button class="btn" type="button" id="closeJournal"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-book"></use></svg> 표지 덮기</button></div><div class="daily-navigation"><div class="date-jump"><span id="pageIndicator"></span><input aria-label="다이어리 날짜 선택" id="diaryDate" type="date"/><button class="btn" id="goToday" type="button">오늘</button></div></div><div class="daily-spread" id="dailySpread"><section aria-label="스티커 메모" class="diary-leaf left-leaf" id="notes"><div class="spread-date-stamp"><time class="stamp-date" id="stampDate"></time><span class="stamp-weekday" id="stampWeekday"></span><span id="stampSpecial" class="stamp-special" hidden></span></div><div class="section-head"><div><span class="eyebrow">QUICK NOTES</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 스티커 메모</h2></div><button class="btn" id="newNoteBtn" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 메모 붙이기</button></div><span class="leaf-date" id="noteDateHeader"></span><div class="inline-note-compose inside-left-leaf"><textarea id="inlineNoteInput" aria-label="스티커 메모 직접 입력" placeholder="여기에 바로 메모를 작성하세요…" rows="2"></textarea><button id="inlineNoteAdd" type="button" aria-label="스티커 메모 추가"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 추가</button></div><div class="sticky-board" id="stickyBoard" aria-label="이 날짜에 붙인 스티커 메모 목록"></div></section><nav class="spread-turn-controls" aria-label="다이어리 날짜 넘기기"><button id="pagePrev" type="button" aria-label="전날로 이동" title="전날"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-left"></use></svg></button><button id="pageNext" type="button" aria-label="다음날로 이동" title="다음날"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-right"></use></svg></button></nav><section aria-label="오늘 예정 업무" class="diary-leaf right-leaf" id="today"><div class="section-head"><div><span class="eyebrow">TODAY</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 오늘의 할 일</h2></div><button class="btn" id="newTodayBtn"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 오늘 업무 추가</button></div><span class="leaf-date" id="taskDateHeader"></span><div class="today-list" id="todayList"></div><div class="daily-resolution"><label for="dailyResolutionInput"><span aria-hidden="true">✎</span> 오늘의 다짐</label><input type="text" id="dailyResolutionInput" maxlength="120" autocomplete="off" placeholder="오늘 마음에 새길 한마디를 적어보세요…" aria-label="선택한 날짜의 다짐 한마디"/><span class="daily-resolution-foot">UNE PROMESSE POUR AUJOURD’HUI</span></div></section><div class="binder-rings" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+<div class="book-close-wrap"><button class="btn last-page-toggle" type="button" id="lastPageBtn" aria-pressed="false"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg> <span class="last-page-label">마지막 페이지</span></button><button class="btn" type="button" id="closeJournal"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-book"></use></svg> 표지 덮기</button></div><div class="daily-navigation"><div class="diary-date-ribbon" aria-label="선택한 다이어리 날짜"><time class="stamp-date" id="stampDate"></time><span class="stamp-weekday" id="stampWeekday"></span><span id="stampSpecial" class="stamp-special" hidden></span></div><div class="date-jump"><span id="pageIndicator"></span><input aria-label="다이어리 날짜 선택" id="diaryDate" type="date"/><button class="btn" id="goToday" type="button">오늘</button></div></div><div class="daily-spread" id="dailySpread"><section aria-label="스티커 메모" class="diary-leaf left-leaf" id="notes"><div class="section-head"><div><span class="eyebrow">QUICK NOTES</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 스티커 메모</h2></div><button class="btn" id="newNoteBtn" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 메모 붙이기</button></div><span class="leaf-date" id="noteDateHeader"></span><div class="inline-note-compose inside-left-leaf"><textarea id="inlineNoteInput" aria-label="스티커 메모 직접 입력" placeholder="여기에 바로 메모를 작성하세요…" rows="2"></textarea><button id="inlineNoteAdd" type="button" aria-label="스티커 메모 추가"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 추가</button></div><div class="sticky-board" id="stickyBoard" aria-label="이 날짜에 붙인 스티커 메모 목록"></div></section><button id="pagePrev" class="spread-page-tab page-prev-edge" type="button" aria-label="전날로 이동" title="전날"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-left"></use></svg></button><button id="pageNext" class="spread-page-tab page-next-edge" type="button" aria-label="다음날로 이동" title="다음날"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-right"></use></svg></button><section aria-label="오늘 예정 업무" class="diary-leaf right-leaf" id="today"><div class="section-head"><div><span class="eyebrow">TODAY</span><h2><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 오늘의 할 일</h2></div><button class="btn" id="newTodayBtn"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-feather"></use></svg> 오늘 업무 추가</button></div><span class="leaf-date" id="taskDateHeader"></span><div class="today-list" id="todayList"></div><div class="daily-resolution"><label for="dailyResolutionInput"><span aria-hidden="true">✎</span> 오늘의 다짐</label><input type="text" id="dailyResolutionInput" maxlength="120" autocomplete="off" placeholder="오늘 마음에 새길 한마디를 적어보세요…" aria-label="선택한 날짜의 다짐 한마디"/><span class="daily-resolution-foot">UNE PROMESSE POUR AUJOURD’HUI</span></div></section><div class="binder-rings" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
 <div class="journal-last-page" id="journalLastPage" aria-hidden="true">
   <section class="endpaper-leaf endpaper-left">
     <div class="endpaper-overline">LE PETIT JOURNAL · VOL. 01</div>
@@ -1377,6 +1609,22 @@ body button,body input,body select,body textarea{font-family:var(--petit-font-bo
 <div class="modal-backdrop hidden" id="fieldBackdrop"><section class="modal"><header><div><span class="eyebrow">WORK FIELDS</span><h2>업무 필드 관리</h2></div><button class="close icon-only" data-close="field" type="button" aria-label="닫기"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-cross"></use></svg></button></header><div class="field-manager"><p style="margin-top:0;color:#77798a;font-size:11px">업무분장의 큰 단위를 등록하세요. 연결된 업무가 있는 필드는 삭제할 수 없습니다.</p><div class="field-row"><input id="newFieldInput" placeholder="예: 서무, 공무직급여, 보안"/><button class="btn primary" id="addFieldBtn" type="button"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-rose"></use></svg> 추가</button></div><div class="chips" id="fieldChips"></div></div><footer><span></span><div><button class="btn primary" data-close="field" type="button">완료</button></div></footer></section></div>
 <div class="modal-backdrop hidden" id="noteBackdrop"><form class="modal" id="noteForm"><header><div><span class="eyebrow">STICKY NOTE</span><h2 id="noteModalTitle">스티커 메모 추가</h2></div><button class="close icon-only" data-close="note" type="button" aria-label="닫기"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-cross"></use></svg></button></header><div class="note-form"><label>메모 제목 *<input id="noteTitle" maxlength="80" placeholder="예: 금요일까지 확인할 사항" required="" type="text"/></label><label>메모 날짜<input id="noteDateInput" required="" type="date"/></label><label>내용<textarea id="noteContent" maxlength="3000" placeholder="짧은 업무 메모나 확인 사항을 적어주세요."></textarea></label><label>메모 색상</label><div class="note-swatches"><label class="note-swatch"><input checked="" name="noteColor" type="radio" value="yellow"/> 노랑</label><label class="note-swatch"><input name="noteColor" type="radio" value="pink"/> 분홍</label><label class="note-swatch"><input name="noteColor" type="radio" value="blue"/> 하늘</label><label class="note-swatch"><input name="noteColor" type="radio" value="green"/> 연두</label></div><span class="note-help">메모는 지정한 날짜의 왼쪽 페이지에 보관됩니다. 기존 메모는 작성일을 기준으로 표시합니다.</span></div><footer><button class="btn danger hidden" id="deleteNoteBtn" type="button">메모 삭제</button><span></span><div><button class="btn" data-close="note" type="button">취소</button><button class="btn primary" type="submit">저장</button></div></footer></form></div>
 <div class="toast hidden" id="toast"></div>
+<div id="dateIndexOverlay" class="date-index-overlay" hidden><section class="day-index-card date-index-dialog" id="dateIndexDialog" role="dialog" aria-modal="true" aria-labelledby="dateIndexTitle" aria-label="연도별 모든 날짜 인덱스">
+      <button type="button" id="closeDateIndex" class="date-index-close" aria-label="날짜 인덱스 닫기">×</button><div class="day-index-heading"><span id="dateIndexTitle">✦ 날짜 INDEX</span><span><button id="indexPrevYear" type="button" aria-label="전년도">‹</button> <strong id="indexYear">2026</strong> <button id="indexNextYear" type="button" aria-label="다음 연도">›</button></span></div>
+      <div class="date-index-layout">
+        <div class="date-index-left">
+          <div class="day-index-actions"><input id="indexSearch" type="search" placeholder="날짜·제목·내용 검색" aria-label="날짜와 기록 검색" /></div>
+          <div class="day-index-filter"><button id="indexShowMarked" type="button" class="active">기록 있는 날</button><button id="indexShowAll" type="button">전체 날짜</button></div>
+          <div id="dateIndexList" class="day-index-scroll" role="navigation" aria-label="날짜별 기록 목록"></div>
+          <p class="day-index-hint" id="indexCount">기록된 날짜</p>
+        </div>
+        <div class="date-index-preview" aria-live="polite">
+          <div class="day-index-preview-heading"><strong id="indexPreviewDate">기록 미리보기</strong><small id="indexPreviewMeta">왼쪽에서 날짜를 선택하세요</small></div>
+          <div id="indexPreviewContent" class="day-index-preview-content"></div>
+          <button type="button" class="day-index-preview-open" id="indexOpenDay">선택한 날짜의 다이어리 열기</button>
+        </div>
+      </div>
+    </section></div>
 <script>
 (()=>{
 "use strict";
@@ -1528,13 +1776,19 @@ function getSpecialDate(day){
 }
 function shortSpecial(text,max=11){return text.length>max?text.slice(0,max-1)+"…":text;}
 
-/* One stable Little Prince-inspired sentence for each diary date. */
+/* French original quotations from Le Petit Prince, translated directly into Korean.
+   Source: https://www.antoinedesaintexupery.org/ouvrage/le-petit-prince-1943/ */
 const petitDailyLines=[
- "정말 소중한 것은 눈으로만 볼 수 없어요.",
- "함께한 시간이 서로를 특별하게 만듭니다.",
- "당신이 돌본 장미는 그래서 더욱 소중합니다.",
- "사막의 아름다움은 보이지 않는 우물에 있습니다.",
- "누군가에게는 작은 별 하나가 온 우주가 됩니다."
+ "가장 중요한 것은 눈에 보이지 않아.",
+ "마음으로 보아야 제대로 볼 수 있어.",
+ "네 장미가 소중한 건 네가 그 장미에 쏟은 시간 때문이야.",
+ "네가 길들인 것에 대해 너는 영원히 책임이 있어.",
+ "우리는 길들인 것만을 진정으로 알게 돼.",
+ "말은 오해의 근원이야.",
+ "누구에게나 그 사람이 줄 수 있는 만큼만 요구해야 해.",
+ "남을 판단하는 것보다 자신을 판단하는 일이 훨씬 어려워.",
+ "사막이 아름다운 건 어딘가에 우물을 숨기고 있기 때문이야.",
+ "아이들만이 자신이 무엇을 찾는지 알고 있어."
 ];
 function renderPetitDailyLine(){
  const el=document.getElementById("petitRotatingQuote");if(!el)return;
@@ -1586,7 +1840,7 @@ function renderNotes(){
   data.notes=data.notes.filter(n=>n.id!==el.dataset.inlineDelete);save();
  });
  $("stickyAdd").onclick=()=>openNote();
- renderNoteIndex(notes);
+ renderNoteIndex();
 }
 function noteIndexLabel(n){
  const title=(n.title||"").trim();
@@ -1594,15 +1848,35 @@ function noteIndexLabel(n){
  const body=(n.content||"").trim().split(/\n+/)[0]||"제목 없는 메모";
  return body.slice(0,30);
 }
-function renderNoteIndex(notes){
- $("noteIndexDate").textContent=fullDiaryDate(selectedDate);
+function renderNoteIndex(){
+ // INDEX represents the complete notebook, not only the currently open day.
+ const allNotes=Array.isArray(data.notes)?data.notes:[];
+ const sorted=[...allNotes].sort((a,b)=>{
+  const dayOrder=noteDay(b).localeCompare(noteDay(a));
+  if(dayOrder)return dayOrder;
+  return String(b.updatedAt||b.createdAt||"").localeCompare(String(a.updatedAt||a.createdAt||""));
+ });
+ const visible=sorted.slice(0,3);
+ $("noteIndexDate").textContent=`전체 스티커 메모 · ${allNotes.length}개`;
  const list=$("noteIndexList");
- if(!notes.length){
-  list.innerHTML='<div class="note-index-empty">이 날짜에 등록된 스티커 메모가 없습니다. 새 메모를 추가해 보세요.</div>';
+ if(!visible.length){
+  list.innerHTML='<div class="note-index-empty">아직 등록된 메모가 없습니다.<br>첫 스티커 메모를 붙여 보세요.</div>';
  }else{
-  list.innerHTML=notes.map((n,i)=>`<button type="button" class="note-index-item ${selectedNoteId===n.id?"active":""}" data-note-jump="${esc(n.id)}"><b aria-hidden="true"><svg class="petit-icon" aria-hidden="true" focusable="false"><use href="#pi-star"></use></svg></b><span>${esc(noteIndexLabel(n))}</span></button>`).join("");
-  list.querySelectorAll("[data-note-jump]").forEach(el=>el.onclick=()=>focusNoteFromIndex(el.dataset.noteJump));
+  list.innerHTML=visible.map(n=>{
+   const day=noteDay(n);
+   const snippet=String(n.content||"").replace(/\s+/g," ").trim().slice(0,55)||"내용 없음";
+   return `<button type="button" class="note-index-item index-note-preview" data-note-jump="${esc(n.id)}" aria-label="${esc(day)} ${esc(noteIndexLabel(n))} 메모 열기"><span class="index-note-top"><span class="index-note-title">${esc(noteIndexLabel(n))}</span><span class="index-note-day">${esc(day.slice(5).replace("-","/"))}</span></span><span class="index-note-snippet">${esc(snippet)}</span></button>`;
+  }).join("");
+  list.querySelectorAll("[data-note-jump]").forEach(el=>el.onclick=()=>{
+   const n=(data.notes||[]).find(x=>x.id===el.dataset.noteJump);
+   if(!n)return;
+   const day=noteDay(n);
+   toggleJournalCover(true);
+   if(day!==selectedDate)setDiaryDate(day,false);
+   focusNoteFromIndex(n.id);
+  });
  }
+ $("noteIndexMore").textContent=allNotes.length>3?`더보기 (${allNotes.length})`:'더보기 · 전체 목록';
  $("noteIndexAdd").onclick=()=>openNote();
 }
 function focusNoteFromIndex(id){
@@ -1616,7 +1890,7 @@ function focusNoteFromIndex(id){
  }
 }
 function persistInlineNote(){
- try{writeData();return true}
+ try{writeData();renderNoteIndex();return true}
  catch(e){toast("메모 저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.");return false}
 }
 function addInlineNote(){
@@ -1786,7 +2060,7 @@ const originalSetDiaryDate=setDiaryDate;
 setDiaryDate=function(next,animate=true){originalSetDiaryDate(next,animate);if(/^\d{4}-\d{2}-\d{2}$/.test(next)){const p=new Date(next+'T00:00:00');if(!Number.isNaN(p.getTime())){deskCalendarMonth=new Date(p.getFullYear(),p.getMonth(),1);renderDeskCalendar()}}};
 
 /* New index, font scale and D-day widgets. Only validated notebook fields are persisted. */
-let indexYear=Number(selectedDate.slice(0,4)),indexFilter="all";
+let indexYear=Number(selectedDate.slice(0,4)),indexFilter="marked",indexPreviewDay=selectedDate;
 function renderDateStamp(){
  const day=new Date(selectedDate+"T12:00:00"),part=getSpecialDate(selectedDate);
  $("stampDate").textContent=`${day.getMonth()+1}월 ${day.getDate()}일`;
@@ -1794,33 +2068,64 @@ function renderDateStamp(){
  const tag=$("stampSpecial");
  tag.textContent=part?part.label:"";tag.hidden=!part;tag.className="stamp-special"+(part?.kind==="observance"?" observance":"");
 }
+function getIndexEntries(day){
+ const entries=[];
+ for(const t of data.tasks||[]){
+  // Index only dates explicitly assigned to a record; routine items do not flood the full year.
+  if(t.startDate!==day&&t.deadline!==day)continue;
+  entries.push({kind:"task",title:t.title||"제목 없는 업무",content:t.memo||"",meta:`${t.field||"업무"} · ${(statusMeta[t.status]||statusMeta.planned).label}`});
+ }
+ for(const n of data.notes||[]){
+  if(noteDay(n)!==day)continue;
+  entries.push({kind:"note",title:n.title||"제목 없는 메모",content:n.content||"",meta:"스티커 메모"});
+ }
+ const resolution=(data.dailyResolutions||{})[day];
+ if(resolution)entries.push({kind:"resolution",title:"오늘의 다짐",content:resolution,meta:"다짐"});
+ return entries;
+}
 function getIndexMarkedDates(){
  const marked=new Set();
- for(const n of data.notes||[]){if(n.date)marked.add(n.date)}
+ for(const n of data.notes||[]){const day=noteDay(n);if(day)marked.add(day)}
  for(const t of data.tasks||[]){if(t.startDate)marked.add(t.startDate);if(t.deadline)marked.add(t.deadline)}
  for(const day of Object.keys(data.dailyResolutions||{}))marked.add(day);
  return marked;
 }
+function renderIndexPreview(){
+ const entries=getIndexEntries(indexPreviewDay),day=new Date(indexPreviewDay+"T12:00:00");
+ const valid=!Number.isNaN(day.getTime());
+ $("indexPreviewDate").textContent=valid?`${day.getFullYear()}년 ${day.getMonth()+1}월 ${day.getDate()}일`:indexPreviewDay;
+ $("indexPreviewMeta").textContent=`${entries.length}개 기록`;
+ $("indexPreviewContent").innerHTML=entries.length?entries.map(e=>`<article class="day-index-preview-item ${e.kind}"><span class="day-index-preview-kind">${esc(e.meta)}</span><strong>${esc(e.title)}</strong>${e.content?`<p>${esc(e.content.slice(0,280))}${e.content.length>280?"…":""}</p>`:""}</article>`).join(""):'<div class="day-index-preview-empty">이 날짜에 저장된 기록이 없습니다.<br>다이어리에서 새 기록을 작성할 수 있습니다.</div>';
+ $("indexOpenDay").disabled=!valid;
+}
 function renderDateIndex(){
  const list=$("dateIndexList");if(!list)return;
  $("indexYear").textContent=indexYear+"";
- const marked=getIndexMarkedDates(),query=$("indexSearch").value.trim();
+ const marked=getIndexMarkedDates(),query=$("indexSearch").value.trim().toLocaleLowerCase();
  let html="",number=0;
  for(let m=0;m<12;m++){
   let rows="";const last=new Date(indexYear,m+1,0).getDate();
   for(let d=1;d<=last;d++){
    const day=iso(new Date(indexYear,m,d)),part=getSpecialDate(day),hasRecord=marked.has(day);
    if(indexFilter==="marked"&&!hasRecord)continue;
-   const text=`${m+1}월 ${d}일 ${part?.label||""} ${hasRecord?"기록":""}`;
-   if(query&&!text.includes(query))continue;
+   const entries=hasRecord?getIndexEntries(day):[];
+   const first=entries[0];
+   const snippet=first?(first.content||first.title).replace(/\s+/g," ").slice(0,55):"";
+   const label=`${m+1}월 ${d}일 ${part?.label||""} ${entries.map(e=>e.title+" "+e.content).join(" ")}`;
+   if(query&&!label.toLocaleLowerCase().includes(query))continue;
    number++;
-   rows+=`<button type="button" class="day-index-row ${day===selectedDate?"active":""} ${part?.kind==="holiday"?"special":""}" data-index-day="${day}" title="${esc(text)}"><b>${m+1}/${String(d).padStart(2,"0")}</b><span class="day-index-detail">${hasRecord?"✎ ":""}${esc(part?.label||"날짜 열기")}</span></button>`;
+   rows+=`<button type="button" class="day-index-row ${day===indexPreviewDay?"active":""} ${part?.kind==="holiday"?"special":""}" data-index-day="${day}" aria-pressed="${day===indexPreviewDay}" title="${esc(label.slice(0,220))}"><b>${m+1}/${String(d).padStart(2,"0")}</b><span class="day-index-entry"><span class="day-index-detail">${first?esc(first.title):esc(part?.label||"기록 없음")}${entries.length>1?` <small>외 ${entries.length-1}건</small>`:""}</span>${snippet?`<span class="day-index-snippet">${esc(snippet)}</span>`:""}</span></button>`;
   }
   if(rows)html+=`<div class="day-index-month">${m+1}월</div>${rows}`;
  }
  list.innerHTML=html||'<div class="note-index-empty">조건에 맞는 날짜가 없습니다.</div>';
  $("indexCount").textContent=`${number}일 표시`;
- list.querySelectorAll("[data-index-day]").forEach(b=>b.onclick=()=>{setDiaryDate(b.dataset.indexDay,false);toggleJournalCover(true)});
+ list.querySelectorAll("[data-index-day]").forEach(b=>b.onclick=()=>{
+  indexPreviewDay=b.dataset.indexDay;
+  list.querySelectorAll("[data-index-day]").forEach(el=>{const active=el===b;el.classList.toggle("active",active);el.setAttribute("aria-pressed",String(active))});
+  renderIndexPreview();
+ });
+ renderIndexPreview();
 }
 function applyFontStep(){
  const step=Math.max(0,Math.min(5,Number(data.fontStep)||0));
@@ -1843,6 +2148,7 @@ $("fontLarger").onclick=()=>{data.fontStep=Math.min(5,(data.fontStep||0)+1);save
 $("indexPrevYear").onclick=()=>{indexYear=Math.max(1900,indexYear-1);renderDateIndex()};
 $("indexNextYear").onclick=()=>{indexYear=Math.min(2100,indexYear+1);renderDateIndex()};
 $("indexSearch").addEventListener("input",renderDateIndex);
+$("indexOpenDay").onclick=()=>{setDiaryDate(indexPreviewDay,false);toggleJournalCover(true);closeDateIndex()};
 $("indexShowAll").onclick=()=>{indexFilter="all";$("indexShowAll").classList.add("active");$("indexShowMarked").classList.remove("active");renderDateIndex()};
 $("indexShowMarked").onclick=()=>{indexFilter="marked";$("indexShowMarked").classList.add("active");$("indexShowAll").classList.remove("active");renderDateIndex()};
 $("ddayEditToggle").onclick=()=>{
@@ -1854,6 +2160,39 @@ $("ddaySave").onclick=()=>{
  if(date&&!validDate(date)){toast("올바른 D-day 날짜를 선택하세요.");return}
  data.dday={title,date};if(save()){$("ddayWidget").classList.remove("editing");renderDday()}
 };
+
+
+// Date list is a modal opened from the EXISTING stationery index.
+const indexOverlay=$("dateIndexOverlay"),indexDialog=$("dateIndexDialog");
+const indexOpenControl=$("openDateIndex"),indexCloseControl=$("closeDateIndex");
+let indexLastFocus=null;
+function openDateIndex(){
+ indexLastFocus=document.activeElement;
+ indexYear=Number(selectedDate.slice(0,4));
+ indexPreviewDay=selectedDate;indexFilter="marked";
+ $("indexShowMarked").classList.add("active");$("indexShowAll").classList.remove("active");
+ $("indexSearch").value="";renderDateIndex();
+ indexOverlay.hidden=false;document.body.classList.add("date-index-opened");
+ indexCloseControl.focus();
+}
+function closeDateIndex(){
+ indexOverlay.hidden=true;document.body.classList.remove("date-index-opened");
+ if(indexLastFocus&&typeof indexLastFocus.focus==="function")indexLastFocus.focus();
+}
+indexOpenControl.onclick=openDateIndex;
+$("noteIndexMore").onclick=openDateIndex;
+indexCloseControl.onclick=closeDateIndex;
+indexOverlay.addEventListener("click",e=>{if(e.target===indexOverlay)closeDateIndex()});
+document.addEventListener("keydown",e=>{
+ if(indexOverlay.hidden)return;
+ if(e.key==="Escape"){e.preventDefault();closeDateIndex();return;}
+ if(e.key==="Tab"){
+  const controls=[...indexDialog.querySelectorAll('button:not([disabled]),input:not([disabled])')].filter(el=>el.getClientRects().length);
+  if(!controls.length)return;
+  if(e.shiftKey&&document.activeElement===controls[0]){e.preventDefault();controls[controls.length-1].focus();}
+  else if(!e.shiftKey&&document.activeElement===controls[controls.length-1]){e.preventDefault();controls[0].focus();}
+ }
+});
 
 tickFlipClock();setInterval(tickFlipClock,15000);
 renderDeskCalendar();
@@ -1889,6 +2228,62 @@ render();
 })();
 
 
+</script>
+
+<!-- Optional first-run notice: browser tab pinning is done by the user, not by the page. -->
+<div id="pinGuideBackdrop" class="pin-guide-backdrop" hidden>
+  <section class="pin-guide-card" role="dialog" aria-modal="true" aria-labelledby="pinGuideHeading" aria-describedby="pinGuideDescription" tabindex="-1">
+    <button id="pinGuideClose" type="button" class="pin-guide-close" aria-label="안내 닫기">×</button>
+    <span class="pin-guide-mark" aria-hidden="true">✦</span>
+    <h2 id="pinGuideHeading">작은 별을 가까이 두세요</h2>
+    <p id="pinGuideDescription">업무일지를 자주 열어보신다면<br>브라우저 탭을 고정해 두세요.</p>
+    <div class="pin-guide-instruction">
+      <strong>Chrome · Edge에서 탭 고정하기</strong>
+      브라우저 상단의 <b>현재 탭을 마우스 오른쪽 클릭</b><br>
+      메뉴에서 <b>「고정」</b> 선택
+    </div>
+    <p class="pin-guide-caption">탭 고정은 브라우저 메뉴에서 직접 설정해야 합니다. 모바일에서는 해당 메뉴가 제공되지 않을 수 있습니다.</p>
+    <label class="pin-guide-opt"><input id="pinGuideDontShow" type="checkbox" checked> 다음부터 이 안내를 표시하지 않기</label>
+    <button type="button" id="pinGuideAccept" class="pin-guide-accept">확인했어요</button>
+  </section>
+</div>
+
+
+<script>
+/* This isolated guide does not read or modify diary data. */
+(()=>{
+  'use strict';
+  const KEY='lePetitJournal.tabPinGuide.hide.v1';
+  const backdrop=document.getElementById('pinGuideBackdrop');
+  const card=backdrop.querySelector('.pin-guide-card');
+  const opt=document.getElementById('pinGuideDontShow');
+  const accept=document.getElementById('pinGuideAccept');
+  const close=document.getElementById('pinGuideClose');
+  if(!backdrop||!opt||!accept||!close)return;
+  let suppressed=false;
+  try{suppressed=localStorage.getItem(KEY)==='1'}catch(_e){}
+  if(suppressed)return;
+  const previousFocus=document.activeElement;
+  const dismiss=()=>{
+    if(opt.checked){try{localStorage.setItem(KEY,'1')}catch(_e){}}
+    backdrop.hidden=true;
+    if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus();
+  };
+  accept.addEventListener('click',dismiss);
+  close.addEventListener('click',dismiss);
+  backdrop.addEventListener('click',event=>{if(event.target===backdrop)dismiss()});
+  backdrop.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){event.preventDefault();dismiss();return;}
+    if(event.key==='Tab'){
+      const targets=[close,opt,accept];
+      const current=targets.indexOf(document.activeElement);
+      if(event.shiftKey&&current<=0){event.preventDefault();accept.focus()}
+      else if(!event.shiftKey&&current===targets.length-1){event.preventDefault();close.focus()}
+    }
+  });
+  backdrop.hidden=false;
+  close.focus();
+})();
 </script>
 </body>
 </html>
